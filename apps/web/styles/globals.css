@@ -1,0 +1,74 @@
+@import url('https://unpkg.com/leaflet@1.9.4/dist/leaflet.css');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* WAYNAH Primary Brand (Emerald Geospatial Discovery) */
+  --color-primary-50: #f0fdf4;
+  --color-primary-100: #dcfce7;
+  --color-primary-200: #bbf7d0;
+  --color-primary-300: #86efac;
+  --color-primary-400: #4ade80;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
+  --color-primary-700: #047857;
+  --color-primary-800: #065f46;
+  --color-primary-900: #064e3b;
+
+  /* Slate Neutrals */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+
+  /* Accent & Verification Gold */
+  --color-gold-500: #f59e0b;
+  --color-gold-600: #d97706;
+
+  /* System Semantics */
+  --color-bg: #f8fafc;
+  --color-surface: #ffffff;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+
+  /* Radii */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Typography Font Stack (Arabic-first) */
+  --font-arabic: 'Segoe UI', Tahoma, Geneva, Verdana, 'Noto Sans Arabic', Arial, sans-serif;
+}
+
+[data-theme='dark'] {
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
+}
+
+html, body {
+  direction: rtl;
+  text-align: right;
+  font-family: var(--font-arabic);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* RTL Layout helper utilities */
+.rtl-mirror {
+  transform: scaleX(-1);
+}

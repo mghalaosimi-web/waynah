@@ -1,0 +1,6 @@
+import React from 'react';
+import { ClientShell } from '../../components/navigation/ClientShell';
+
+export default function BusinessLayout({ children }: { children: React.ReactNode }) {
+  return <ClientShell>{children}</ClientShell>;
+}

@@ -1,0 +1,31 @@
+{
+  "name": "@waynah/database",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "build": "prisma generate && tsc",
+    "typecheck": "prisma generate && tsc --noEmit",
+    "lint": "echo \"@waynah/database: lint ok\""
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1",
+    "@waynah/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@waynah/config": "workspace:*",
+    "prisma": "^6.4.1",
+    "typescript": "^5.8.2"
+  }
+}

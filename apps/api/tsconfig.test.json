@@ -1,0 +1,10 @@
+{
+  "extends": "@waynah/config/tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "dist",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src/**/*", "tests/**/*", "vitest.config.ts"]
+}

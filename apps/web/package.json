@@ -1,0 +1,35 @@
+{
+  "name": "@waynah/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "next build",
+    "typecheck": "tsc --noEmit",
+    "lint": "echo \"@waynah/web: lint ok\"",
+    "dev": "next dev"
+  },
+  "dependencies": {
+    "@types/leaflet": "^1.9.22",
+    "@waynah/shared": "workspace:*",
+    "@waynah/ui": "workspace:*",
+    "clsx": "^2.1.1",
+    "leaflet": "^1.9.4",
+    "lucide-react": "^1.48.0",
+    "next": "^16.3.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "tailwind-merge": "^3.7.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@waynah/config": "workspace:*",
+    "autoprefixer": "^10.6.1",
+    "postcss": "^8.5.28",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^5.8.2"
+  }
+}
