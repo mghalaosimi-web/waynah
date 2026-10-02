@@ -29,36 +29,154 @@
 
 ```mermaid
 graph TD
-    User[Web Client Next.js] -->|HTTPS REST / GraphQL| API[Express / Node.js API Gateway]
-    Mobile[Mobile Client Flutter] -->|HTTPS REST| API
-    
-    API --> Auth[JWT & RBAC Security Middleware]
-    API --> SearchEngine[Meilisearch / Search Engine Package]
-    API --> Spatial[Prisma Spatial Data Layer]
-    
-    Spatial --> DB[(PostgreSQL + PostGIS Database)]
-    SearchEngine --> Index[(Search Index Store)]
+    subgraph ClientLayer ["🎨 Client Layer (apps/web)"]
+        UI_PUBLIC["🌐 (public)<br/>Map, Places & Search"]
+        UI_CLIENT["👤 (client)<br/>Favorites & Requests"]
+        UI_BUSINESS["🏢 (business)<br/>Branch Claiming & Dashboard"]
+        UI_ADMIN["🛡️ (admin)<br/>Admin Console & Conflicts"]
+    end
+
+    subgraph SharedPackages ["📦 Shared Packages (packages/*)"]
+        PKG_UI["🎨 packages/ui<br/>Button, Card, Badge..."]
+        PKG_SHARED["📑 packages/shared<br/>Types, Schemas, Permissions"]
+        PKG_MAPS["🗺️ packages/maps<br/>Markers, Layers, Clusters"]
+        PKG_SEARCH["🔍 packages/search<br/>Fuzzy Search & Ranking"]
+    end
+
+    subgraph ApiLayer ["⚙️ Core API Layer (apps/api)"]
+        ROUTES["🔌 routes/v1<br/>(Admin, Auth, Business, Geo, Search, User)"]
+        MIDDLEWARE["🛡️ middleware<br/>(Auth, RBAC, Rate-Limit, Audit Log)"]
+
+        subgraph DomainServices ["🧠 Domain Services"]
+            DOM_BUSINESS["🏢 Business & Claims"]
+            DOM_GEO["🌍 Geography & Spatial (PostGIS)"]
+            DOM_DISCOVERY["🔎 Discovery & Entity Resolution"]
+            DOM_INTEL["📊 Confidence Scoring"]
+            DOM_USER["👥 User & Favorites"]
+            DOM_ADMIN["🛡️ Admin Verification"]
+        end
+    end
+
+    subgraph DataLayer ["🗄️ Database & Spatial Layer (packages/database)"]
+        PRISMA["💎 Prisma ORM Client"]
+        MIGRATIONS["📜 7 Database Migrations"]
+        POSTGIS[("🐘 PostgreSQL + PostGIS<br/>(Spatial Boundaries & Yemen Geography)")]
+    end
+
+    ClientLayer --> PKG_UI
+    ClientLayer --> PKG_SHARED
+    ClientLayer --> PKG_MAPS
+    ClientLayer --> ROUTES
+
+    ROUTES --> MIDDLEWARE
+    MIDDLEWARE --> DomainServices
+
+    DomainServices --> PKG_SHARED
+    DomainServices --> PKG_SEARCH
+    DomainServices --> PRISMA
+
+    PRISMA --> MIGRATIONS
+    MIGRATIONS --> POSTGIS
 ```
 
 ---
 
-## 📂 Monorepo Structure
+## 🗺️ Master System Tree (Present & Future)
 
-```
-waynah/
-├── apps/
-│   ├── web/                    # Next.js 15 Web Application
-│   └── api/                    # Core REST API Gateway
-├── packages/
-│   ├── database/               # Prisma Schema, Migrations & Database Client
-│   ├── maps/                   # Mapbox / Leaflet Spatial Components
-│   ├── search/                 # Search Indexing & Query Pipeline
-│   ├── ui/                     # Shared Design System & UI Components
-│   ├── shared/                 # Common Types, Utilities & DTOs
-│   └── config/                 # Shared ESLint, TypeScript & Tailwind Configs
-├── docker/                     # Docker Compose Database Setup
-├── docs/images/                # High-Resolution Screenshots
-└── README.md                   # Complete Platform Documentation
+```text
+====================================================================================================
+                                 📍 WAYNAH - MASTER SYSTEM TREE (PRESENT & FUTURE)
+====================================================================================================
+
+ 📂 [waynah] (Monorepo Root)
+ ├── 🟢 ⚙️ package.json                # Root dependencies & scripts
+ ├── 🟢 ⚙️ pnpm-workspace.yaml          # PNPM Workspaces (apps/* & packages/*)
+ ├── 🟢 ⚙️ turbo.json                   # Turborepo build orchestrator & caching
+ ├── 🟢 🐳 docker-compose.yml          # PostgreSQL 16 + PostGIS 3.4
+ ├── 🔮 🐳 docker-compose.prod.yml     # [Future] Redis Queue + MinIO S3 + Nginx Gateway
+ ├── 🟢 🔑 .env                         # Local environment variables
+ └── 🟢 📘 README.md                    # Core platform guide
+
+ │
+ ├── 🟢 📁 [apps] (Executable Applications)
+ │   │
+ │   ├── 🟢 📁 [api] (Express API & Domain Core)
+ │   │   ├── 🟢 📄 index.ts / server.ts # Server entry points
+ │   │   ├── 🟢 📁 [src/config]       # security.config.ts
+ │   │   ├── 🟢 📁 [src/middleware]   # auth, authorization (RBAC), rate-limit, audit-log, logging
+ │   │   ├── 🟢 📁 [src/routes/v1]    # admin, auth, business, discovery, geography, search, user
+ │   │   │   └── 🔮 [src/routes/v2]   # [Future] GraphQL & Mobile Optimization Routes
+ │   │   ├── 🟢 📁 [src/domain]       # 🧠 Domain Business Logic:
+ │   │   │   ├── 🟢 📁 admin          # admin.service, admin-verification.service
+ │   │   │   ├── 🟢 📁 business       # business.service, business-verification (Branch Claiming)
+ │   │   │   ├── 🟢 📁 discovery      # discovery-orchestrator, ingestion, entity-resolution
+ │   │   │   ├── 🟢 📁 geography      # geography, geography-spatial-resolution (PostGIS)
+ │   │   │   ├── 🟢 📁 intelligence   # confidence-scoring.service
+ │   │   │   ├── 🟢 📁 search         # search.service
+ │   │   │   ├── 🟢 📁 user           # user-favorites, user-requests
+ │   │   │   ├── 🔮 📁 notifications  # [Future] WhatsApp / SMS / Push Notifications Engine
+ │   │   │   ├── 🔮 📁 billing        # [Future] Verified Business Subscriptions & Billing
+ │   │   │   └── 🔮 📁 ai-assistant   # [Future] Natural Language Location AI Assistant
+ │   │   └── 🟢 📁 [tests]            # 🧪 17 Test Suites (Security, Geography, Domain, Auth)
+ │   │
+ │   ├── 🟢 📁 [web] (Next.js 14 Web Application)
+ │   │   ├── 🟢 📁 [app]               # App Router: (public), (auth), (client), (business), admin
+ │   │   ├── 🟢 📁 [components]        # Domain, Layout, Maps, Navigation, Filters
+ │   │   ├── 🟢 📁 [lib]               # api-client, auth-context, map-shell, permission-guard
+ │   │   └── 🔮 📁 [pwa]               # [Future] Offline PWA Cache Layer
+ │   │
+ │   ├── 🔮 📁 [mobile]                # 🚀 [Future] React Native / Expo Mobile App (iOS & Android)
+ │   │   ├── 🔮 📁 ios                 # iOS Native Project
+ │   │   ├── 🔮 📁 android             # Android Native Project
+ │   │   └── 🔮 📁 src                 # Offline Vector Maps & Native GPS Tracking
+ │   │
+ │   └── 🔮 📁 [workers]               # 🚀 [Future] Background Queue Workers (BullMQ & Redis)
+ │       ├── 🔮 📄 geocoding-job.ts    # Async Geocoding & Boundary Resolution
+ │       └── 🔮 📄 sync-scheduler.ts   # Continuous Data Ingestion Scheduler
+ │
+ ├── 🟢 📁 [packages] (Shared Workspace Packages)
+ │   ├── 🟢 📁 [database]             # 💎 Prisma ORM & PostGIS Spatial DB
+ │   │   ├── 🟢 📁 prisma/schema.prisma # Central Prisma Data Schema
+ │   │   ├── 🟢 📁 prisma/migrations    # 7 Spatial & Structural Schema Migrations
+ │   │   ├── 🟢 📁 src/spatial          # health.ts, resolution.ts (PostGIS Resolution)
+ │   │   └── 🔮 📁 src/seeders          # [Future] Large Scale Seed Generator
+ │   │
+ │   ├── 🟢 📁 [shared]               # 📑 Shared Constants, Types & Zod Schemas
+ │   │   ├── 🟢 📁 constants          # permissions.ts (RBAC), error-codes.ts
+ │   │   ├── 🟢 📁 schemas            # discovery, pagination, search
+ │   │   └── 🟢 📁 types              # auth.types, response.types
+ │   │
+ │   ├── 🟢 📁 [ui]                   # 🎨 Design System & Primitive UI Components
+ │   │   └── 🟢 📁 src/primitives    # Button, Card, Badge, Input, Skeleton, Spinner, Container...
+ │   │
+ │   ├── 🟢 📁 [maps]                 # 🗺️ Map Components, Markers, Layers & Clustering
+ │   │   ├── 🟢 📁 src/clustering      # Marker Cluster Algorithms
+ │   │   └── 🔮 📁 src/offline-tiles   # [Future] Vector Tile Offline Caching
+ │   │
+ │   ├── 🟢 📁 [search]               # 🔍 Spatial Search, Fuzzy Matching & Ranking Engine
+ │   │   ├── 🟢 📁 src/normalization   # Arabic & Yemen Geographic Term Normalization
+ │   │   └── 🔮 📁 src/vector-search  # [Future] pgvector AI Semantic Search
+ │   │
+ │   ├── 🔮 📁 [notifications]        # 🚀 [Future] WhatsApp API & Push Dispatcher
+ │   ├── 🔮 📁 [offline-sync]         # 🚀 [Future] Low-Bandwidth Yemen Data Sync Engine
+ │   └── 🟢 📁 [config]               # ⚙️ Shared ESLint, TypeScript & Prettier Configs
+ │
+ ├── 🟢 📁 [docs] (Architecture & Formal Specification Studies)
+ │   ├── 🟢 📄 WAYNAH_BUILD_SPECIFICATION.md
+ │   ├── 🟢 📄 WAYNAH_PHASE_3_DOMAIN_MODEL_STUDY_V1_2.md
+ │   ├── 🟢 📄 WAYNAH_PHASE_4_SYSTEM_ARCHITECTURE_STUDY_V1_0.md
+ │   ├── 🟢 📄 WAYNAH_PHASE_5_UX_UI_SYSTEM_STUDY_V1_0.md
+ │   ├── 🟢 📄 YEMEN_GEOGRAPHIC_IMPORT_SPECIFICATION.md
+ │   └── 🔮 📄 WAYNAH_PHASE_6_PRODUCTION_DEVOPS_PLAN.md # [Future] CI/CD & Production Guide
+ │
+ ├── 🟢 📁 [scripts] (Data Pipelines & Import Utilities)
+ │   ├── 🟢 📜 import-yemen-boundaries.ts # Import Yemen Administrative Boundaries to PostGIS
+ │   ├── 🟢 📜 import-yemen-geography.ts  # Import & Seed Yemen Geographic Landmark Data
+ │   ├── 🟢 📁 data                        # Data Cleaning, Normalization & Export Tools
+ │   └── 🔮 📁 etl                         # [Future] Large Scale Spatial Data Extraction Pipeline
+ │
+ └── 🟢 📁 [tests] (E2E & Integration Verification Suites)
+====================================================================================================
 ```
 
 ---
