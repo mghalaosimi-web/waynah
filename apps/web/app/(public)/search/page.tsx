@@ -185,10 +185,10 @@ function SearchPageContent() {
                   nameAr={place.nameAr}
                   nameEn={place.nameEn}
                   categoryNameAr={place.categoryNameAr || 'مكان محلي'}
-                  districtNameAr={place.districtNameAr || place.governorateNameAr || 'حي الرياض'}
+                  districtNameAr={place.districtNameAr || place.governorateNameAr}
                   address={place.address}
                   distanceMeters={place.distance_meters}
-                  confidenceScore={place.confidenceScore ?? (place.match_score ? Math.min(place.match_score, 1.0) : 0.85)}
+                  confidenceScore={place.confidenceScore}
                   status={place.verificationStatus || 'AUTO_APPROVED'}
                 />
               ))}

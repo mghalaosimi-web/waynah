@@ -1,8 +1,7 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
 import { Container } from '@waynah/ui';
+import { WaynahLogo } from '../shared/WaynahLogo';
 
 export const Footer: React.FC = () => {
   return (
@@ -11,14 +10,9 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary-500 to-amber-600 flex items-center justify-center text-white font-bold">
-                و
-              </div>
-              <span className="font-extrabold text-xl text-white">وينه؟ — WAYNAH</span>
-            </div>
+            <WaynahLogo size="lg" showBadge={false} />
             <p className="text-sm text-slate-400 max-w-md leading-relaxed">
-              منصة استكشاف الأماكن والخدمات المحلية في المملكة العربية السعودية. تساعدك على معرفة أماكن الخدمات والوصول إليها بدقة وموثوقية عالية.
+              منصة استكشاف الأماكن والخدمات المحلية (وَيْنَه؟ — WAYNAH). تصميم محلي هادئ يساعد الجماهير على اكتشاف الأماكن المكانية والخدمات الموثوقة بدقة واستمرارية.
             </p>
           </div>
 
@@ -53,7 +47,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <h4 className="text-sm font-bold text-white uppercase tracking-wider">عن المنصة</h4>
             <ul className="space-y-2 text-sm text-slate-400">
-              <li>المملكة العربية السعودية</li>
+              <li>محافظة حجة — اليمن</li>
               <li>دليل مكاني مدعوم بالذكاء الاصطناعي</li>
               <li className="pt-2 text-xs text-slate-500">الإصدار v1.0.0 — WAYNAH-PUBLIC-001</li>
             </ul>

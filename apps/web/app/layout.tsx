@@ -4,7 +4,7 @@ import { AuthProvider } from '../lib/auth/auth-context';
 
 export const metadata = {
   title: 'وينه؟ — WAYNAH Discovery Engine',
-  description: 'منصة استكشاف الأماكن والخدمات المحلية في المملكة العربية السعودية',
+  description: 'وينه؟ — منصة يمنية للاكتشاف الجغرافي والمعلومات المحلية، البداية من محافظة حجة',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -5,21 +5,23 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   Container,
-  PageHeader,
   Button,
   Badge,
   Card,
   CardHeader,
   CardTitle,
   CardContent,
-  CardFooter,
   Skeleton,
   ErrorState,
 } from '@waynah/ui';
-import { Bookmark, Loader2 } from 'lucide-react';
+import { Bookmark, Loader2, Edit3, ShieldCheck, MapPin } from 'lucide-react';
 import { Header } from '../../../../components/layout/Header';
 import { Footer } from '../../../../components/layout/Footer';
 import { StatusBadge } from '../../../../components/domain/StatusBadge';
+import { TrustProvenanceCard } from '../../../../components/domain/TrustProvenanceCard';
+import { CorrectionModal } from '../../../../components/domain/CorrectionModal';
+import { BusinessOverviewCard } from '../../../../components/domain/BusinessOverviewCard';
+import { UncertaintyNotice } from '../../../../components/domain/UncertaintyNotice';
 import { apiClient, type PlaceSearchResult } from '../../../../lib/api/api-client';
 import { useAuth } from '../../../../lib/auth/auth-context';
 
@@ -34,6 +36,7 @@ export default function PlaceDetailsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [favLoading, setFavLoading] = useState(false);
+  const [showCorrectionModal, setShowCorrectionModal] = useState(false);
 
   const fetchPlaceDetails = async () => {
     if (!placeId) return;
@@ -103,9 +106,8 @@ export default function PlaceDetailsPage() {
               ← العودة لنتائج البحث
             </Button>
 
-            <div className="text-xs text-slate-500 flex items-center gap-1 font-mono">
-              <span>المعرّف المكان المكاني:</span>
-              <span className="font-bold text-slate-700 dark:text-slate-300">{placeId}</span>
+            <div className="text-xs text-slate-500 flex items-center gap-1 font-mono dir-ltr">
+              <span className="font-bold text-slate-700 dark:text-slate-300">ID: {placeId}</span>
             </div>
           </div>
 
@@ -144,13 +146,24 @@ export default function PlaceDetailsPage() {
                     )}
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {/* Correction / Report Action Button (Screen 07 trigger) */}
                     <Button
-                      variant={isSaved ? 'emerald' : 'outline'}
+                      variant="outline"
+                      size="md"
+                      onClick={() => setShowCorrectionModal(true)}
+                      className="gap-2 font-bold rounded-xl text-xs text-slate-700 dark:text-slate-200"
+                    >
+                      <Edit3 className="w-4 h-4 text-amber-600" />
+                      <span>إبلاغ عن خطأ / اقترح تعديلاً</span>
+                    </Button>
+
+                    <Button
+                      variant={isSaved ? 'primary' : 'outline'}
                       size="md"
                       disabled={favLoading}
                       onClick={handleToggleFavorite}
-                      className="gap-2 font-bold rounded-xl"
+                      className="gap-2 font-bold rounded-xl text-xs"
                     >
                       {favLoading ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -159,19 +172,17 @@ export default function PlaceDetailsPage() {
                       )}
                       <span>
                         {!isAuthenticated
-                          ? 'سجل دخولك للحفظ'
+                          ? 'حفظ المكان'
                           : isSaved
-                          ? 'محفوظ في المفضلة'
+                          ? 'محفوظ'
                           : 'حفظ للمفضلة'}
                       </span>
                     </Button>
 
                     {place.latitude && place.longitude && (
                       <Link href={`/map?lat=${place.latitude}&lng=${place.longitude}`}>
-                        <Button variant="primary" size="md" className="gap-2 font-bold shadow-md shadow-primary-500/20">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          </svg>
+                        <Button variant="primary" size="md" className="gap-2 font-bold shadow-md shadow-primary-500/20 text-xs">
+                          <MapPin className="w-4 h-4" />
                           <span>عرض على الخريطة</span>
                         </Button>
                       </Link>
@@ -190,7 +201,7 @@ export default function PlaceDetailsPage() {
 
                   {place.districtNameAr && (
                     <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-700 px-3 py-1.5 rounded-lg text-slate-700 dark:text-slate-200 font-semibold">
-                      <span>📍 الحي:</span>
+                      <span>📍 الحي المكاني:</span>
                       <span className="font-bold">{place.districtNameAr}</span>
                     </div>
                   )}
@@ -204,21 +215,36 @@ export default function PlaceDetailsPage() {
                 </div>
               </div>
 
-              {/* Information Cards Grid */}
+              {/* Uncertainty Warning Notice (Section 17 Edge State) */}
+              {place.verificationStatus === 'COMMUNITY' && (
+                <UncertaintyNotice
+                  type="CONFLICTING_PHONE"
+                  onAction={() => setShowCorrectionModal(true)}
+                  actionText="ساهم بتأكيد الهاتف"
+                />
+              )}
+
+              {place.verificationStatus === 'STALE' && (
+                <UncertaintyNotice
+                  type="STALE_DATA"
+                  onAction={() => setShowCorrectionModal(true)}
+                  actionText="تحديث بيانات المكان"
+                />
+              )}
+
+              {/* Grid Layout for Place Information */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Location & Address */}
                 <Card variant="default">
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <svg className="w-5 h-5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      </svg>
+                      <MapPin className="w-5 h-5 text-primary-500" />
                       الموقع والعنوان المكاني
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     {place.address ? (
-                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed">
+                      <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-semibold">
                         {place.address}
                       </p>
                     ) : (
@@ -226,7 +252,7 @@ export default function PlaceDetailsPage() {
                     )}
 
                     {place.latitude && place.longitude && (
-                      <div className="p-3 bg-slate-100 dark:bg-slate-800 rounded-xl font-mono text-xs text-slate-600 dark:text-slate-300 space-y-1 dir-ltr text-right">
+                      <div className="p-3 bg-slate-100 dark:bg-slate-800/80 rounded-xl font-mono text-xs text-slate-600 dark:text-slate-300 space-y-1 dir-ltr text-right">
                         <div>Latitude: {place.latitude.toFixed(6)}</div>
                         <div>Longitude: {place.longitude.toFixed(6)}</div>
                       </div>
@@ -234,21 +260,24 @@ export default function PlaceDetailsPage() {
                   </CardContent>
                 </Card>
 
-                {/* Contact & Extra Details */}
+                {/* Contact & Hours Details */}
                 <Card variant="default">
                   <CardHeader>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <svg className="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      معلومات التواصل والملاحظات
+                      <ShieldCheck className="w-5 h-5 text-amber-500" />
+                      معلومات التواصل وساعات العمل
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3 text-sm">
                     {place.phoneNumber ? (
                       <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/80 rounded-xl">
-                        <span className="text-xs text-slate-500">رقم الهاتف:</span>
-                        <span className="font-mono font-bold dir-ltr">{place.phoneNumber}</span>
+                        <span className="text-xs text-slate-500">رقم التواصل:</span>
+                        <a
+                          href={`tel:${place.phoneNumber}`}
+                          className="font-mono font-bold text-primary-600 dark:text-primary-400 hover:underline dir-ltr"
+                        >
+                          {place.phoneNumber}
+                        </a>
                       </div>
                     ) : (
                       <p className="text-xs text-slate-400 italic">رقم الهاتف غير متوفر حالياً.</p>
@@ -272,17 +301,43 @@ export default function PlaceDetailsPage() {
 
                     {place.description && (
                       <div className="pt-2 border-t border-slate-100 dark:border-slate-700 text-xs text-slate-600 dark:text-slate-300">
-                        <span className="font-bold block mb-1">الوصف المكاني:</span>
-                        <p>{place.description}</p>
+                        <span className="font-bold block mb-1">الوصف المكاني والخدماتي:</span>
+                        <p className="leading-relaxed">{place.description}</p>
                       </div>
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Screen 06 — Trust & Provenance Card */}
+                <TrustProvenanceCard
+                  status={place.verificationStatus}
+                  sourceType="تثبت ميداني ومجتمعي"
+                  lastConfirmedAt="قبل 5 أيام"
+                  confidenceScore={place.confidenceScore}
+                  isStale={place.verificationStatus === 'STALE'}
+                />
+
+                {/* Screen 05 — Business Entity Overview Card */}
+                <BusinessOverviewCard
+                  businessId="biz-1"
+                  businessName="منشأة صيدليات السلام الوطنية"
+                  verificationStatus="VERIFIED"
+                />
               </div>
             </div>
           )}
         </Container>
       </main>
+
+      {/* Screen 07 — Contribution / Correction Modal */}
+      {place && (
+        <CorrectionModal
+          placeId={place.id}
+          placeName={place.nameAr}
+          isOpen={showCorrectionModal}
+          onClose={() => setShowCorrectionModal(false)}
+        />
+      )}
 
       <Footer />
     </div>

@@ -23,7 +23,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
   nameAr,
   nameEn,
   categoryNameAr = 'مكان محلي',
-  districtNameAr = 'حي الرياض',
+  districtNameAr,
   address,
   distanceMeters,
   confidenceScore,
@@ -83,7 +83,7 @@ export const PlaceCard: React.FC<PlaceCardProps> = ({
             )}
 
             {distanceText && (
-              <div className="flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-md font-bold">
+              <div className="flex items-center gap-1 bg-primary-50 dark:bg-primary-950/40 text-primary-700 dark:text-primary-400 px-2.5 py-1 rounded-md font-bold">
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>

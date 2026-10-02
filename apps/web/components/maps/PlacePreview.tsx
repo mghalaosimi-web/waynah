@@ -88,7 +88,7 @@ export const PlacePreview: React.FC<PlacePreviewProps> = ({
           )}
 
           {distanceText && (
-            <span className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 px-2 py-0.5 rounded font-bold">
+            <span className="bg-primary-50 dark:bg-primary-950/60 text-primary-700 dark:text-primary-400 px-2 py-0.5 rounded font-bold">
               {distanceText}
             </span>
           )}

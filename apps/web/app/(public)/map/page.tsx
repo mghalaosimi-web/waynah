@@ -43,9 +43,10 @@ function MapPageContent() {
   const [radiusMeters, setRadiusMeters] = useState<number>(5000);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(initialPlaceId || null);
 
-  // View mode toggle on mobile (Map vs List)
+  // View mode toggle on mobile (Map vs List) & Low Bandwidth map disable toggle
   const [mobileView, setMobileView] = useState<'map' | 'list'>('map');
   const [showFilters, setShowFilters] = useState(false);
+  const [isMapDisabled, setIsMapDisabled] = useState(false);
 
   // Data states
   const [places, setPlaces] = useState<PlaceSearchResult[]>([]);
@@ -122,7 +123,7 @@ function MapPageContent() {
       categoryNameAr: p.categoryNameAr,
       districtNameAr: p.districtNameAr || p.governorateNameAr,
       address: p.address,
-      confidenceScore: p.confidenceScore ?? (p.match_score ? Math.min(p.match_score, 1.0) : 0.85),
+      confidenceScore: p.confidenceScore,
       verificationStatus: p.verificationStatus,
       distance_meters: p.distance_meters,
     }));
@@ -181,30 +182,44 @@ function MapPageContent() {
               className="mb-0 pb-0 border-b-0"
             />
 
-            {/* Mobile View Toggle */}
-            <div className="flex md:hidden items-center justify-center p-1 bg-slate-200 dark:bg-slate-800 rounded-xl">
+            {/* Controls: Low Bandwidth Toggle & Mobile View Toggle */}
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 type="button"
-                onClick={() => setMobileView('map')}
-                className={`flex-1 py-1.5 px-4 text-xs font-bold rounded-lg transition-colors ${
-                  mobileView === 'map'
-                    ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400'
+                onClick={() => setIsMapDisabled(!isMapDisabled)}
+                className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all ${
+                  isMapDisabled
+                    ? 'bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 border-amber-300'
+                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100'
                 }`}
               >
-                🗺️ الخريطة
+                {isMapDisabled ? '⚡ النمط النصي الخفيف مفعّل' : '📡 نمط الاتصال الخفيف (بدون خريطة)'}
               </button>
-              <button
-                type="button"
-                onClick={() => setMobileView('list')}
-                className={`flex-1 py-1.5 px-4 text-xs font-bold rounded-lg transition-colors ${
-                  mobileView === 'list'
-                    ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm'
-                    : 'text-slate-600 dark:text-slate-400'
-                }`}
-              >
-                📋 القائمة ({places.length})
-              </button>
+
+              <div className="flex md:hidden items-center justify-center p-1 bg-slate-200 dark:bg-slate-800 rounded-xl">
+                <button
+                  type="button"
+                  onClick={() => setMobileView('map')}
+                  className={`flex-1 py-1.5 px-4 text-xs font-bold rounded-lg transition-colors ${
+                    mobileView === 'map'
+                      ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  🗺️ الخريطة
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMobileView('list')}
+                  className={`flex-1 py-1.5 px-4 text-xs font-bold rounded-lg transition-colors ${
+                    mobileView === 'list'
+                      ? 'bg-white dark:bg-slate-900 text-primary-600 dark:text-primary-400 shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400'
+                  }`}
+                >
+                  📋 القائمة ({places.length})
+                </button>
+              </div>
             </div>
           </div>
 
@@ -244,22 +259,41 @@ function MapPageContent() {
             />
           )}
 
+          {/* Low Bandwidth Warning Banner if map is disabled */}
+          {isMapDisabled && (
+            <div className="p-4 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900 rounded-2xl text-xs text-amber-900 dark:text-amber-200 flex items-center justify-between">
+              <div>
+                <span className="font-bold block text-sm mb-0.5">📡 نمط الاستكشاف النصي الخفيف (Low-Bandwidth)</span>
+                <p>تم إيقاف بلاطات الخريطة لتوفير البيانات. الاستكشاف والتصفح وتفاصيل الأماكن تعمل بالكامل عبر القائمة.</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsMapDisabled(false)}
+                className="px-3 py-1.5 rounded-lg bg-amber-200 dark:bg-amber-800 font-bold hover:opacity-90"
+              >
+                تفعيل الخريطة
+              </button>
+            </div>
+          )}
+
           {/* Main Content Area: Split View Desktop / Responsive View Mobile */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[500px] pt-2">
-            {/* List Side Panel (Visible on Desktop OR when mobileView === 'list') */}
-            <div className={`lg:col-span-1 space-y-4 overflow-y-auto max-h-[600px] pr-1 scrollbar-thin ${mobileView === 'map' ? 'hidden lg:block' : 'block'}`}>
-              <div className="flex items-center justify-between text-xs font-bold text-slate-500 pb-1 border-b border-slate-200 dark:border-slate-800">
-                <span>نتائج التصفح المكاني ({places.length})</span>
-                {selectedPlaceId && (
-                  <button
-                    type="button"
-                    onClick={() => setSelectedPlaceId(null)}
-                    className="text-primary-600 hover:underline"
-                  >
-                    إلغاء التحديد
-                  </button>
-                )}
-              </div>
+            {/* List Side Panel */}
+            <div className={`${isMapDisabled ? 'lg:col-span-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4' : 'lg:col-span-1 space-y-4 overflow-y-auto max-h-[600px] pr-1 scrollbar-thin'} ${mobileView === 'map' && !isMapDisabled ? 'hidden lg:block' : 'block'}`}>
+              {!isMapDisabled && (
+                <div className="flex items-center justify-between text-xs font-bold text-slate-500 pb-1 border-b border-slate-200 dark:border-slate-800">
+                  <span>نتائج التصفح المكاني ({places.length})</span>
+                  {selectedPlaceId && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPlaceId(null)}
+                      className="text-primary-600 hover:underline"
+                    >
+                      إلغاء التحديد
+                    </button>
+                  )}
+                </div>
+              )}
 
               {loading && (
                 <div className="space-y-3">
@@ -297,10 +331,10 @@ function MapPageContent() {
                           nameAr={place.nameAr}
                           nameEn={place.nameEn}
                           categoryNameAr={place.categoryNameAr || 'مكان محلي'}
-                          districtNameAr={place.districtNameAr || place.governorateNameAr || 'حي الرياض'}
+                          districtNameAr={place.districtNameAr || place.governorateNameAr}
                           address={place.address}
                           distanceMeters={place.distance_meters}
-                          confidenceScore={place.confidenceScore ?? (place.match_score ? Math.min(place.match_score, 1.0) : 0.85)}
+                          confidenceScore={place.confidenceScore}
                           status={place.verificationStatus || 'AUTO_APPROVED'}
                           onViewDetails={() => handlePlaceSelect(place.id)}
                         />
@@ -318,18 +352,20 @@ function MapPageContent() {
               )}
             </div>
 
-            {/* Map Container Viewport (Visible on Desktop OR when mobileView === 'map') */}
-            <div className={`lg:col-span-2 relative ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
-              <MapShell
-                center={{ latitude: initialLat, longitude: initialLng }}
-                zoom={12}
-                markers={mapMarkers}
-                selectedMarkerId={selectedPlaceId}
-                onMarkerSelect={(m) => setSelectedPlaceId(m ? m.id : null)}
-                onLocationFound={(coords) => setLocation({ lat: coords.latitude, lng: coords.longitude })}
-                height="h-[550px] lg:h-[650px]"
-              />
-            </div>
+            {/* Map Container Viewport (Hidden if isMapDisabled is true) */}
+            {!isMapDisabled && (
+              <div className={`lg:col-span-2 relative ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
+                <MapShell
+                  center={{ latitude: initialLat, longitude: initialLng }}
+                  zoom={12}
+                  markers={mapMarkers}
+                  selectedMarkerId={selectedPlaceId}
+                  onMarkerSelect={(m) => setSelectedPlaceId(m ? m.id : null)}
+                  onLocationFound={(coords) => setLocation({ lat: coords.latitude, lng: coords.longitude })}
+                  height="h-[550px] lg:h-[650px]"
+                />
+              </div>
+            )}
           </div>
         </Container>
       </main>

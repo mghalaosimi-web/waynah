@@ -134,13 +134,24 @@ export default function PublicHomePage() {
       <Header />
 
       <main className="flex-1 space-y-10 pb-16">
-        {/* Hero & Primary Search Section */}
-        <section className="relative bg-gradient-to-b from-primary-500/10 via-primary-500/5 to-transparent pt-12 pb-10 border-b border-slate-200/60 dark:border-slate-800">
-          <Container size="xl">
+        {/* Hero & Primary Search Section with Calm Atlas Contour Lines */}
+        <section className="relative overflow-hidden bg-gradient-to-b from-primary-500/10 via-primary-500/5 to-transparent pt-12 pb-12 border-b border-slate-200/60 dark:border-slate-800">
+          {/* Geographic SVG Contour Lines Pattern */}
+          <div className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none overflow-hidden">
+            <svg className="w-full h-full text-primary-900 dark:text-primary-100" fill="none" viewBox="0 0 1200 400" preserveAspectRatio="none">
+              <path stroke="currentColor" strokeWidth="1" d="M 0 100 Q 300 250 600 120 T 1200 200" />
+              <path stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" d="M 0 180 Q 400 80 800 280 T 1200 100" />
+              <path stroke="currentColor" strokeWidth="1.5" d="M 0 300 Q 200 150 700 350 T 1200 220" />
+              <circle cx="600" cy="120" r="4" fill="currentColor" />
+              <circle cx="800" cy="280" r="3" fill="currentColor" />
+            </svg>
+          </div>
+
+          <Container size="xl" className="relative z-10">
             <div className="max-w-3xl mx-auto text-center space-y-6">
               {/* Badge & Main Title */}
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary-100 dark:bg-primary-950/80 text-primary-700 dark:text-primary-300 text-xs font-bold border border-primary-200 dark:border-primary-800 shadow-sm">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="w-2 h-2 rounded-full bg-primary-500 animate-pulse"></span>
                 <span>المحرك المكاني الموثوق لـ "وينه؟"</span>
               </div>
 
@@ -177,7 +188,7 @@ export default function PublicHomePage() {
                 </button>
 
                 {location && (
-                  <span className="text-emerald-700 dark:text-emerald-400 font-bold bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-1 rounded-md">
+                  <span className="text-primary-700 dark:text-primary-300 font-bold bg-primary-100 dark:bg-primary-950/60 px-2.5 py-1 rounded-md">
                     📍 التصفح مقترن بموقعك الجغرافي الحالي
                   </span>
                 )}
@@ -253,10 +264,10 @@ export default function PublicHomePage() {
                   nameAr={place.nameAr}
                   nameEn={place.nameEn}
                   categoryNameAr={place.categoryNameAr || 'مكان محلي'}
-                  districtNameAr={place.districtNameAr || place.governorateNameAr || 'حي الرياض'}
+                  districtNameAr={place.districtNameAr || place.governorateNameAr}
                   address={place.address}
                   distanceMeters={place.distance_meters}
-                  confidenceScore={place.confidenceScore ?? (place.match_score ? Math.min(place.match_score, 1.0) : 0.85)}
+                  confidenceScore={place.confidenceScore}
                   status={place.verificationStatus || 'AUTO_APPROVED'}
                 />
               ))}

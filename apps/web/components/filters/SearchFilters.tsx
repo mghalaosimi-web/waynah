@@ -80,7 +80,7 @@ export const SearchFilters: React.FC<SearchFiltersProps> = ({
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <label className="font-semibold text-slate-600 dark:text-slate-300 block">
-              نطاق المسافة {hasLocation && <span className="text-emerald-600 dark:text-emerald-400 font-bold">(مفعل جغرافياً)</span>}
+              نطاق المسافة {hasLocation && <span className="text-primary-600 dark:text-primary-400 font-bold">(مفعل جغرافياً)</span>}
             </label>
           </div>
 

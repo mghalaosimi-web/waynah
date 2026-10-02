@@ -1,9 +1,9 @@
-'use client';
-
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Container, Button, Badge } from '@waynah/ui';
+import { Container, Button } from '@waynah/ui';
+import { WaynahLogo } from '../shared/WaynahLogo';
+import { ThemePicker } from './ThemePicker';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -28,22 +28,8 @@ export const Header: React.FC = () => {
       <Container size="xl">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-amber-600 flex items-center justify-center text-white shadow-md shadow-primary-500/20 group-hover:scale-105 transition-transform">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-xl tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
-                وينه؟
-                <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-                  تجريبي
-                </span>
-              </span>
-              <span className="text-[10px] text-slate-500 font-medium">الدليل الاستكشافي المحلي</span>
-            </div>
+          <Link href="/">
+            <WaynahLogo size="md" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -56,7 +42,7 @@ export const Header: React.FC = () => {
                   href={item.href}
                   className={`px-4 py-2 rounded-lg text-sm font-semibold transition-colors ${
                     active
-                      ? 'bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400'
+                      ? 'bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 font-bold'
                       : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`}
                 >
@@ -66,11 +52,13 @@ export const Header: React.FC = () => {
             })}
           </nav>
 
-          {/* Actions & Mobile Menu Toggle */}
+          {/* Actions & Theme Picker */}
           <div className="flex items-center gap-2">
+            <ThemePicker />
+
             <Link href="/dashboard" className="hidden sm:inline-flex">
               <Button variant="outline" size="sm" className="gap-1.5 font-bold rounded-xl">
-                <svg className="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 <span>حسابي</span>

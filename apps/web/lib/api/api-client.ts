@@ -165,12 +165,226 @@ export interface BusinessItem {
   verificationStatus?: BusinessVerificationStatus;
 }
 
+export interface IngestObservationInput {
+  dataSourceId?: string;
+  placeId?: string;
+  name?: string;
+  phone?: string;
+  categoryId?: string;
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface IngestObservationResult {
+  observation: {
+    id: string;
+    placeId?: string | null;
+    createdAt?: string;
+  };
+  action: string;
+}
+
+export interface DataConflictItem {
+  id: string;
+  placeId: string;
+  description: string;
+  baseObservationId: string;
+  conflictingObservationId: string;
+  status: string;
+  resolvedAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  place: {
+    id: string;
+    nameAr: string;
+    nameEn?: string | null;
+    phoneNumber?: string | null;
+  };
+}
+
+export interface PlaceObservationItem {
+  id: string;
+  placeId?: string | null;
+  dataSourceId: string;
+  name?: string | null;
+  phone?: string | null;
+  categoryId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  confidenceScore: number;
+  status: string;
+  discoveredAt: string;
+  createdAt: string;
+  updatedAt: string;
+  dataSource: {
+    id: string;
+    name: string;
+    type: string;
+    reliabilityWeight: number;
+  };
+}
+
+export interface PlaceHistoryData {
+  id: string;
+  nameAr: string;
+  nameEn?: string | null;
+  slug?: string | null;
+  description?: string | null;
+  address?: string | null;
+  phoneNumber?: string | null;
+  website?: string | null;
+  verificationStatus: string;
+  categoryId: string;
+  districtId: string;
+  category: {
+    id: string;
+    nameAr: string;
+    nameEn?: string | null;
+    slug: string;
+    icon?: string | null;
+  };
+  district: {
+    id: string;
+    nameAr: string;
+    nameEn?: string | null;
+    governorate: {
+      id: string;
+      nameAr: string;
+      nameEn?: string | null;
+    };
+  };
+  location?: {
+    id: string;
+    latitude: number;
+    longitude: number;
+  } | null;
+  observations: PlaceObservationItem[];
+  conflicts: {
+    id: string;
+    placeId: string;
+    description: string;
+    baseObservationId: string;
+    conflictingObservationId: string;
+    status: string;
+    createdAt: string;
+  }[];
+}
+
+
+export const MOCK_DEMO_CATEGORIES: PlaceCategory[] = [
+  { id: 'cat-1', nameAr: 'صيدليات ورعاية صحية', nameEn: 'Pharmacies & Health', slug: 'pharmacies', icon: '💊' },
+  { id: 'cat-2', nameAr: 'مطاعم ومأكولات شعبية', nameEn: 'Restaurants & Food', slug: 'restaurants', icon: '🍽️' },
+  { id: 'cat-3', nameAr: 'مستشفيات وطوارئ', nameEn: 'Hospitals & Emergency', slug: 'hospitals', icon: '🏥' },
+  { id: 'cat-4', nameAr: 'مراكز خدمة وتقنية', nameEn: 'Services & Tech', slug: 'services', icon: '⚡' },
+  { id: 'cat-5', nameAr: 'سوبرماركت ومتاجر', nameEn: 'Stores & Supermarkets', slug: 'stores', icon: '🛒' },
+  { id: 'cat-6', nameAr: 'خدمات لوجستية ونقل', nameEn: 'Logistics & Transport', slug: 'logistics', icon: '🚚' },
+];
+
+export const MOCK_DEMO_PLACES: PlaceSearchResult[] = [
+  {
+    id: 'place-1',
+    nameAr: 'صيدلية السلام الحديثة [بيانات تجريبية]',
+    nameEn: 'Al-Salam Modern Pharmacy (Demo)',
+    slug: 'al-salam-pharmacy-abs',
+    description: 'فرع صيدلية السلام الوطنية. توفر المستلزمات الطبية والأدوية العامة والخدمة الاستشارية على مدار 24 ساعة.',
+    address: 'عبس — شارع السوق الرئيسي — بجوار المجمع الطبي',
+    phoneNumber: '+967 771 234 567',
+    website: 'https://waynah.demo/pharmacy-abs',
+    verificationStatus: 'VERIFIED',
+    categoryId: 'cat-1',
+    categoryNameAr: 'صيدليات ورعاية صحية',
+    districtNameAr: 'حي السوق الرئيسي',
+    governorateNameAr: 'عبس — محافظة حجة',
+    latitude: 15.9189,
+    longitude: 43.2081,
+    distance_meters: 320,
+    confidenceScore: 0.96,
+  },
+  {
+    id: 'place-2',
+    nameAr: 'مستشفى عبس العام والتخصصي [بيانات تجريبية]',
+    nameEn: 'Abs General Hospital (Demo)',
+    slug: 'abs-general-hospital',
+    description: 'مستشفى حكومي تخصصي يوفر أقسام الطوارئ العاجلة والعمليات والأشعة والمختبرات المركزية.',
+    address: 'عبس — المدخل الجنوبي — الخط العام',
+    phoneNumber: '+967 770 987 654',
+    website: 'https://waynah.demo/abs-hospital',
+    verificationStatus: 'VERIFIED',
+    categoryId: 'cat-3',
+    categoryNameAr: 'مستشفيات وطوارئ',
+    districtNameAr: 'حي النصر',
+    governorateNameAr: 'عبس — محافظة حجة',
+    latitude: 15.9120,
+    longitude: 43.2150,
+    distance_meters: 850,
+    confidenceScore: 0.98,
+  },
+  {
+    id: 'place-3',
+    nameAr: 'مطعم السعيد للمأكولات الشعبية [بيانات تجريبية]',
+    nameEn: 'Al-Saeed Traditional Restaurant (Demo)',
+    slug: 'al-saeed-restaurant-abs',
+    description: 'مطعم مأكولات شعبية يمني. تنبيه عدم يقين: يوجد تعارض في رقم التواصل المحدث عبر بلاغ مجتمعي.',
+    address: 'عبس — قرب دوار الساعة',
+    phoneNumber: '+967 773 112 233',
+    verificationStatus: 'COMMUNITY',
+    categoryId: 'cat-2',
+    categoryNameAr: 'مطاعم ومأكولات شعبية',
+    districtNameAr: 'دوار الساعة',
+    governorateNameAr: 'عبس — محافظة حجة',
+    latitude: 15.9220,
+    longitude: 43.2010,
+    distance_meters: 1100,
+    confidenceScore: 0.75,
+  },
+  {
+    id: 'place-4',
+    nameAr: 'مركز الخدمة السريعة للاتصالات [بيانات تجريبية]',
+    nameEn: 'Express Telecom Service Center (Demo)',
+    slug: 'express-telecom-abs',
+    description: 'مركز خدمة وصيانة أجهزة وسداد فواتير. تنبيه: المعلومات غير محدثة ميدانياً منذ أكثر من 90 يوماً.',
+    address: 'عبس — شارع المحطة الرئيسي',
+    phoneNumber: '+967 777 444 555',
+    verificationStatus: 'STALE',
+    categoryId: 'cat-4',
+    categoryNameAr: 'مراكز خدمة وتقنية',
+    districtNameAr: 'شارع المحطة',
+    governorateNameAr: 'عبس — محافظة حجة',
+    latitude: 15.9150,
+    longitude: 43.2050,
+    distance_meters: 500,
+    confidenceScore: 0.60,
+  },
+  {
+    id: 'place-5',
+    nameAr: 'صيدلية الحكمة والتجهيزات الطبية [بيانات تجريبية]',
+    nameEn: 'Al-Hikma Pharmacy (Demo)',
+    slug: 'al-hikma-pharmacy-hajjah',
+    description: 'صيدلية مركزية توفر المستلزمات الطبية والأدوية وتجهيزات العناية الشخصية.',
+    address: 'حجة — الشارع الرئيسي — مقابل المستشفى الجمهوري',
+    phoneNumber: '+967 775 888 999',
+    verificationStatus: 'VERIFIED',
+    categoryId: 'cat-1',
+    categoryNameAr: 'صيدليات ورعاية صحية',
+    districtNameAr: 'حي النصر',
+    governorateNameAr: 'حجة — المركز',
+    latitude: 15.6942,
+    longitude: 43.6041,
+    distance_meters: 12400,
+    confidenceScore: 0.92,
+  },
+];
 
 export class ApiClient {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || (typeof window !== 'undefined' ? '' : 'http://localhost:3000');
+    const envUrl = process.env.NEXT_PUBLIC_API_URL;
+    this.baseUrl =
+      baseUrl ||
+      (typeof window !== 'undefined'
+        ? envUrl || ''
+        : envUrl || 'http://localhost:3000');
   }
 
   private async request<T>(
@@ -206,11 +420,201 @@ export class ApiClient {
       }
 
       return data as ApiResponse<T>;
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to connect to API server';
+    } catch (_err: unknown) {
+      // Prototype Mock Fallback Logic when server is offline and mock mode is explicitly enabled
+      const enableMock = process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === 'true';
+
+      if (enableMock) {
+        if (endpoint.includes('/v1/search/categories')) {
+          return { success: true, data: MOCK_DEMO_CATEGORIES as unknown as T };
+        }
+
+        if (endpoint.includes('/v1/search/places/')) {
+          const placeId = endpoint.split('/v1/search/places/')[1];
+          const found = MOCK_DEMO_PLACES.find((p) => p.id === placeId) || MOCK_DEMO_PLACES[0];
+          return { success: true, data: found as unknown as T };
+        }
+
+        if (endpoint.includes('/v1/search')) {
+          const urlObj = new URL(url, 'http://localhost');
+          const q = urlObj.searchParams.get('query')?.toLowerCase();
+          const catId = urlObj.searchParams.get('categoryId');
+
+          let filtered = [...MOCK_DEMO_PLACES];
+          if (q) {
+            filtered = filtered.filter(
+              (p) =>
+                p.nameAr.toLowerCase().includes(q) ||
+                (p.nameEn && p.nameEn.toLowerCase().includes(q)) ||
+                (p.address && p.address.toLowerCase().includes(q))
+            );
+          }
+          if (catId) {
+            filtered = filtered.filter((p) => p.categoryId === catId);
+          }
+          return { success: true, data: filtered as unknown as T };
+        }
+
+        if (endpoint.includes('/v1/discovery/ingest') || endpoint.includes('/v1/discovery/community-report')) {
+          const bodyStr = options.body as string;
+          let parsed: Record<string, unknown> = {};
+          try {
+            if (bodyStr) parsed = JSON.parse(bodyStr);
+          } catch (_e) {}
+
+          return {
+            success: true,
+            data: {
+              observation: {
+                id: `obs-${Math.random().toString(36).substring(2, 9)}`,
+                placeId: (parsed.placeId as string) || null,
+                createdAt: new Date().toISOString(),
+              },
+              action: 'OBSERVATION_INGESTED',
+            } as unknown as T,
+          };
+        }
+
+        if (endpoint.includes('/v1/businesses/')) {
+          return {
+            success: true,
+            data: {
+              id: 'biz-1',
+              name: 'منشأة صيدليات السلام الوطنية [بيانات تجريبية]',
+              description: 'منشأة صحية رائدة تدير وتغل شبكة من الصيدليات والمراكز الطبية في عبس وحجة.',
+              status: 'ACTIVE',
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              verified: true,
+              verificationStatus: 'VERIFIED',
+              places: MOCK_DEMO_PLACES.filter((p) => p.categoryId === 'cat-1'),
+            } as unknown as T,
+          };
+        }
+
+        if (endpoint.includes('/v1/admin/conflicts')) {
+          return {
+            success: true,
+            data: [
+              {
+                id: 'conflict-demo-1',
+                placeId: 'place-3',
+                description: '[{"field":"phone","old":"+967 773 112 233","new":"+967 773 999 000"}]',
+                baseObservationId: 'obs-base-1',
+                conflictingObservationId: 'obs-conflict-1',
+                status: 'OPEN',
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                place: {
+                  id: 'place-3',
+                  nameAr: 'مطعم السعيد للمأكولات الشعبية [بيانات تجريبية]',
+                  nameEn: 'Al-Saeed Traditional Restaurant (Demo)',
+                  phoneNumber: '+967 773 112 233',
+                },
+              },
+            ] as unknown as T,
+            count: 1,
+          };
+        }
+
+        if (endpoint.includes('/v1/admin/places/') && endpoint.includes('/history')) {
+          const placeId = endpoint.split('/v1/admin/places/')[1].split('/history')[0];
+          const found = MOCK_DEMO_PLACES.find((p) => p.id === placeId) || MOCK_DEMO_PLACES[0];
+          return {
+            success: true,
+            data: {
+              id: found.id,
+              nameAr: found.nameAr,
+              nameEn: found.nameEn,
+              slug: found.slug,
+              description: found.description,
+              address: found.address,
+              phoneNumber: found.phoneNumber,
+              website: found.website,
+              verificationStatus: found.verificationStatus || 'UNVERIFIED',
+              categoryId: found.categoryId || 'cat-1',
+              districtId: 'dist-1',
+              category: {
+                id: found.categoryId || 'cat-1',
+                nameAr: found.categoryNameAr || 'صيدليات ورعاية صحية',
+                nameEn: 'Pharmacies & Health',
+                slug: 'pharmacies',
+                icon: '💊',
+              },
+              district: {
+                id: 'dist-1',
+                nameAr: found.districtNameAr || 'عبس',
+                nameEn: 'Abs',
+                governorate: {
+                  id: 'gov-1',
+                  nameAr: 'محافظة حجة',
+                  nameEn: 'Hajjah Governorate',
+                },
+              },
+              location: found.latitude ? { id: 'loc-1', latitude: found.latitude, longitude: found.longitude || 0 } : null,
+              observations: [
+                {
+                  id: 'obs-sys-1',
+                  placeId: found.id,
+                  dataSourceId: 'ds-1',
+                  name: found.nameAr,
+                  phone: found.phoneNumber,
+                  categoryId: found.categoryId,
+                  latitude: found.latitude,
+                  longitude: found.longitude,
+                  confidenceScore: found.confidenceScore || 0.8,
+                  status: 'AUTO_APPROVED',
+                  discoveredAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+                  createdAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+                  updatedAt: new Date(Date.now() - 86400000 * 5).toISOString(),
+                  dataSource: {
+                    id: 'ds-1',
+                    name: 'معدل بيانات الشركاء الميدانيين (Partner Data Ingestion)',
+                    type: 'SYSTEM_INGESTION',
+                    reliabilityWeight: 0.85,
+                  },
+                },
+                {
+                  id: 'obs-comm-1',
+                  placeId: found.id,
+                  dataSourceId: 'ds-community',
+                  name: found.nameAr,
+                  phone: '+967 773 999 000',
+                  categoryId: found.categoryId,
+                  latitude: found.latitude,
+                  longitude: found.longitude,
+                  confidenceScore: 0.0,
+                  status: 'PENDING',
+                  discoveredAt: new Date().toISOString(),
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                  dataSource: {
+                    id: 'ds-community',
+                    name: 'WAYNAH Community Reports',
+                    type: 'COMMUNITY_OBSERVATION',
+                    reliabilityWeight: 0.5,
+                  },
+                },
+              ],
+              conflicts: [
+                {
+                  id: 'conflict-demo-1',
+                  placeId: found.id,
+                  description: '[{"field":"phone","old":"+967 773 112 233","new":"+967 773 999 000"}]',
+                  baseObservationId: 'obs-sys-1',
+                  conflictingObservationId: 'obs-comm-1',
+                  status: 'OPEN',
+                  createdAt: new Date().toISOString(),
+                },
+              ],
+            } as unknown as T,
+          };
+        }
+      }
+
       return {
         success: false,
-        error: message,
+        error: 'تعذر الاتصال بخادم الواجهة البرمجية، يرجى المحاولة لاحقاً.',
       };
     }
   }
@@ -355,15 +759,15 @@ export class ApiClient {
   /**
    * Admin Conflicts (Protected API)
    */
-  public async getAdminConflicts(apiKey?: string): Promise<ApiResponse<unknown[]>> {
-    return this.request<unknown[]>('/v1/admin/conflicts', { method: 'GET' }, apiKey);
+  public async getAdminConflicts(apiKey?: string): Promise<ApiResponse<DataConflictItem[]>> {
+    return this.request<DataConflictItem[]>('/v1/admin/conflicts', { method: 'GET' }, apiKey);
   }
 
   /**
    * Admin Place History (Protected API)
    */
-  public async getPlaceHistory(placeId: string, apiKey?: string): Promise<ApiResponse<unknown>> {
-    return this.request<unknown>(`/v1/admin/places/${placeId}/history`, { method: 'GET' }, apiKey);
+  public async getPlaceHistory(placeId: string, apiKey?: string): Promise<ApiResponse<PlaceHistoryData>> {
+    return this.request<PlaceHistoryData>(`/v1/admin/places/${placeId}/history`, { method: 'GET' }, apiKey);
   }
 
   /**
@@ -461,18 +865,23 @@ export class ApiClient {
   }
 
   /**
-   * Admin Review Verification Request (Protected API)
+   * Submit Place Correction / Community Observation (Public Community API)
    */
-  public async reviewBusinessVerification(
-    id: string,
-    data: {
-      status: 'VERIFIED' | 'REJECTED';
-      rejectionReason?: string | null;
-    }
-  ): Promise<ApiResponse<BusinessVerificationData>> {
-    return this.request<BusinessVerificationData>(`/v1/admin/verifications/${id}/review`, {
+  public async submitPlaceCorrection(
+    data: Omit<IngestObservationInput, 'dataSourceId'>
+  ): Promise<ApiResponse<IngestObservationResult>> {
+    const payload = {
+      placeId: data.placeId,
+      name: data.name,
+      phone: data.phone,
+      categoryId: data.categoryId,
+      latitude: data.latitude,
+      longitude: data.longitude,
+    };
+
+    return this.request<IngestObservationResult>('/v1/discovery/community-report', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify(payload),
     });
   }
 }

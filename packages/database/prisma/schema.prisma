@@ -101,6 +101,7 @@ model Place {
   conflicts          DataConflict[]
   favorites          Favorite[]
   requests           ServiceRequest[]
+  branchClaims       BranchClaim[]
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
 
@@ -179,8 +180,10 @@ model User {
   sessions            Session[]
   favorites           Favorite[]
   requests            ServiceRequest[]
-  businessMemberships BusinessMember[]
-  createdAt           DateTime         @default(now()) @map("created_at")
+  businessMemberships   BusinessMember[]
+  submittedBranchClaims BranchClaim[]     @relation("SubmittedBranchClaims")
+  reviewedBranchClaims  BranchClaim[]     @relation("ReviewedBranchClaims")
+  createdAt             DateTime         @default(now()) @map("created_at")
   updatedAt           DateTime         @updatedAt @map("updated_at")
 
   @@map("users")
@@ -262,6 +265,7 @@ model Business {
   members      BusinessMember[]
   places       Place[]
   verification BusinessVerification?
+  branchClaims BranchClaim[]
   createdAt    DateTime              @default(now()) @map("created_at")
   updatedAt    DateTime              @updatedAt @map("updated_at")
 
@@ -299,3 +303,37 @@ model BusinessVerification {
 
   @@map("business_verifications")
 }
+
+enum BranchClaimStatus {
+  PENDING_REVIEW
+  PENDING_DISPUTE
+  APPROVED
+  REJECTED
+  CANCELLED
+}
+
+model BranchClaim {
+  id              String            @id @default(uuid())
+  businessId      String            @map("business_id")
+  business        Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  placeId         String            @map("place_id")
+  place           Place             @relation(fields: [placeId], references: [id], onDelete: Cascade)
+  claimantId      String            @map("claimant_id")
+  claimant        User              @relation("SubmittedBranchClaims", fields: [claimantId], references: [id], onDelete: Cascade)
+  status          BranchClaimStatus @default(PENDING_REVIEW)
+  notes           String?
+  reviewerId      String?           @map("reviewer_id")
+  reviewer        User?             @relation("ReviewedBranchClaims", fields: [reviewerId], references: [id], onDelete: SetNull)
+  rejectionReason String?           @map("rejection_reason")
+  submittedAt     DateTime          @default(now()) @map("submitted_at")
+  reviewedAt      DateTime?         @map("reviewed_at")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([placeId])
+  @@index([claimantId])
+  @@index([status])
+  @@map("branch_claims")
+}
+
