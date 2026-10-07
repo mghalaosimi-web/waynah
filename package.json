@@ -12,7 +12,9 @@
     "db:up": "docker compose -f docker/docker-compose.yml up -d",
     "db:down": "docker compose -f docker/docker-compose.yml down",
     "db:generate": "turbo run db:generate",
-    "db:migrate": "pnpm --filter @waynah/database db:migrate"
+    "db:migrate": "pnpm --filter @waynah/database db:migrate",
+    "db:deploy": "pnpm --filter @waynah/database db:deploy",
+    "bootstrap:admin": "pnpm --filter @waynah/api exec tsx ../../scripts/bootstrap-admin.ts"
   },
   "devDependencies": {
     "turbo": "^2.4.4",

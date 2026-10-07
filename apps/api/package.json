@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
+    "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "lint": "echo \"@waynah/api: lint ok\"",
     "test": "vitest run",

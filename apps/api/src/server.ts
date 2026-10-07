@@ -135,7 +135,7 @@ const PORT = Number(process.env.PORT) || 3000;
 
 if (process.env.NODE_ENV !== 'test') {
   console.log(`Starting WAYNAH API Server on port ${PORT}...`);
-  serve(
+  const server = serve(
     {
       fetch: app.fetch,
       port: PORT,
@@ -144,4 +144,25 @@ if (process.env.NODE_ENV !== 'test') {
       console.log(`🚀 API Server running on http://localhost:${info.port}`);
     }
   );
+
+  let isShuttingDown = false;
+  const gracefulShutdown = async (signal: string) => {
+    if (isShuttingDown) return;
+    isShuttingDown = true;
+    console.log(`\nReceived ${signal}. Gracefully shutting down WAYNAH API Server...`);
+
+    server.close(async () => {
+      console.log('HTTP server closed.');
+      try {
+        await prisma.$disconnect();
+        console.log('Database client disconnected cleanly.');
+      } catch (err) {
+        console.error('Error disconnecting database:', err);
+      }
+      process.exit(0);
+    });
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
