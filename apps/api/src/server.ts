@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
+import { handle } from 'hono/vercel';
 import { cors } from 'hono/cors';
 import { prisma, verifySpatialConnection } from '@waynah/database';
 import { securityConfig } from './config/security.config.js';
@@ -133,7 +134,7 @@ export const app = createServer(prisma);
 
 const PORT = Number(process.env.PORT) || 3000;
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   console.log(`Starting WAYNAH API Server on port ${PORT}...`);
   const server = serve(
     {
@@ -166,3 +167,5 @@ if (process.env.NODE_ENV !== 'test') {
   process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
+
+export default handle(app);
