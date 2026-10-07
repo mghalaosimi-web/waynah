@@ -4,6 +4,11 @@ export {
   BusinessStatus,
   BusinessRole,
   BusinessVerificationStatus,
+  BranchClaimStatus,
+  BusinessInvitationStatus,
+  ReviewStatus,
+  DuplicateCandidateStatus,
+  NotificationType,
 } from '@prisma/client';
 export type {
   HealthCheck,
@@ -24,6 +29,12 @@ export type {
   Business,
   BusinessMember,
   BusinessVerification,
+  BranchClaim,
+  BusinessInvitation,
+  VerificationLog,
+  Review,
+  DuplicateCandidate,
+  Notification,
 } from '@prisma/client';
 
 

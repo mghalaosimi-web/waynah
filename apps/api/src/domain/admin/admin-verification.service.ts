@@ -168,6 +168,21 @@ export class AdminVerificationService {
       },
     });
 
+    // GAP-DB-02: Write historical audit trail record
+    if (this.prisma.verificationLog) {
+      await this.prisma.verificationLog.create({
+        data: {
+          businessId: verification.businessId,
+          verificationId: verification.id,
+          status: targetStatus,
+          actorId: reviewerId,
+          actorRole: 'ADMIN',
+          action: targetStatus === STATUS_VERIFIED ? 'APPROVE' : 'REJECT',
+          rejectionReason: targetStatus === STATUS_REJECTED ? rejectionReason : null,
+        },
+      });
+    }
+
     return updated;
   }
 }

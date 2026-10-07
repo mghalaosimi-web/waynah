@@ -69,7 +69,7 @@ export function createAuthMiddleware(prismaClient?: PrismaClient): MiddlewareHan
 
       c.set('actor', actor);
       c.set('authStatus', 'AUTHENTICATED');
-      AuditLogger.logAuthSuccess(c.req.method, c.req.path, actor.id, actor.type, ip);
+      await AuditLogger.logAuthSuccess(c.req.method, c.req.path, actor.id, actor.type, ip);
       return await next();
     }
 
@@ -84,7 +84,7 @@ export function createAuthMiddleware(prismaClient?: PrismaClient): MiddlewareHan
     }
 
     // 3. Provided credentials invalid or expired
-    AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Invalid or expired authentication credentials');
+    await AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Invalid or expired authentication credentials');
     c.set('actor', ANONYMOUS_ACTOR);
     c.set('authStatus', 'INVALID_CREDENTIALS');
     c.set('authError', 'Unauthorized: Invalid or missing API key');

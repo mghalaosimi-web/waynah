@@ -78,6 +78,16 @@ function makeMockPrisma() {
         }
         return Promise.resolve({ count: 1 });
       }),
+      update: vi.fn().mockImplementation(({ where, data }) => {
+        for (const [k, v] of sessions.entries()) {
+          if (v.id === where.id) {
+            const updated = { ...v, ...data };
+            sessions.set(k, updated);
+            return Promise.resolve(updated);
+          }
+        }
+        return Promise.resolve({ id: where.id, ...data });
+      }),
     },
     $queryRaw: vi.fn().mockResolvedValue([]),
   } as unknown as PrismaClient;
@@ -320,5 +330,89 @@ describe('WAYNAH-AUTH-002 — Authentication & Identity Flow', () => {
 
     warnSpy.mockRestore();
     infoSpy.mockRestore();
+  });
+
+  // 10. Slice 5A — Email Normalization & Case Insensitivity
+  it('Normalizes email during registration and login (lowercase + trimming whitespace)', async () => {
+    // Register with mixed case and leading/trailing spaces
+    const regRes = await app.request('/v1/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'Normal User',
+        email: '  Normal.User@WAYNAH.COM  ',
+        password: 'Password123!',
+      }),
+    });
+    expect(regRes.status).toBe(201);
+    const regData = await regRes.json();
+    expect(regData.data.user.email).toBe('normal.user@waynah.com');
+
+    // Login with different case variations and spaces
+    const loginRes = await app.request('/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: ' NORMAL.USER@waynah.com ',
+        password: 'Password123!',
+      }),
+    });
+    expect(loginRes.status).toBe(200);
+    const loginData = await loginRes.json();
+    expect(loginData.data.user.email).toBe('normal.user@waynah.com');
+  });
+
+  // 11. Slice 5A — Hardened Login Input Validation
+  it('Rejects malformed email strings during login validation', async () => {
+    const res = await app.request('/v1/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: 'not-an-email',
+        password: 'Password123!',
+      }),
+    });
+    expect(res.status).toBe(401);
+    const data = await res.json();
+    expect(data.success).toBe(false);
+    expect(data.error.message).toContain('غير صحيحة');
+  });
+
+  // 12. Slice 5A — Sliding Session Refresh
+  it('Slides session expiration date if session is close to expiring', async () => {
+    const AuthServiceModule = await import('../src/services/auth.service.js');
+    const authService = new AuthServiceModule.AuthService(mockPrisma);
+
+    const oldExpiresAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000); // 3 days remaining (< 5 days)
+
+    vi.spyOn(mockPrisma.session, 'findUnique').mockResolvedValueOnce({
+      id: 'ses-old-1',
+      userId: 'usr-1',
+      token: 'tok-old-1',
+      expiresAt: oldExpiresAt,
+      createdAt: new Date(),
+      user: {
+        id: 'usr-1',
+        name: 'User One',
+        email: 'user1@waynah.com',
+        role: 'USER',
+        passwordHash: 'hash',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    } as any);
+
+    const updateSpy = vi.spyOn(mockPrisma.session, 'update').mockResolvedValueOnce({} as any);
+
+    const result = await authService.validateSession('tok-old-1');
+    expect(result).not.toBeNull();
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: { id: 'ses-old-1' },
+        data: expect.objectContaining({
+          expiresAt: expect.any(Date),
+        }),
+      })
+    );
   });
 });

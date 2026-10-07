@@ -85,5 +85,27 @@ export function createGeographyRouter(prismaClient: PrismaClient = defaultPrisma
     );
   });
 
+  /**
+   * GET /v1/geography/districts/:id
+   *
+   * Returns a single district with its governorate context, PostGIS boundary status,
+   * boundary geometry type, SRID, boundary GeoJSON polygon (if available), and related Place count.
+   * Returns 404 if district is not found.
+   */
+  router.get('/districts/:id', async (c) => {
+    const id = c.req.param('id');
+    const districtDetail = await geographyService.getDistrictDetailsById(id);
+
+    if (!districtDetail) {
+      return c.json(
+        ApiResponse.error(`District with ID '${id}' was not found`, 'NOT_FOUND'),
+        404
+      );
+    }
+
+    return c.json(ApiResponse.success(districtDetail));
+  });
+
   return router;
 }
+

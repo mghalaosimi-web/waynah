@@ -13,7 +13,8 @@ import {
   ChevronLeft,
   RefreshCw,
   Layers,
-  ArrowUpRight
+  ArrowUpRight,
+  Compass
 } from 'lucide-react';
 
 export default function AdminDashboardPage() {
@@ -215,6 +216,34 @@ export default function AdminDashboardPage() {
             <Link href="/admin/conflicts">
               <Button variant="outline" className="w-full font-bold py-3 rounded-2xl gap-2 text-xs">
                 <span>فتح طابور التعارضات (Conflicts Queue)</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Action 3: Admin Geography UI */}
+        <div className="bg-white dark:bg-slate-850 p-6 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm space-y-4 md:col-span-2">
+          <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2.5 bg-indigo-500/10 text-indigo-600 rounded-xl">
+                <Compass className="w-5 h-5" />
+              </div>
+              <h2 className="font-extrabold text-base text-slate-900 dark:text-white">
+                سجل الجغرافيا والتقسيم الإداري (Geography UI — Geo-D)
+              </h2>
+            </div>
+            <span className="px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300">
+              PostGIS & OCHA References
+            </span>
+          </div>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            استعراض وتفحص سجلات المحافظات والمديريات، التحقق من توفر الحدود المكانية المضلعة، ومطابقة البيانات الجغرافية الإدارية.
+          </p>
+          <div className="pt-2">
+            <Link href="/admin/geography">
+              <Button variant="outline" className="w-full font-bold py-3 rounded-2xl gap-2 text-xs border-indigo-200 dark:border-indigo-900 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950">
+                <span>فتح سجل الجغرافيا الإدارية (Admin Geography UI)</span>
                 <ArrowUpRight className="w-4 h-4" />
               </Button>
             </Link>

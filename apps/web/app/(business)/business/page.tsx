@@ -5,6 +5,10 @@ import Link from 'next/link';
 import { useAuth } from '../../../lib/auth/auth-context';
 import { apiClient, type BusinessItem, type BusinessVerificationData } from '../../../lib/api/api-client';
 import { Button } from '@waynah/ui';
+import { TeamSection } from '../../../components/domain/TeamSection';
+import { CatalogSection } from '../../../components/domain/CatalogSection';
+import { TransactionSection } from '../../../components/domain/TransactionSection';
+import { FulfillmentSection } from '../../../components/domain/FulfillmentSection';
 import {
   Building2,
   PlusCircle,
@@ -37,6 +41,9 @@ export default function BusinessDashboardPage() {
   const [descriptionInput, setDescriptionInput] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  // Active section tab (team management, catalog, transactions, fulfillment)
+  const [activeSection, setActiveSection] = useState<'overview' | 'catalog' | 'team' | 'transactions' | 'fulfillment'>('overview');
 
   // Verification State
   const [verification, setVerification] = useState<BusinessVerificationData | null>(null);
@@ -656,14 +663,18 @@ export default function BusinessDashboardPage() {
             </div>
           </div>
 
-          {/* Card 2: Services */}
-          <div className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group">
+          {/* Card 2: Catalog — Now Active (Phase 5) */}
+          <button
+            onClick={() => setActiveSection('catalog')}
+            className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group hover:border-blue-500/40 hover:shadow-md transition-all text-right w-full cursor-pointer"
+            aria-label="الانتقال إلى كتالوج المنتجات والخدمات"
+          >
             <div className="flex items-center justify-between">
               <div className="p-2.5 bg-blue-500/10 text-blue-600 rounded-xl">
                 <Store className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-                مرحلة لاحقة (Services)
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 dark:bg-blue-950 text-blue-700 dark:text-blue-300 border border-blue-500/20">
+                متاح الآن (Catalog)
               </span>
             </div>
             <div>
@@ -674,7 +685,7 @@ export default function BusinessDashboardPage() {
                 إضافة وقوائم الخدمات المقدمة والمنتجات المتاحة وتفاصيل الأسعار.
               </p>
             </div>
-          </div>
+          </button>
 
           {/* Card 3: Verification */}
           <div className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group">
@@ -696,14 +707,18 @@ export default function BusinessDashboardPage() {
             </div>
           </div>
 
-          {/* Card 4: Orders */}
-          <div className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group">
+          {/* Card 4: Orders & Transactions — Now Active (Phase 6) */}
+          <button
+            onClick={() => setActiveSection('transactions')}
+            className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group hover:border-purple-500/40 hover:shadow-md transition-all text-right w-full cursor-pointer"
+            aria-label="الانتقال إلى إدارة الطلبات والحجوزات"
+          >
             <div className="flex items-center justify-between">
               <div className="p-2.5 bg-purple-500/10 text-purple-600 rounded-xl">
                 <Briefcase className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500">
-                مرحلة لاحقة (Orders)
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-500/20">
+                متاح الآن (Transactions)
               </span>
             </div>
             <div>
@@ -711,19 +726,23 @@ export default function BusinessDashboardPage() {
                 إدارة الطلبات والحجوزات
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                استقبال طلبات العملاء المباشرة وإدارة الحجوزات والمواعيد.
+                استقبال طلبات العملاء المباشرة، وتلقي الاستفسارات، وإدارة طلبات التسعير (RFQ)، والحجوزات، والطلبات المالية.
               </p>
             </div>
-          </div>
+          </button>
 
-          {/* Card 5: Members */}
-          <div className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group">
+          {/* Card 5: Members — Now Active */}
+          <button
+            onClick={() => setActiveSection('team')}
+            className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group hover:border-emerald-500/40 hover:shadow-md transition-all text-right w-full cursor-pointer"
+            aria-label="الانتقال إلى إدارة فريق العمل"
+          >
             <div className="flex items-center justify-between">
-              <div className="p-2.5 bg-amber-500/10 text-amber-600 rounded-xl">
+              <div className="p-2.5 bg-emerald-500/10 text-emerald-600 rounded-xl">
                 <Users className="w-5 h-5" />
               </div>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20">
-                قريباً (Team)
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-500/20">
+                متاح الآن (Team)
               </span>
             </div>
             <div>
@@ -731,13 +750,149 @@ export default function BusinessDashboardPage() {
                 فريق العمل والصلاحيات
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                دُعاء وتعيين مدراء وأعضاء للنشاط التجاري وتحديد الصلاحيات.
+                دعوة وتعيين مدراء وأعضاء للنشاط التجاري وتحديد الصلاحيات.
               </p>
             </div>
-          </div>
+          </button>
+
+          {/* Card 6: Fulfillment & Payments — Now Active (Phase 7) */}
+          <button
+            onClick={() => setActiveSection('fulfillment')}
+            className="bg-white dark:bg-slate-850 p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 space-y-3 relative overflow-hidden group hover:border-teal-500/40 hover:shadow-md transition-all text-right w-full cursor-pointer"
+            aria-label="الانتقال إلى إدارة الوفاء والتسليم والحدود المالية"
+          >
+            <div className="flex items-center justify-between">
+              <div className="p-2.5 bg-teal-500/10 text-teal-600 rounded-xl">
+                <FileCheck className="w-5 h-5" />
+              </div>
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-500/20">
+                متاح الآن (Fulfillment)
+              </span>
+            </div>
+            <div>
+              <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">
+                الوفاء والتسليم والحدود المالية
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                إدارة أنماط الوفاء والتوصيل الميداني، إثبات الاكتمال (OTP)، وتتبع حالات السداد والحدود المالية.
+              </p>
+            </div>
+          </button>
 
         </div>
       </div>
+
+      {/* ─── Fulfillment & Payments Section (Phase 7) ──────────────────── */}
+      {activeSection === 'fulfillment' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                إدارة الوفاء والتسليم والحدود المالية
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                متابعة التسليم الميداني وإثبات الاكتمال وإقرار السداد لنشاط: {currentBiz.name}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection('overview')}
+              className="gap-1.5 text-xs font-bold rounded-xl"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>العودة للوحة الرئيسية</span>
+            </Button>
+          </div>
+          <FulfillmentSection businessId={currentBiz.id} />
+        </div>
+      )}
+
+      {/* ─── Transactions & Orders Section (Phase 6) ───────────────────── */}
+      {activeSection === 'transactions' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                إدارة التعهدات والطلبات
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                الطلبات والحجوزات والاستفسارات التابعة لنشاط: {currentBiz.name}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection('overview')}
+              className="gap-1.5 text-xs font-bold rounded-xl"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>العودة للوحة الرئيسية</span>
+            </Button>
+          </div>
+          <TransactionSection businessId={currentBiz.id} />
+        </div>
+      )}
+
+      {/* ─── Catalog Management Section (Phase 5) ───────────────────────── */}
+      {activeSection === 'catalog' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                إدارة كتالوج العرض
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                المنتجات المادية والخدمات التابعة لنشاط: {currentBiz.name}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection('overview')}
+              className="gap-1.5 text-xs font-bold rounded-xl"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>العودة للوحة الرئيسية</span>
+            </Button>
+          </div>
+          <CatalogSection
+            businessId={currentBiz.id}
+            currentMembershipRole={(currentBiz.membershipRole as 'OWNER' | 'MANAGER' | 'MEMBER') || 'MEMBER'}
+            actor={actor}
+          />
+        </div>
+      )}
+
+      {/* ─── Team Management Section ─────────────────────────────────────── */}
+      {activeSection === 'team' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-black text-slate-900 dark:text-white">
+                إدارة فريق العمل
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                أعضاء الفريق والدعوات المعلقة لنشاط: {currentBiz.name}
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveSection('overview')}
+              className="gap-1.5 text-xs font-bold rounded-xl"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>العودة للوحة الرئيسية</span>
+            </Button>
+          </div>
+          <TeamSection
+            businessId={currentBiz.id}
+            currentMembershipRole={(currentBiz.membershipRole as 'OWNER' | 'MANAGER' | 'MEMBER') || 'MEMBER'}
+            actor={actor}
+          />
+        </div>
+      )}
 
     </div>
   );

@@ -35,6 +35,7 @@ export class IngestionService {
           name: data.name,
           phone: data.phone,
           categoryId: data.categoryId,
+          description: data.description,
           latitude: data.latitude,
           longitude: data.longitude,
           // Domain-owned fields: never sourced from caller input.

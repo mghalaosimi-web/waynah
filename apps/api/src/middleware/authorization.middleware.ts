@@ -8,12 +8,12 @@ import { AuditLogger } from '../utils/audit-logger.js';
  * Supports exact match, global wildcard ('*'), and domain wildcards (e.g., 'admin.*').
  */
 export function hasPermission(actor: Actor, requiredPermission: string): boolean {
-  if (!actor || !actor.permissions) return false;
+  if (!actor || !actor.permissions || !requiredPermission) return false;
   if (actor.permissions.includes('*')) return true;
   if (actor.permissions.includes(requiredPermission)) return true;
 
   return actor.permissions.some((p) => {
-    if (p.endsWith('.*')) {
+    if (p && typeof p === 'string' && p.endsWith('.*')) {
       const prefix = p.slice(0, -1); // e.g. 'admin.'
       return requiredPermission.startsWith(prefix);
     }
@@ -68,7 +68,7 @@ export const requirePermission = (...permissions: string[]): MiddlewareHandler =
 
     // 2. Unauthenticated caller -> 401 Unauthorized
     if (actor.type === 'ANONYMOUS' || authStatus === 'ANONYMOUS') {
-      AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt to protected endpoint');
+      await AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt to protected endpoint');
       return c.json(
         {
           success: false,
@@ -82,7 +82,7 @@ export const requirePermission = (...permissions: string[]): MiddlewareHandler =
     const hasAllPermissions = permissions.every((p) => hasPermission(actor, p));
 
     if (!hasAllPermissions) {
-      AuditLogger.logAuthFailure(
+      await AuditLogger.logAuthFailure(
         c.req.method,
         c.req.path,
         ip,
@@ -127,7 +127,7 @@ export const requireRole = (...roles: string[]): MiddlewareHandler => {
     }
 
     if (actor.type === 'ANONYMOUS' || authStatus === 'ANONYMOUS') {
-      AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt to role-protected endpoint');
+      await AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt to role-protected endpoint');
       return c.json(
         {
           success: false,
@@ -140,7 +140,7 @@ export const requireRole = (...roles: string[]): MiddlewareHandler => {
     const hasAnyRole = roles.some((r) => hasRole(actor, r));
 
     if (!hasAnyRole) {
-      AuditLogger.logAuthFailure(
+      await AuditLogger.logAuthFailure(
         c.req.method,
         c.req.path,
         ip,
@@ -185,7 +185,7 @@ export const requireActorType = (...types: ActorType[]): MiddlewareHandler => {
     }
 
     if (actor.type === 'ANONYMOUS' || authStatus === 'ANONYMOUS') {
-      AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt');
+      await AuditLogger.logAuthFailure(c.req.method, c.req.path, ip, 'Unauthenticated access attempt');
       return c.json(
         {
           success: false,
@@ -196,7 +196,7 @@ export const requireActorType = (...types: ActorType[]): MiddlewareHandler => {
     }
 
     if (!types.includes(actor.type)) {
-      AuditLogger.logAuthFailure(
+      await AuditLogger.logAuthFailure(
         c.req.method,
         c.req.path,
         ip,

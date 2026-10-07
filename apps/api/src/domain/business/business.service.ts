@@ -184,9 +184,17 @@ export class BusinessService {
             description: true,
             address: true,
             phoneNumber: true,
+            website: true,
             verificationStatus: true,
             category: { select: { id: true, nameAr: true, icon: true } },
-            district: { select: { id: true, nameAr: true } },
+            district: {
+              select: {
+                id: true,
+                nameAr: true,
+                governorate: { select: { id: true, nameAr: true } },
+              },
+            },
+            location: { select: { latitude: true, longitude: true } },
           },
         },
         _count: {
@@ -266,4 +274,108 @@ export class BusinessService {
       },
     });
   }
+
+  /**
+   * Unlinks a branch (Place) from a Business by setting Place.businessId to NULL.
+   * Requires OWNER role for Business members, or Admin privilege.
+   * Uses row-level FOR UPDATE lock to prevent race conditions.
+   */
+  public async unlinkBranch(
+    userId: string,
+    businessId: string,
+    placeId: string,
+    isAdmin = false
+  ) {
+    // 1. Business existence check
+    const business = await this.prisma.business.findUnique({
+      where: { id: businessId },
+    });
+
+    if (!business) {
+      throw new Error('BUSINESS_NOT_FOUND');
+    }
+
+    // 2. Membership & Role Authorization Check (OWNER allowed, MANAGER / MEMBER denied)
+    if (!isAdmin) {
+      const membership = await this.prisma.businessMember.findUnique({
+        where: {
+          businessId_userId: {
+            businessId,
+            userId,
+          },
+        },
+      });
+
+      if (!membership) {
+        throw new Error('NOT_BUSINESS_MEMBER');
+      }
+
+      if (membership.role !== OWNER_ROLE) {
+        throw new Error('INSUFFICIENT_BUSINESS_PERMISSIONS');
+      }
+    }
+
+    // 3. Place initial lookup
+    const place = await this.prisma.place.findUnique({
+      where: { id: placeId },
+    });
+
+    if (!place) {
+      throw new Error('PLACE_NOT_FOUND');
+    }
+
+    // 4. Precondition checks
+    if (place.businessId === null) {
+      throw new Error('ALREADY_UNLINKED');
+    }
+
+    if (place.businessId !== businessId) {
+      throw new Error('PLACE_NOT_LINKED_TO_THIS_BUSINESS');
+    }
+
+    // 5. Transaction with pessimistic row-level lock FOR UPDATE
+    const unlinkedPlace = await this.prisma.$transaction(async (tx) => {
+      // Step A: PostgreSQL row-level lock FOR UPDATE on target Place
+      await tx.$queryRaw`SELECT "id", "business_id" FROM "places" WHERE "id" = ${placeId} FOR UPDATE`;
+
+      // Step B: Re-read authoritative Place state inside transaction
+      const currentPlace = await tx.place.findUnique({
+        where: { id: placeId },
+      });
+
+      if (!currentPlace) {
+        throw new Error('PLACE_NOT_FOUND');
+      }
+
+      if (currentPlace.businessId === null) {
+        throw new Error('ALREADY_UNLINKED');
+      }
+
+      if (currentPlace.businessId !== businessId) {
+        throw new Error('PLACE_NOT_LINKED_TO_THIS_BUSINESS');
+      }
+
+      // Step C: Atomically update Place.businessId = NULL
+      const updated = await tx.place.update({
+        where: { id: placeId },
+        data: {
+          businessId: null,
+        },
+        select: {
+          id: true,
+          nameAr: true,
+          nameEn: true,
+          address: true,
+          businessId: true,
+          verificationStatus: true,
+          updatedAt: true,
+        },
+      });
+
+      return updated;
+    });
+
+    return unlinkedPlace;
+  }
 }
+

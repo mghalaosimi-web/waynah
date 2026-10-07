@@ -8,11 +8,16 @@ export interface AuthContextType {
   actor: Actor;
   user: UserData | null;
   isAuthenticated: boolean;
+  emailVerified: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
+  verifyEmail: (token: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resendVerification: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; message?: string; error?: string }>;
+  resetPassword: (token: string, newPassword: string) => Promise<{ success: boolean; message?: string; error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -22,6 +27,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<UserData | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const emailVerified = Boolean(user?.emailVerified);
 
   const refreshAuth = useCallback(async () => {
     setIsLoading(true);
@@ -117,17 +124,99 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const verifyEmail = async (token: string) => {
+    try {
+      const res = await apiClient.verifyEmail({ token });
+      if (res.success) {
+        await refreshAuth();
+        return { success: true, message: res.data.message };
+      }
+      const errorMessage =
+        typeof res.error === 'object' && res.error?.message
+          ? res.error.message
+          : typeof res.error === 'string'
+          ? res.error
+          : 'فشل تأكيد البريد الإلكتروني';
+      return { success: false, error: errorMessage };
+    } catch {
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء التأكيد' };
+    }
+  };
+
+  const resendVerification = async (email: string) => {
+    try {
+      const res = await apiClient.resendVerification({ email });
+      if (res.success) {
+        return { success: true, message: res.data.message };
+      }
+      const errorMessage =
+        typeof res.error === 'object' && res.error?.message
+          ? res.error.message
+          : typeof res.error === 'string'
+          ? res.error
+          : 'فشل إعادة إرسال رابط التأكيد';
+      return { success: false, error: errorMessage };
+    } catch {
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء طلب إعادة الإرسال' };
+    }
+  };
+
+  const forgotPassword = async (email: string) => {
+    try {
+      const res = await apiClient.forgotPassword({ email });
+      if (res.success) {
+        return { success: true, message: res.data.message };
+      }
+      const errorMessage =
+        typeof res.error === 'object' && res.error?.message
+          ? res.error.message
+          : typeof res.error === 'string'
+          ? res.error
+          : 'فشل طلب إعادة ضبط كلمة المرور';
+      return { success: false, error: errorMessage };
+    } catch {
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء الطلب' };
+    }
+  };
+
+  const resetPassword = async (token: string, newPassword: string) => {
+    try {
+      const res = await apiClient.resetPassword({ token, newPassword });
+      if (res.success) {
+        // Backend revokes all active sessions upon password reset
+        setActor(ANONYMOUS_ACTOR);
+        setUser(null);
+        setIsAuthenticated(false);
+        return { success: true, message: res.data.message };
+      }
+      const errorMessage =
+        typeof res.error === 'object' && res.error?.message
+          ? res.error.message
+          : typeof res.error === 'string'
+          ? res.error
+          : 'فشل إعادة ضبط كلمة المرور';
+      return { success: false, error: errorMessage };
+    } catch {
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء العملية' };
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
         actor,
         user,
         isAuthenticated,
+        emailVerified,
         isLoading,
         login,
         register,
         logout,
         refreshAuth,
+        verifyEmail,
+        resendVerification,
+        forgotPassword,
+        resetPassword,
       }}
     >
       {children}

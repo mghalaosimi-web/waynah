@@ -109,6 +109,14 @@ export default function LoginPage() {
               disabled={loading}
               autoComplete="current-password"
             />
+            <div className="flex justify-end mt-1">
+              <Link
+                href="/forgot-password"
+                className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+              >
+                نسيت كلمة المرور؟
+              </Link>
+            </div>
           </div>
 
           <Button

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth/auth-context';
 import { Button } from '@waynah/ui';
+import { NotificationBell } from '../notifications/NotificationBell';
 import { 
   Compass, 
   MapPin, 
@@ -118,6 +119,7 @@ export const ClientHeader: React.FC<ClientHeaderProps> = ({
 
           {/* User Identity & Auth State Area */}
           <div className="flex items-center gap-3">
+            <NotificationBell />
             {isAuthenticated ? (
               <div className="relative">
                 <button

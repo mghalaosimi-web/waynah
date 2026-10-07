@@ -82,6 +82,12 @@ export class PasswordSecurity {
     if (!data.email || typeof data.email !== 'string' || !data.password || typeof data.password !== 'string') {
       return { isValid: false, error: 'البريد الإلكتروني وكلمة المرور مطلوبان' };
     }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email.trim())) {
+      return { isValid: false, error: 'صيغة البريد الإلكتروني غير صحيحة' };
+    }
+
     return { isValid: true };
   }
 }

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { UnverifiedAccountBanner } from '../auth/UnverifiedAccountBanner';
 import { useAuth } from '../../lib/auth/auth-context';
 import { ClientHeader } from './ClientHeader';
 import { ClientSidebar } from './ClientSidebar';
@@ -15,7 +16,7 @@ interface ClientShellProps {
 
 export const ClientShell: React.FC<ClientShellProps> = ({ children }) => {
   const pathname = usePathname();
-  const { actor, switchRole } = useAuth();
+  const { actor } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Generate page title and breadcrumbs based on route
@@ -41,7 +42,9 @@ export const ClientShell: React.FC<ClientShellProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 transition-colors">
-      
+      {/* Email Verification Alert Banner */}
+      <UnverifiedAccountBanner />
+
       {/* Client Shell Top Header */}
       <ClientHeader
         onToggleMobileMenu={() => setMobileMenuOpen(!mobileMenuOpen)}

@@ -35,4 +35,10 @@ export const securityConfig = {
     maxRequestsProtected: Number(process.env.RATE_LIMIT_MAX_PROTECTED) || 60,
     maxRequestsPublic: Number(process.env.RATE_LIMIT_MAX_PUBLIC) || 300,
   },
+
+  // Account Token Lifetimes
+  accountTokens: {
+    emailVerificationExpiryMs: 24 * 60 * 60 * 1000, // 24 hours
+    passwordResetExpiryMs: 60 * 60 * 1000, // 1 hour
+  },
 };

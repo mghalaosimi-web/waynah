@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { Container, Button } from '@waynah/ui';
 import { WaynahLogo } from '../shared/WaynahLogo';
 import { ThemePicker } from './ThemePicker';
+import { UnverifiedAccountBanner } from '../auth/UnverifiedAccountBanner';
 
 export const Header: React.FC = () => {
   const pathname = usePathname();
@@ -24,7 +25,9 @@ export const Header: React.FC = () => {
   };
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
+    <>
+      <UnverifiedAccountBanner />
+      <header className="sticky top-0 z-40 w-full bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-colors">
       <Container size="xl">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
@@ -115,5 +118,6 @@ export const Header: React.FC = () => {
         )}
       </Container>
     </header>
+  </>
   );
 };

@@ -22,6 +22,209 @@ import {
   Lock,
 } from 'lucide-react';
 
+function formatEventActor(actor?: { id: string | null; type: string } | null): string {
+  if (!actor || !actor.type) return 'غير معروف';
+  switch (actor.type) {
+    case 'ADMIN':
+      return actor.id ? `مدير النظام (${actor.id})` : 'مدير النظام';
+    case 'USER':
+      return actor.id ? `مستخدم (${actor.id})` : 'مستخدم';
+    case 'SYSTEM':
+      return 'النظام التلقائي';
+    default:
+      return 'غير معروف';
+  }
+}
+
+function formatEventTimestamp(tsString?: string): string {
+  if (!tsString) return 'تاريخ غير محدد';
+  try {
+    const d = new Date(tsString);
+    if (isNaN(d.getTime())) return tsString;
+    return d.toLocaleString('ar-YE', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return tsString;
+  }
+}
+
+function getEventBadgeStyle(type: string, severity?: string) {
+  switch (type) {
+    case 'PLACE_CREATED':
+      return 'bg-sky-500/10 text-sky-700 dark:text-sky-300 border-sky-500/20';
+    case 'OBSERVATION_RECORDED':
+      return severity === 'WARNING'
+        ? 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/20'
+        : 'bg-teal-500/10 text-teal-700 dark:text-teal-300 border-teal-500/20';
+    case 'CONFLICT_CREATED':
+      return 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20';
+    case 'CONFLICT_RESOLVED':
+      return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20';
+    case 'BRANCH_CLAIM_SUBMITTED':
+      return 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/20';
+    case 'BRANCH_CLAIM_APPROVED':
+      return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20';
+    case 'BRANCH_CLAIM_REJECTED':
+      return 'bg-rose-500/10 text-rose-700 dark:text-rose-300 border-rose-500/20';
+    case 'BRANCH_CLAIM_REVIEWED':
+      return 'bg-blue-500/10 text-blue-700 dark:text-blue-300 border-blue-500/20';
+    default:
+      return 'bg-slate-500/10 text-slate-700 dark:text-slate-300 border-slate-500/20';
+  }
+}
+
+function renderEventIcon(type: string, actorType?: string) {
+  switch (type) {
+    case 'PLACE_CREATED':
+      return <Building2 className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />;
+    case 'OBSERVATION_RECORDED':
+      return actorType === 'USER' ? (
+        <Users className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+      ) : (
+        <Database className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
+      );
+    case 'CONFLICT_CREATED':
+      return <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />;
+    case 'CONFLICT_RESOLVED':
+      return <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
+    case 'BRANCH_CLAIM_SUBMITTED':
+      return <FileText className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />;
+    case 'BRANCH_CLAIM_APPROVED':
+      return <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />;
+    case 'BRANCH_CLAIM_REJECTED':
+      return <AlertCircle className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400" />;
+    case 'BRANCH_CLAIM_REVIEWED':
+      return <ShieldCheck className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />;
+    default:
+      return <Clock className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />;
+  }
+}
+
+function PlaceTimelineSection({ timeline }: { timeline?: any[] }) {
+  if (timeline === undefined) return null;
+
+  return (
+    <div className="bg-white dark:bg-slate-850 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden space-y-4 p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div className="flex items-center gap-2.5">
+          <div className="p-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+              التسلسل الزمني التاريخي للمكان (Place Knowledge Timeline)
+            </h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              تسلسل زمني موثق للأحداث والتعديلات والملاحظات المرتبطة بالمكان
+            </p>
+          </div>
+        </div>
+
+        <span className="text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full">
+          {timeline.length} أحداث
+        </span>
+      </div>
+
+      {timeline.length === 0 ? (
+        <div className="p-8 text-center text-slate-500 dark:text-slate-400 text-xs">
+          لا توجد أحداث مسجلة في التسلسل الزمني لهذا المكان حتى الآن.
+        </div>
+      ) : (
+        <div className="relative pr-6 space-y-6 before:absolute before:right-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+          {timeline.map((event) => {
+            const badgeClass = getEventBadgeStyle(event.type, event.severity);
+
+            return (
+              <div key={event.id} className="relative flex items-start gap-4 text-xs">
+                {/* Marker */}
+                <div className="absolute -right-6 top-0.5 w-5 h-5 rounded-full bg-white dark:bg-slate-850 border border-slate-200 dark:border-slate-700 flex items-center justify-center shrink-0 z-10 shadow-xs">
+                  {renderEventIcon(event.type, event.actor?.type)}
+                </div>
+
+                {/* Content Card */}
+                <div className="w-full bg-slate-50/70 dark:bg-slate-900/60 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/50 dark:border-slate-800/60 pb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold border ${badgeClass}`}>
+                        {event.title || event.type}
+                      </span>
+                      <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+                        المصدر: <strong className="text-slate-700 dark:text-slate-300">{event.source || 'غير محدد'}</strong>
+                      </span>
+                    </div>
+
+                    <span className="font-mono text-[11px] text-slate-400">
+                      {formatEventTimestamp(event.timestamp)}
+                    </span>
+                  </div>
+
+                  <p className="font-bold text-slate-800 dark:text-slate-200 text-xs">
+                    {event.description || 'بدون تفاصيل إضافية'}
+                  </p>
+
+                  <div className="flex items-center justify-between gap-2 text-[11px] text-slate-400 pt-1">
+                    <span>المنفذ: {formatEventActor(event.actor)}</span>
+                    {event.status && (
+                      <span className="font-mono">الحالة: {event.status}</span>
+                    )}
+                  </div>
+
+                  {/* Metadata */}
+                  {event.metadata && typeof event.metadata === 'object' && (
+                    <div className="pt-2 border-t border-slate-200/40 dark:border-slate-800/40 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px]">
+                      {event.metadata.confidenceScore !== undefined && (
+                        <div>
+                          <span className="text-slate-400">درجة الثقة: </span>
+                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                            {Math.round(event.metadata.confidenceScore * 100)}%
+                          </span>
+                        </div>
+                      )}
+                      {event.metadata.phone && (
+                        <div>
+                          <span className="text-slate-400">رقم الهاتف: </span>
+                          <span className="font-mono font-bold text-slate-700 dark:text-slate-300">
+                            {event.metadata.phone}
+                          </span>
+                        </div>
+                      )}
+                      {event.metadata.businessName && (
+                        <div>
+                          <span className="text-slate-400">النشاط التجاري: </span>
+                          <span className="font-bold text-slate-700 dark:text-slate-300">
+                            {event.metadata.businessName}
+                          </span>
+                        </div>
+                      )}
+                      {event.metadata.rejectionReason && (
+                        <div className="col-span-1 sm:col-span-2 text-rose-600 dark:text-rose-400">
+                          <span>سبب الرفض: </span>
+                          <span className="font-medium">{event.metadata.rejectionReason}</span>
+                        </div>
+                      )}
+                      {event.metadata.notes && (
+                        <div className="col-span-1 sm:col-span-2 text-slate-600 dark:text-slate-400">
+                          <span>ملاحظات: </span>
+                          <span className="font-medium">{event.metadata.notes}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PlaceKnowledgeHistoryPage() {
   const params = useParams();
   const placeId = (params?.id as string) || '';
@@ -202,6 +405,9 @@ export default function PlaceKnowledgeHistoryPage() {
             </div>
           </div>
 
+          {/* Place Knowledge Timeline Section */}
+          <PlaceTimelineSection timeline={placeHistory.timeline} />
+
           {/* Observations Timeline Table */}
           <div className="bg-white dark:bg-slate-850 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm overflow-hidden space-y-4 p-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-4">
@@ -345,3 +551,4 @@ export default function PlaceKnowledgeHistoryPage() {
     </div>
   );
 }
+

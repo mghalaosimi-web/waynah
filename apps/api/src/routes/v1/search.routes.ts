@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator';
 import { searchParamsSchema, type SearchParams } from '@waynah/shared';
 import { prisma as defaultPrisma, type PrismaClient } from '@waynah/database';
 import { SearchService } from '../../domain/search/search.service.js';
+import { publicSearchRateLimiter } from '../../middleware/rate-limit.middleware.js';
 
 export function createSearchRouter(prismaClient: PrismaClient = defaultPrisma) {
   const router = new Hono();
@@ -10,6 +11,7 @@ export function createSearchRouter(prismaClient: PrismaClient = defaultPrisma) {
 
   router.get(
     '/',
+    publicSearchRateLimiter,
     zValidator(
       'query',
       searchParamsSchema,

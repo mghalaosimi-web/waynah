@@ -184,6 +184,9 @@ importers:
       '@waynah/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@waynah/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       '@waynah/shared':
         specifier: workspace:*
         version: link:../../packages/shared
@@ -297,6 +300,18 @@ importers:
       typescript:
         specifier: ^5.8.2
         version: 5.9.3
+
+  packages/search:
+    devDependencies:
+      '@waynah/config':
+        specifier: workspace:*
+        version: link:../config
+      typescript:
+        specifier: ^5.8.2
+        version: 5.9.3
+      vitest:
+        specifier: ^5.0.2
+        version: 5.0.2(@types/node@22.20.4)(vite@8.3.1(@types/node@22.20.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15))
 
   packages/shared:
     dependencies:

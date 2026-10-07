@@ -16,11 +16,14 @@ export type BaseEntity = z.infer<typeof BaseEntitySchema>;
 export * from './types/response.types.js';
 export * from './constants/error-codes.js';
 export * from './errors/app-error.js';
+export * from './errors/domain-error.js';
 export * from './utils/api-response.builder.js';
 
 // Schemas & Types
 export * from './schemas/pagination.schema.js';
 export * from './schemas/discovery.schema.js';
 export * from './schemas/search.schema.js';
+export * from './schemas/notification.schema.js';
 export * from './types/auth.types.js';
+export * from './types/notification.types.js';
 export * from './constants/permissions.js';

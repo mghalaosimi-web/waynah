@@ -73,9 +73,11 @@ model Category {
   parentId  String?    @map("parent_id")
   parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   children  Category[] @relation("CategoryHierarchy")
-  places    Place[]
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  places       Place[]
+  products     Product[]
+  services     ServiceItem[]
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
 
   @@map("categories")
 }
@@ -102,6 +104,9 @@ model Place {
   favorites          Favorite[]
   requests           ServiceRequest[]
   branchClaims       BranchClaim[]
+  reviews            Review[]
+  sourceCandidates   DuplicateCandidate[] @relation("SourceCandidate")
+  targetCandidates   DuplicateCandidate[] @relation("TargetCandidate")
   createdAt          DateTime           @default(now()) @map("created_at")
   updatedAt          DateTime           @updatedAt @map("updated_at")
 
@@ -143,6 +148,7 @@ model PlaceObservation {
   name            String?
   phone           String?
   categoryId      String?                                @map("category_id")
+  description     String?
   latitude        Float?
   longitude       Float?
   geom            Unsupported("geography(Point, 4326)")?
@@ -177,16 +183,45 @@ model User {
   email               String           @unique
   passwordHash        String           @map("password_hash")
   role                String           @default("USER")
+  emailVerified       Boolean          @default(false) @map("email_verified")
+  emailVerifiedAt     DateTime?        @map("email_verified_at")
   sessions            Session[]
+  accountTokens       AccountToken[]
   favorites           Favorite[]
   requests            ServiceRequest[]
+  inquiries           Inquiry[]
+  rfqs                RFQ[]
+  bookings            Booking[]
+  orders              Order[]
   businessMemberships   BusinessMember[]
   submittedBranchClaims BranchClaim[]     @relation("SubmittedBranchClaims")
   reviewedBranchClaims  BranchClaim[]     @relation("ReviewedBranchClaims")
+  sentBusinessInvitations BusinessInvitation[] @relation("SentBusinessInvitations")
+  reviews               Review[]
+  notifications         Notification[]
   createdAt             DateTime         @default(now()) @map("created_at")
   updatedAt           DateTime         @updatedAt @map("updated_at")
 
   @@map("users")
+}
+
+enum AccountTokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model AccountToken {
+  id        String           @id @default(uuid())
+  userId    String           @map("user_id")
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      AccountTokenType
+  tokenHash String           @unique @map("token_hash")
+  expiresAt DateTime         @map("expires_at")
+  usedAt    DateTime?        @map("used_at")
+  createdAt DateTime         @default(now()) @map("created_at")
+
+  @@index([userId, type])
+  @@map("account_tokens")
 }
 
 model Session {
@@ -227,14 +262,22 @@ model ServiceRequest {
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   placeId     String?       @map("place_id")
   place       Place?        @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  businessId  String?       @map("business_id")
+  business    Business?     @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  serviceId   String?       @map("service_id")
+  service     ServiceItem?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  productId   String?       @map("product_id")
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
   title       String
   description String
   status      RequestStatus @default(PENDING)
+  notes       String?
   createdAt   DateTime      @default(now()) @map("created_at")
   updatedAt   DateTime      @updatedAt @map("updated_at")
 
   @@index([userId])
   @@index([placeId])
+  @@index([businessId])
   @@map("service_requests")
 }
 
@@ -266,6 +309,20 @@ model Business {
   places       Place[]
   verification BusinessVerification?
   branchClaims BranchClaim[]
+  invitations  BusinessInvitation[]
+  products     Product[]
+  services     ServiceItem[]
+  inquiries    Inquiry[]
+  requests     ServiceRequest[]
+  rfqs         RFQ[]
+  quotes       Quote[]
+  bookings     Booking[]
+  orders       Order[]
+  fulfillments Fulfillment[]
+  paymentRecords PaymentRecord[]
+  verificationLogs VerificationLog[]
+  reviews      Review[]
+  notifications Notification[]
   createdAt    DateTime              @default(now()) @map("created_at")
   updatedAt    DateTime              @updatedAt @map("updated_at")
 
@@ -298,6 +355,7 @@ model BusinessVerification {
   reviewedAt      DateTime?                  @map("reviewed_at")
   rejectionReason String?                    @map("rejection_reason")
   reviewerId      String?                    @map("reviewer_id")
+  verificationLogs VerificationLog[]
   createdAt       DateTime                   @default(now()) @map("created_at")
   updatedAt       DateTime                   @updatedAt @map("updated_at")
 
@@ -336,4 +394,521 @@ model BranchClaim {
   @@index([status])
   @@map("branch_claims")
 }
+
+enum BusinessInvitationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  CANCELLED
+}
+
+model BusinessInvitation {
+  id          String                   @id @default(uuid())
+  businessId  String                   @map("business_id")
+  business    Business                 @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  email       String                   @map("email")
+  role        BusinessRole             @default(MEMBER)
+  inviterId   String                   @map("inviter_id")
+  inviter     User                     @relation("SentBusinessInvitations", fields: [inviterId], references: [id], onDelete: Cascade)
+  tokenHash   String                   @unique @map("token_hash")
+  status      BusinessInvitationStatus @default(PENDING)
+  expiresAt   DateTime                 @map("expires_at")
+  acceptedAt  DateTime?                @map("accepted_at")
+  declinedAt  DateTime?                @map("declined_at")
+  cancelledAt DateTime?                @map("cancelled_at")
+  createdAt   DateTime                 @default(now()) @map("created_at")
+  updatedAt   DateTime                 @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([email])
+  @@index([businessId, email, status])
+
+  @@map("business_invitations")
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  businessId  String           @map("business_id")
+  business    Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  nameAr      String           @map("name_ar")
+  nameEn      String?          @map("name_en")
+  description String?
+  price       Float
+  currency    String           @default("YER")
+  isAvailable Boolean          @default(true) @map("is_available")
+  sku         String?
+  imageUrl    String?          @map("image_url")
+  categoryId  String?          @map("category_id")
+  category    Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  variants    ProductVariant[]
+  inquiries   Inquiry[]
+  requests    ServiceRequest[]
+  orderItems  OrderItem[]
+  reviews     Review[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model ProductVariant {
+  id          String   @id @default(uuid())
+  productId   String   @map("product_id")
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  nameAr      String   @map("name_ar")
+  nameEn      String?  @map("name_en")
+  price       Float?
+  isAvailable Boolean  @default(true) @map("is_available")
+  sku         String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([productId])
+  @@map("product_variants")
+}
+
+model ServiceItem {
+  id              String           @id @default(uuid())
+  businessId      String           @map("business_id")
+  business        Business         @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  nameAr          String           @map("name_ar")
+  nameEn          String?          @map("name_en")
+  description     String?
+  price           Float?
+  currency        String           @default("YER")
+  isAvailable     Boolean          @default(true) @map("is_available")
+  durationMinutes Int?             @map("duration_minutes")
+  categoryId      String?          @map("category_id")
+  category        Category?        @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  inquiries       Inquiry[]
+  requests        ServiceRequest[]
+  bookings        Booking[]
+  orderItems      OrderItem[]
+  reviews         Review[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([categoryId])
+  @@map("service_items")
+}
+
+enum InquiryStatus {
+  PENDING
+  ANSWERED
+  CLOSED
+}
+
+model Inquiry {
+  id          String        @id @default(uuid())
+  businessId  String        @map("business_id")
+  business    Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId      String        @map("user_id")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId   String?       @map("product_id")
+  product     Product?      @relation(fields: [productId], references: [id], onDelete: SetNull)
+  serviceId   String?       @map("service_id")
+  service     ServiceItem?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  subject     String
+  message     String
+  reply       String?
+  status      InquiryStatus @default(PENDING)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([userId])
+  @@map("inquiries")
+}
+
+enum RFQStatus {
+  OPEN
+  QUOTED
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum QuoteStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model RFQ {
+  id          String    @id @default(uuid())
+  businessId  String    @map("business_id")
+  business    Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId      String    @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  budget      Float?
+  currency    String    @default("YER")
+  status      RFQStatus @default(OPEN)
+  expiresAt   DateTime? @map("expires_at")
+  quotes      Quote[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([userId])
+  @@map("rfqs")
+}
+
+model Quote {
+  id         String      @id @default(uuid())
+  rfqId      String      @map("rfq_id")
+  rfq        RFQ         @relation(fields: [rfqId], references: [id], onDelete: Cascade)
+  businessId String      @map("business_id")
+  business   Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  amount     Float
+  currency   String      @default("YER")
+  notes      String?
+  status     QuoteStatus @default(PENDING)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
+
+  @@index([rfqId])
+  @@index([businessId])
+  @@map("quotes")
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  businessId      String        @map("business_id")
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId          String        @map("user_id")
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  serviceId       String?       @map("service_id")
+  service         ServiceItem?  @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  scheduledAt     DateTime      @map("scheduled_at")
+  durationMinutes Int?          @map("duration_minutes")
+  status          BookingStatus @default(PENDING)
+  notes           String?
+  fulfillments    Fulfillment[]
+  paymentRecords  PaymentRecord[]
+  reviews         Review[]
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([userId])
+  @@map("bookings")
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  CANCELLED
+}
+
+model Order {
+  id             String          @id @default(uuid())
+  orderNumber    String          @unique @map("order_number")
+  businessId     String          @map("business_id")
+  business       Business        @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  userId         String          @map("user_id")
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalAmount    Float           @map("total_amount")
+  currency       String          @default("YER")
+  status         OrderStatus     @default(PENDING)
+  notes          String?
+  items          OrderItem[]
+  fulfillments   Fulfillment[]
+  paymentRecords PaymentRecord[]
+  reviews        Review[]
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([userId])
+  @@index([orderNumber])
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String       @id @default(uuid())
+  orderId    String       @map("order_id")
+  order      Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId  String?      @map("product_id")
+  product    Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  serviceId  String?      @map("service_id")
+  service    ServiceItem? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  title      String
+  quantity   Int          @default(1)
+  unitPrice  Float        @map("unit_price")
+  totalPrice Float        @map("total_price")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+enum FulfillmentStatus {
+  PENDING
+  PREPARING
+  READY
+  IN_TRANSIT
+  DELIVERED
+  FULFILLED
+  CANCELLED
+}
+
+enum FulfillmentMode {
+  CUSTOMER_PICKUP
+  MERCHANT_FULFILLMENT
+  THIRD_PARTY_DELIVERY
+  FIELD_FULFILLMENT
+  ON_SITE
+  REMOTE
+}
+
+enum DeliveryStatus {
+  ASSIGNED
+  DISPATCHED
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum PaymentStatus {
+  UNPAID
+  PENDING_VERIFICATION
+  PAID
+  PAYMENT_FAILED
+  PARTIALLY_REFUNDED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CASH_ON_DELIVERY
+  WALLET_TRANSFER
+  BANK_TRANSFER
+  CARD
+  DIRECT_MERCHANT
+}
+
+model Fulfillment {
+  id           String            @id @default(uuid())
+  orderId      String?           @map("order_id")
+  order        Order?            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bookingId    String?           @map("booking_id")
+  booking      Booking?          @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  businessId   String            @map("business_id")
+  business     Business          @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  mode         FulfillmentMode   @default(MERCHANT_FULFILLMENT)
+  status       FulfillmentStatus @default(PENDING)
+  otpCode      String?           @map("otp_code")
+  notes        String?
+  deliveries   Delivery[]
+  fulfilledAt  DateTime?         @map("fulfilled_at")
+  createdAt    DateTime          @default(now()) @map("created_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@index([bookingId])
+  @@index([businessId])
+  @@map("fulfillments")
+}
+
+model Delivery {
+  id             String         @id @default(uuid())
+  fulfillmentId  String         @map("fulfillment_id")
+  fulfillment    Fulfillment    @relation(fields: [fulfillmentId], references: [id], onDelete: Cascade)
+  status         DeliveryStatus @default(ASSIGNED)
+  carrierName    String?        @map("carrier_name")
+  carrierPhone   String?        @map("carrier_phone")
+  trackingNumber String?        @map("tracking_number")
+  proofPhotoUrl  String?        @map("proof_photo_url")
+  deliveredAt    DateTime?      @map("delivered_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  @@index([fulfillmentId])
+  @@map("deliveries")
+}
+
+model PaymentRecord {
+  id              String        @id @default(uuid())
+  orderId         String?       @map("order_id")
+  order           Order?        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  bookingId       String?       @map("booking_id")
+  booking         Booking?      @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  businessId      String        @map("business_id")
+  business        Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  amount          Float
+  currency        String        @default("YER")
+  method          PaymentMethod @default(CASH_ON_DELIVERY)
+  status          PaymentStatus @default(UNPAID)
+  referenceNumber String?       @map("reference_number")
+  notes           String?
+  verifiedAt      DateTime?     @map("verified_at")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  @@index([orderId])
+  @@index([bookingId])
+  @@index([businessId])
+  @@map("payment_records")
+}
+
+model VerificationLog {
+  id              String                     @id @default(uuid())
+  businessId      String                     @map("business_id")
+  business        Business                   @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  verificationId  String?                    @map("verification_id")
+  verification    BusinessVerification?      @relation(fields: [verificationId], references: [id], onDelete: SetNull)
+  status          BusinessVerificationStatus
+  actorId         String                     @map("actor_id")
+  actorRole       String                     @default("USER") @map("actor_role")
+  action          String
+  notes           String?
+  rejectionReason String?                    @map("rejection_reason")
+  createdAt       DateTime                   @default(now()) @map("created_at")
+
+  @@index([businessId])
+  @@index([verificationId])
+  @@index([actorId])
+  @@map("verification_logs")
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  FLAGGED
+  HIDDEN
+}
+
+model Review {
+  id          String       @id @default(uuid())
+  userId      String       @map("user_id")
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId  String       @map("business_id")
+  business    Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  placeId     String?      @map("place_id")
+  place       Place?       @relation(fields: [placeId], references: [id], onDelete: SetNull)
+  productId   String?      @map("product_id")
+  product     Product?     @relation(fields: [productId], references: [id], onDelete: SetNull)
+  serviceId   String?      @map("service_id")
+  service     ServiceItem? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  orderId     String?      @map("order_id")
+  order       Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  bookingId   String?      @map("booking_id")
+  booking     Booking?     @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  rating      Int
+  comment     String?
+  status      ReviewStatus @default(PUBLISHED)
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  @@index([businessId])
+  @@index([userId])
+  @@index([placeId])
+  @@index([status])
+  @@map("reviews")
+}
+
+enum DuplicateCandidateStatus {
+  PENDING
+  MERGED
+  IGNORED
+}
+
+model DuplicateCandidate {
+  id             String                   @id @default(uuid())
+  sourcePlaceId  String                   @map("source_place_id")
+  sourcePlace    Place                    @relation("SourceCandidate", fields: [sourcePlaceId], references: [id], onDelete: Cascade)
+  targetPlaceId  String                   @map("target_place_id")
+  targetPlace    Place                    @relation("TargetCandidate", fields: [targetPlaceId], references: [id], onDelete: Cascade)
+  candidateScore Float                    @map("candidate_score")
+  matchReasons   Json                     @map("match_reasons")
+  status         DuplicateCandidateStatus @default(PENDING)
+  createdAt      DateTime                 @default(now()) @map("created_at")
+  updatedAt      DateTime                 @updatedAt @map("updated_at")
+
+  @@unique([sourcePlaceId, targetPlaceId])
+  @@index([sourcePlaceId])
+  @@index([targetPlaceId])
+  @@index([status])
+  @@index([candidateScore])
+  @@map("duplicate_candidates")
+}
+
+enum NotificationType {
+  SYSTEM_ALERT
+  VERIFICATION_UPDATE
+  CLAIM_UPDATE
+  MEMBER_INVITATION
+  TRANSACTION_UPDATE
+  REVIEW_MODERATED
+}
+
+model Notification {
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessId String?          @map("business_id")
+  business   Business?        @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  type       NotificationType
+  title      String
+  body       String
+  data       Json?
+  isRead     Boolean          @default(false) @map("is_read")
+  readAt     DateTime?        @map("read_at")
+  createdAt  DateTime         @default(now()) @map("created_at")
+  updatedAt  DateTime         @updatedAt @map("updated_at")
+
+  @@index([userId, isRead])
+  @@index([userId, createdAt])
+  @@index([businessId])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+
+  eventType    String   @map("event_type")
+  action       String?
+  method       String?
+  path         String?
+  ip           String?
+
+  actorId      String?  @map("actor_id")
+  actorType    String?  @map("actor_type")
+  actorRole    String?  @map("actor_role")
+
+  resourceType String?  @map("resource_type")
+  resourceId   String?  @map("resource_id")
+
+  businessId   String?  @map("business_id")
+  placeId      String?  @map("place_id")
+
+  metadata     Json?
+
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@index([eventType])
+  @@index([actorId])
+  @@index([resourceType, resourceId])
+  @@index([businessId])
+  @@index([placeId])
+  @@index([createdAt])
+
+  @@map("audit_logs")
+}
+
+
+
 

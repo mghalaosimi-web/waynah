@@ -142,6 +142,20 @@ export class BusinessVerificationService {
       },
     });
 
+    if (this.prisma.verificationLog) {
+      await this.prisma.verificationLog.create({
+        data: {
+          businessId,
+          verificationId: verification.id,
+          status: STATUS_PENDING,
+          actorId: userId,
+          actorRole: isAdmin ? 'ADMIN' : 'MERCHANT',
+          action: 'SUBMIT',
+          notes,
+        },
+      });
+    }
+
     return verification;
   }
 

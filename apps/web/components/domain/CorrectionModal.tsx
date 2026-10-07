@@ -49,6 +49,7 @@ export const CorrectionModal: React.FC<CorrectionModalProps> = ({
       name?: string;
       latitude?: number;
       longitude?: number;
+      description?: string;
     } = {
       placeId: validPlaceId,
     };
@@ -62,11 +63,16 @@ export const CorrectionModal: React.FC<CorrectionModalProps> = ({
       if (parts.length === 2 && !isNaN(parts[0]!) && !isNaN(parts[1]!)) {
         payload.latitude = parts[0];
         payload.longitude = parts[1];
+        payload.description = `تصحيح موقع جغرافي: ${val}`;
       } else {
         setError('يرجى إدخال إحداثيات صالحة بصيغة: خط العرض، خط الطول (مثال: 15.9189, 43.2081)');
         setIsSubmitting(false);
         return;
       }
+    } else if (reportType === 'HOURS') {
+      payload.description = `تحديث ساعات العمل: ${val}`;
+    } else if (reportType === 'CLOSED') {
+      payload.description = `بلاغ إغلاق المكان: ${val}`;
     }
 
     const res = await apiClient.submitPlaceCorrection(payload);
@@ -101,6 +107,10 @@ export const CorrectionModal: React.FC<CorrectionModalProps> = ({
         return 'أدخل الاسم الصحيح الدقيق للمكان...';
       case 'RELOCATION':
         return 'أدخل الإحداثيات بصيغة: خط العرض، خط الطول (مثال: 15.9189, 43.2081)...';
+      case 'HOURS':
+        return 'أدخل تفاصيل وساعات العمل (مثال: السبت-الخميس 8:00 ص - 8:00 م)...';
+      case 'CLOSED':
+        return 'أدخل تفاصيل ومبررات بلاغ إغلاق المكان (مغلق نهائياً / مغلق مؤقتاً)...';
       default:
         return 'أدخل المعلومة البنيوية الصحيحة المقترحة...';
     }
@@ -175,6 +185,8 @@ export const CorrectionModal: React.FC<CorrectionModalProps> = ({
                 <option value="INCORRECT_PHONE">تغيير أو إضافة رقم الهاتف (الهاتف)</option>
                 <option value="CORRECT_NAME">تصحيح اسم المكان الرسمي (الاسم)</option>
                 <option value="RELOCATION">تحديث الإحداثيات الجغرافية (الموقع)</option>
+                <option value="HOURS">تحديث ساعات العمل (ساعات العمل)</option>
+                <option value="CLOSED">بلاغ إغلاق المكان (إغلاق المكان)</option>
               </select>
             </div>
 
@@ -194,7 +206,7 @@ export const CorrectionModal: React.FC<CorrectionModalProps> = ({
 
             {/* Scope info alert */}
             <div className="p-3 bg-slate-100 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700/80 rounded-xl text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed font-semibold">
-              ℹ️ تنبيه: يتم تسجيل التصحيح في سجل الرصد المكاني بصفة مستقلة. تحديثات ساعات العمل والإغلاق غير البنيوي غير متوفرة في هذا النطاق لحين تفعيل سجل الأدلة في المراحل القادمة.
+              ℹ️ تنبيه: يتم تسجيل التصحيح في سجل الرصد المكاني بصفة مستقلة لحين اكتمال التحقق والاعتماد الميداني.
             </div>
 
             {/* Action buttons */}

@@ -63,7 +63,7 @@ export function createRateLimiter(options?: {
     c.header('X-RateLimit-Reset', resetSeconds.toString());
 
     if (entry.count > maxRequests) {
-      AuditLogger.logRateLimitExceeded(c.req.method, c.req.path, ip);
+      await AuditLogger.logRateLimitExceeded(c.req.method, c.req.path, ip);
       return c.json(
         {
           success: false,
@@ -80,4 +80,9 @@ export function createRateLimiter(options?: {
 export const protectedRateLimiter = createRateLimiter({
   windowMs: securityConfig.rateLimit.windowMs,
   maxRequests: securityConfig.rateLimit.maxRequestsProtected,
+});
+
+export const publicSearchRateLimiter = createRateLimiter({
+  windowMs: securityConfig.rateLimit.windowMs || 60000,
+  maxRequests: securityConfig.rateLimit.maxRequestsPublic || 60,
 });

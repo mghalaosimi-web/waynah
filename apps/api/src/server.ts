@@ -13,9 +13,17 @@ import { createAuthRouter } from './routes/v1/auth.routes.js';
 import { createUserRouter } from './routes/v1/user.routes.js';
 import { createBusinessRouter } from './routes/v1/business.routes.js';
 import { createGeographyRouter } from './routes/v1/geography.routes.js';
+import { createTransactionRouter } from './routes/v1/transaction.routes.js';
+import { createFulfillmentRouter } from './routes/v1/fulfillment.routes.js';
+import { createTrustRouter } from './routes/v1/trust.routes.js';
+import { createReviewRouter } from './routes/v1/review.routes.js';
+import { createObservationRouter } from './routes/v1/observation.routes.js';
+import { createNotificationRouter } from './routes/v1/notification.routes.js';
+import { AuditLogger } from './utils/audit-logger.js';
 import { ApiResponse } from './utils/api-response.js';
 
 export function createServer(prismaClient = prisma) {
+  AuditLogger.setPrismaClient(prismaClient);
   const app = new Hono();
 
   // Middleware: Security Headers, Request Logger & Authentication
@@ -75,6 +83,12 @@ export function createServer(prismaClient = prisma) {
   app.route('/v1/discovery', createDiscoveryRouter(prismaClient));
   app.route('/v1/admin', createAdminRouter(prismaClient));
   app.route('/v1/geography', createGeographyRouter(prismaClient));
+  app.route('/v1/transactions', createTransactionRouter(prismaClient));
+  app.route('/v1/fulfillment', createFulfillmentRouter(prismaClient));
+  app.route('/v1/trust', createTrustRouter(prismaClient));
+  app.route('/v1/reviews', createReviewRouter(prismaClient));
+  app.route('/v1/observations', createObservationRouter(prismaClient));
+  app.route('/v1/notifications', createNotificationRouter(prismaClient));
 
 
 

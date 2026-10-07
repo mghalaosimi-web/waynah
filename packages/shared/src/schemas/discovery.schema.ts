@@ -15,6 +15,7 @@ export const createObservationSchema = z
     name: z.string().trim().min(1).optional(),
     phone: z.string().trim().min(1).optional(),
     categoryId: z.string().uuid({ message: 'categoryId must be a valid UUID' }).optional(),
+    description: z.string().trim().min(1).optional(),
     latitude: z
       .number()
       .min(-90, { message: 'Latitude must be between -90 and 90' })
@@ -31,11 +32,12 @@ export const createObservationSchema = z
       data.name !== undefined ||
       data.phone !== undefined ||
       data.categoryId !== undefined ||
+      data.description !== undefined ||
       (data.latitude !== undefined && data.longitude !== undefined) ||
       data.placeId !== undefined,
     {
       message:
-        'At least one core attribute (name, phone, categoryId, location coordinates, or placeId) must be provided',
+        'At least one core attribute (name, phone, categoryId, description, location coordinates, or placeId) must be provided',
     }
   )
   .refine(
@@ -62,6 +64,7 @@ export const communityReportSchema = z
     name: z.string().trim().min(1).optional(),
     phone: z.string().trim().min(1).optional(),
     categoryId: z.string().uuid({ message: 'categoryId must be a valid UUID' }).optional(),
+    description: z.string().trim().min(1).optional(),
     latitude: z
       .number()
       .min(-90, { message: 'Latitude must be between -90 and 90' })
@@ -78,11 +81,12 @@ export const communityReportSchema = z
       data.name !== undefined ||
       data.phone !== undefined ||
       data.categoryId !== undefined ||
+      data.description !== undefined ||
       (data.latitude !== undefined && data.longitude !== undefined) ||
       data.placeId !== undefined,
     {
       message:
-        'At least one core attribute (name, phone, categoryId, location coordinates, or placeId) must be provided',
+        'At least one core attribute (name, phone, categoryId, description, location coordinates, or placeId) must be provided',
     }
   )
   .refine(

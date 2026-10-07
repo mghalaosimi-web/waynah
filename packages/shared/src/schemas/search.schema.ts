@@ -19,6 +19,8 @@ export const searchParamsSchema = z
       .default(5000)
       .optional(),
     categoryId: z.string().uuid({ message: 'categoryId must be a valid UUID' }).optional(),
+    governorateId: z.string().trim().min(1).optional(),
+    districtId: z.string().trim().min(1).optional(),
     limit: z.number().int().min(1).max(50).default(20).optional(),
     offset: z.number().int().min(0).default(0).optional(),
   })

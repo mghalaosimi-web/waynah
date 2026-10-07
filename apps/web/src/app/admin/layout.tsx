@@ -23,6 +23,12 @@ export default function AdminLayout({
               الرئيسية
             </a>
             <a
+              href="/admin/geography"
+              className="text-slate-300 hover:text-white transition-colors duration-150"
+            >
+              إدارة الجغرافيا (Geography UI)
+            </a>
+            <a
               href="/admin/verifications"
               className="text-slate-300 hover:text-white transition-colors duration-150"
             >

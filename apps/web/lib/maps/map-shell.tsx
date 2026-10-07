@@ -16,6 +16,7 @@ export interface MapShellProps {
   className?: string;
   height?: string;
   showControls?: boolean;
+  boundaryGeoJson?: any;
 }
 
 const DEFAULT_CENTER: GeoPoint = {
@@ -33,11 +34,13 @@ export const MapShell: React.FC<MapShellProps> = ({
   className,
   height = 'h-[450px]',
   showControls = true,
+  boundaryGeoJson = null,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
   const leafletRef = useRef<any>(null);
   const markerLayerGroupRef = useRef<any>(null);
+  const boundaryLayerGroupRef = useRef<any>(null);
   const userLocationMarkerRef = useRef<any>(null);
 
   const [activeMarker, setActiveMarker] = useState<MapMarkerData | null>(null);
@@ -180,6 +183,41 @@ export const MapShell: React.FC<MapShellProps> = ({
       updateMapMarkers();
     }
   }, [isMapReady, updateMapMarkers]);
+
+  // Update District / Area Boundary GeoJSON Layer
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+
+    if (!isMapReady || !L || !map) return;
+
+    if (boundaryLayerGroupRef.current) {
+      map.removeLayer(boundaryLayerGroupRef.current);
+      boundaryLayerGroupRef.current = null;
+    }
+
+    if (boundaryGeoJson) {
+      try {
+        const layer = L.geoJSON(boundaryGeoJson, {
+          style: {
+            color: '#059669',
+            weight: 2.5,
+            fillColor: '#10b981',
+            fillOpacity: 0.25,
+          },
+        }).addTo(map);
+
+        boundaryLayerGroupRef.current = layer;
+
+        const bounds = layer.getBounds();
+        if (bounds && bounds.isValid()) {
+          map.fitBounds(bounds, { padding: [35, 35] });
+        }
+      } catch (err) {
+        console.warn('Failed to render boundary GeoJSON on map:', err);
+      }
+    }
+  }, [isMapReady, boundaryGeoJson]);
 
   // Controls Handlers
   const handleZoomIn = () => {

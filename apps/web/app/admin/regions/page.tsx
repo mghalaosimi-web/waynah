@@ -1,10 +1,6 @@
-import React from 'react';
-import { Container, PageHeader } from '@waynah/ui';
+import { redirect } from 'next/navigation';
 
 export default function AdminRegionsPage() {
-  return (
-    <Container size="xl" className="py-8">
-      <PageHeader title="إدارة المناطق والأحياء" subtitle="إدارة التقسيم الجغرافي والحدود المكانية" />
-    </Container>
-  );
+  redirect('/admin/geography');
 }
+
