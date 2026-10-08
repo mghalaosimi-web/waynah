@@ -98,6 +98,9 @@
 
 ## 06 — GEOGRAPHIC INTELLIGENCE
 
+![Geographic Spatial Hierarchy](docs/images/geographic_hierarchy.png)
+*الشكل الهيكلي: التسلسل الجغرافي الإداري في اليمن ونماذج PostGIS المكانية (MultiPolygon & Point).*
+
 يتعامل WAYNAH مع الجغرافيا اليمنية من خلال هيكل رمزي وهندسي محدد باستخدام تقنيات PostGIS المكانية (`geography(MultiPolygon, 4326)` & `geography(Point, 4326)`):
 
 ```text
@@ -123,6 +126,9 @@ Yemen (جمهورية اليمن)
 ---
 
 ## 07 — TRUST & DATA FRESHNESS
+
+![Trust & Verification Pipeline](docs/images/trust_model.png)
+*المخطط الهندسي: متوالية التوثيق والموثوقية وتدقيق المصادر وسجلات النزاع.*
 
 لا يعتمد WAYNAH على الادعاء المباشر لدقة البيانات، بل يبني الموثوقية عبر متوالية تدقيق متعددة الطبقات:
 
@@ -254,6 +260,9 @@ User (المستخدم)
 ---
 
 ## 11 — SEARCH & DISCOVERY
+
+![Arabic Normalization & Hybrid Search Engine Flow](docs/images/search_flow.png)
+*الشكل المعماري: معالجة المصطلحات العربية وتنقية النصوص والاستعلام المكاني الهجين ترتيبًا.*
 
 تم تطوير حزمة `@waynah/search` خصيصًا لضمان فهم طبيعة المصطلحات الجغرافية والتجارية في اليمن:
 
