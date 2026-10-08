@@ -5,7 +5,8 @@
  * CORS origins, rate limiting, and environment separation.
  */
 
-const DEFAULT_DEV_CORS_ORIGINS = [
+const DEFAULT_CORS_ORIGINS = [
+  'https://waynah.vercel.app',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://127.0.0.1:3000',
@@ -27,7 +28,7 @@ export const securityConfig = {
   // CORS configuration
   corsOrigins: process.env.CORS_ORIGIN
     ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
-    : DEFAULT_DEV_CORS_ORIGINS,
+    : DEFAULT_CORS_ORIGINS,
 
   // Rate Limiting defaults (In-Memory)
   rateLimit: {

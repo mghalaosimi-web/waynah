@@ -27,12 +27,7 @@ export function createServer(prismaClient = prisma) {
   AuditLogger.setPrismaClient(prismaClient);
   const app = new Hono();
 
-  // Middleware: Security Headers, Request Logger & Authentication
-  app.use('*', securityHeadersMiddleware);
-  app.use('*', requestLoggerMiddleware);
-  app.use('*', createAuthMiddleware(prismaClient));
-
-  // Middleware: Enable CORS with controlled dev/prod origins
+  // Middleware 1: Enable CORS with controlled dev/prod origins (MUST be registered first to handle preflight OPTIONS immediately)
   app.use(
     '*',
     cors({
@@ -55,6 +50,11 @@ export function createServer(prismaClient = prisma) {
       maxAge: 86400,
     })
   );
+
+  // Middleware 2: Security Headers, Request Logger & Authentication
+  app.use('*', securityHeadersMiddleware);
+  app.use('*', requestLoggerMiddleware);
+  app.use('*', createAuthMiddleware(prismaClient));
 
   // Health Check Endpoint (Public API)
   app.get('/health', async (c) => {
