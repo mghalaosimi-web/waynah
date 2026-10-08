@@ -10,9 +10,8 @@ export const prisma =
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
   });
 
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma;
-}
+// Cache PrismaClient instance globally across serverless lambda invocations to avoid connection pool exhaustion
+globalForPrisma.prisma = prisma;
 
 /**
  * Creates a dedicated PrismaClient instance using DIRECT_URL (direct PostgreSQL port 5432).
