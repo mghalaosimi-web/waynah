@@ -42,9 +42,9 @@
 تفتقر البيانات المكانية والتجارية المحلية في اليمن إلى الفهرسة الموحدة والموثوقية المستمرة:
 
 1. **العنوان غير الرسمي**: معظم الأماكن تُوصف بالأحياء والأزقة والمعالم البارزة وليس بالرموز البريدية أو الشوارع الرقمية.
-2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والمواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
+2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والم مواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
 3. **غياب نظام الموثوقية**: صعوبة التمييز بين الأماكن التي تم فحصها وتأكيدها، والأماكن غير المعتمدة أو المغلقة.
-4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما يؤدي إلى فشل أنظمة البحث التقليدية.
+4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما تؤدي إلى فشل أنظمة البحث التقليدية.
 
 ---
 
@@ -128,7 +128,10 @@ Yemen (جمهورية اليمن)
 ## 07 — TRUST & DATA FRESHNESS
 
 ![Trust & Verification Pipeline](docs/images/trust_model.png)
-*المخطط الهندسي: متوالية التوثيق والموثوقية وتدقيق المصادر وسجلات النزاع.*
+*المخطط الهندسي 1: متوالية التوثيق والموثوقية وتدقيق المصادر وسجلات النزاع.*
+
+![Merchant Verification & Branch Claiming Flow](docs/images/branch_claiming_flow.png)
+*المخطط الهندسي 2: دورة حياة ملكية الفروع والتوثيق التجاري وقواعد الربط الذري.*
 
 لا يعتمد WAYNAH على الادعاء المباشر لدقة البيانات، بل يبني الموثوقية عبر متوالية تدقيق متعددة الطبقات:
 
@@ -156,7 +159,7 @@ flowchart LR
 
 ---
 
-## 08 — PRODUCT EXPERIENCE
+## 08 — PRODUCT EXPERIENCE & DOMAIN TRANSACTIONS
 
 تم تصميم واجهات **WAYNAH Web** بهوية بصرية هادئة تحت طابع **"Calm Local Atlas — أطلس محلي هادئ"** باستخدام منصة Next.js 16 وتوليفات Tailwind CSS v4 مع خريطة Leaflet المتفاعلة.
 
@@ -172,7 +175,16 @@ flowchart LR
 
 ---
 
+### 3. Catalog, Bookings & Fulfillment Subsystem
+![Product Catalog, Booking & Fulfillment Engine](docs/images/catalog_transactions.png)
+*الشكل 3: هيكلية إدارة المنتجات والخدمات، طلبات الأسعار (RFQ)، الحجوزات، وأنماط التنفيذ والتسديد.*
+
+---
+
 ## 09 — SYSTEM ARCHITECTURE
+
+![Monorepo Layered Topology Architecture](docs/images/monorepo_architecture.png)
+*الشكل المعماري: طبقات المونوريبو المسؤولة عن الربط بين الويب، الحزم المشتركة، بوابات REST API، وقاعدة البيانات المكانية.*
 
 يعمل WAYNAH كبنية مونوريبو (Monorepo Architecture) متكاملة تدار بواسطة Turborepo و pnpm workspaces:
 
@@ -314,6 +326,9 @@ User Query ("مطعم شيباني صنعاء")
 
 ## 13 — SECURITY & GOVERNANCE
 
+![Security Controls, RBAC & Audit Trail Architecture](docs/images/security_audit_flow.png)
+*الشكل الأمني: طبقات الحماية وتأكيد الهوية وصلاحيات RBAC وتسجيل الفعاليات في AuditLog.*
+
 يتبع **WAYNAH** معايير هندسية محكمة لحماية البيانات وإدارة الوصول (Security Hardened & Verified Controls):
 
 - 🔐 **إدارة الصلاحيات (RBAC - Role-Based Access Control)**: حظر العمليات الحساسة وتحديد صلاحيات الأدوار (`SUPER_ADMIN`, `ADMIN`, `BUSINESS_OWNER`, `BUSINESS_MANAGER`, `USER`).
@@ -384,7 +399,7 @@ waynah/
 │   └── config/                 # Shared TypeScript & ESLint Rules
 │
 ├── docs/                       # Architecture Specs & Technical Studies
-│   ├── images/                 # Official System Diagrams & Screenshots
+│   ├── images/                 # Official System Diagrams & Screenshots (14 Visual Assets)
 │   └── WAYNAH_BUILD_SPECIFICATION.md
 │
 ├── docker/                     # Docker Compose (PostgreSQL 16 + PostGIS 3.4)
@@ -423,7 +438,7 @@ EXPLORATORY / HYPOTHESIS (رؤية مستقبلية قيد الدراسة)
 
 <div align="center">
 
-![Developer Visual Header](docs/images/developer_visual.png)
+![Developer Profile Header](docs/images/developer_visual.png)
 
 ### Mohammed Ghaleb AL-AOSIMI (`M.GH.AL`)
 **Full-Stack Developer · Software Engineer · Third-Year IT Student**
@@ -441,6 +456,39 @@ EXPLORATORY / HYPOTHESIS (رؤية مستقبلية قيد الدراسة)
 - **Database & Spatial Systems**: PostgreSQL 17, PostGIS Spatial Extensions (`geography`, `ST_Covers`), Prisma ORM, SQLite, Drift, Firebase, Supabase.
 - **Infrastructure & Deployment**: Vercel Serverless Hosting, Supabase Managed Cloud Postgres, Monorepo Orchestration (Turborepo, pnpm Workspaces).
 - **Mobile & Cross-Platform**: Flutter, Android Native.
+
+#### Developer Engineering Gallery (M.GH.AL in Action)
+
+<table align="center">
+  <tr>
+    <td width="50%" align="center">
+      <b>01 — Geographic Data Engineering & PostGIS</b><br/>
+      <img src="docs/images/dev_spatial_engineering.png" alt="Spatial Data Engineering" width="100%"/>
+      <br/>
+      <i>هندسة البيانات المكانية واستعلامات النطاقات الجغرافية لليمن.</i>
+    </td>
+    <td width="50%" align="center">
+      <b>02 — Monorepo System Architecture Review</b><br/>
+      <img src="docs/images/dev_architecture_review.png" alt="Monorepo Architecture Review" width="100%"/>
+      <br/>
+      <i>مراجعة الهيكل المعماري للمونوريبو وفصل الطبقات الخدمية.</i>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <b>03 — Production Infrastructure & System Health</b><br/>
+      <img src="docs/images/dev_production_monitoring.png" alt="Production Infrastructure" width="100%"/>
+      <br/>
+      <i>متابعة النشر الإنتاجي ومؤشرات الأداء على Vercel و Supabase.</i>
+    </td>
+    <td width="50%" align="center">
+      <b>04 — Product Builder & Spatial Intelligence Core</b><br/>
+      <img src="docs/images/hero_visual.png" alt="Product Builder Core" width="100%"/>
+      <br/>
+      <i>تطوير النواة المكانية ومحرك البحث الهجين والاستكشاف الجغرافي.</i>
+    </td>
+  </tr>
+</table>
 
 #### Project Connection
 **WAYNAH / وَيْنَه؟** represents an independent engineering project developed under the **`M.GH.AL`** identity to solve real-world spatial discovery, administrative data hierarchy, and trust verification challenges within Yemen's geographic landscape.
