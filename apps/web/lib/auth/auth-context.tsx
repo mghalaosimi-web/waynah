@@ -143,9 +143,7 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
     if (typeof window !== 'undefined' && window.localStorage) {
       for (let i = 0; i < window.localStorage.length; i++) {
         const key = window.localStorage.key(i);
-        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
-          localStorageKeys.push(key);
-        }
+        if (key) localStorageKeys.push(key);
       }
     }
   } catch {
@@ -156,9 +154,7 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
     if (typeof window !== 'undefined' && window.sessionStorage) {
       for (let i = 0; i < window.sessionStorage.length; i++) {
         const key = window.sessionStorage.key(i);
-        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
-          sessionStorageKeys.push(key);
-        }
+        if (key) sessionStorageKeys.push(key);
       }
     }
   } catch {

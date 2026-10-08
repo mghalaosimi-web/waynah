@@ -16,6 +16,10 @@ interface DiagnosticError {
   origin?: string;
   pathname?: string;
   hasCode?: boolean;
+  searchParamNames?: string[];
+  hasHash?: boolean;
+  hashParamNames?: string[];
+  hasAccessTokenInHash?: boolean;
   localStorageKeys?: string[];
   sessionStorageKeys?: string[];
   hasVerifierKey?: boolean;
@@ -29,9 +33,7 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
     if (typeof window !== 'undefined' && window.localStorage) {
       for (let i = 0; i < window.localStorage.length; i++) {
         const key = window.localStorage.key(i);
-        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
-          localStorageKeys.push(key);
-        }
+        if (key) localStorageKeys.push(key);
       }
     }
   } catch {
@@ -42,9 +44,7 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
     if (typeof window !== 'undefined' && window.sessionStorage) {
       for (let i = 0; i < window.sessionStorage.length; i++) {
         const key = window.sessionStorage.key(i);
-        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
-          sessionStorageKeys.push(key);
-        }
+        if (key) sessionStorageKeys.push(key);
       }
     }
   } catch {
@@ -55,6 +55,16 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
   const hasVerifierKey = allKeys.some(k => k.toLowerCase().includes('verifier') || k.toLowerCase().includes('code-verifier'));
 
   return { localStorageKeys, sessionStorageKeys, hasVerifierKey };
+}
+
+function getHashParamNames(): string[] {
+  if (typeof window === 'undefined' || !window.location.hash) return [];
+  try {
+    const hashStr = window.location.hash.substring(1);
+    return hashStr.split('&').map(pair => pair.split('=')[0]).filter(Boolean);
+  } catch {
+    return [];
+  }
 }
 
 export default function AuthCallbackPage() {
@@ -77,6 +87,10 @@ export default function AuthCallbackPage() {
       const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'غير محدد';
       const storageDiag = getSafeStorageKeys();
+      const searchParamNames = Array.from(searchParams.keys());
+      const hasHash = Boolean(typeof window !== 'undefined' && window.location.hash);
+      const hashParamNames = getHashParamNames();
+      const hasAccessTokenInHash = Boolean(typeof window !== 'undefined' && window.location.hash.includes('access_token'));
 
       // Log non-sensitive PKCE and storage diagnostics only (Keys and Booleans only, no codes/tokens/secrets/values)
       console.log('[OAuth PKCE Diagnostic - Callback Entry]', {
@@ -85,6 +99,10 @@ export default function AuthCallbackPage() {
         hasCode: Boolean(code),
         hasError: Boolean(rawError),
         hasErrorDescription: Boolean(rawErrorDesc),
+        searchParamNames,
+        hasHash,
+        hashParamNames,
+        hasAccessTokenInHash,
         supabaseUrl,
         localStorageKeys: storageDiag.localStorageKeys,
         sessionStorageKeys: storageDiag.sessionStorageKeys,
@@ -104,6 +122,10 @@ export default function AuthCallbackPage() {
             origin,
             pathname,
             hasCode: Boolean(code),
+            searchParamNames,
+            hasHash,
+            hashParamNames,
+            hasAccessTokenInHash,
             localStorageKeys: storageDiag.localStorageKeys,
             sessionStorageKeys: storageDiag.sessionStorageKeys,
             hasVerifierKey: storageDiag.hasVerifierKey,
@@ -150,6 +172,10 @@ export default function AuthCallbackPage() {
                 origin,
                 pathname,
                 hasCode: Boolean(code),
+                searchParamNames,
+                hasHash,
+                hashParamNames,
+                hasAccessTokenInHash,
                 localStorageKeys: storageDiag.localStorageKeys,
                 sessionStorageKeys: storageDiag.sessionStorageKeys,
                 hasVerifierKey: storageDiag.hasVerifierKey,
@@ -187,6 +213,10 @@ export default function AuthCallbackPage() {
               origin,
               pathname,
               hasCode: Boolean(code),
+              searchParamNames,
+              hasHash,
+              hashParamNames,
+              hasAccessTokenInHash,
               localStorageKeys: storageDiag.localStorageKeys,
               sessionStorageKeys: storageDiag.sessionStorageKeys,
               hasVerifierKey: storageDiag.hasVerifierKey,
@@ -222,6 +252,10 @@ export default function AuthCallbackPage() {
               origin,
               pathname,
               hasCode: Boolean(code),
+              searchParamNames,
+              hasHash,
+              hashParamNames,
+              hasAccessTokenInHash,
               localStorageKeys: storageDiag.localStorageKeys,
               sessionStorageKeys: storageDiag.sessionStorageKeys,
               hasVerifierKey: storageDiag.hasVerifierKey,
@@ -244,6 +278,10 @@ export default function AuthCallbackPage() {
             origin,
             pathname,
             hasCode: Boolean(code),
+            searchParamNames,
+            hasHash,
+            hashParamNames,
+            hasAccessTokenInHash,
             localStorageKeys: storageDiag.localStorageKeys,
             sessionStorageKeys: storageDiag.sessionStorageKeys,
             hasVerifierKey: storageDiag.hasVerifierKey,
@@ -290,15 +328,19 @@ export default function AuthCallbackPage() {
 
           <div className="space-y-2 bg-slate-100 dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs">
             <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
-              تشخيص تخزين المتصفح و PKCE:
+              تشخيص تخزين المتصفح و URL Params & PKCE:
             </div>
             <div className="grid grid-cols-1 gap-1 text-[11px] font-mono text-slate-700 dark:text-slate-300 break-all">
               <div>origin: <span className="text-emerald-600 dark:text-emerald-400 font-sans">{diagnosticError.origin}</span></div>
               <div>pathname: <span className="text-emerald-600 dark:text-emerald-400 font-sans">{diagnosticError.pathname}</span></div>
-              <div>hasCode: <span className="font-bold">{diagnosticError.hasCode ? 'true (موجود)' : 'false (غير موجود)'}</span></div>
+              <div>hasCode: <span className="font-bold">{diagnosticError.hasCode ? 'true (موجود في Query)' : 'false (غير موجود في Query)'}</span></div>
+              <div>searchParamKeys: <span className="font-sans text-slate-500">{diagnosticError.searchParamNames?.length ? diagnosticError.searchParamNames.join(', ') : 'لا يوجد query params'}</span></div>
+              <div>hasHash: <span className="font-bold">{diagnosticError.hasHash ? 'true (يوجد # في URL)' : 'false (لا يوجد #)'}</span></div>
+              <div>hashParamKeys: <span className="font-sans text-slate-500">{diagnosticError.hashParamNames?.length ? diagnosticError.hashParamNames.join(', ') : 'لا يوجد hash params'}</span></div>
+              <div>hasAccessTokenInHash: <span className="font-bold">{diagnosticError.hasAccessTokenInHash ? 'true (موجود في Hash!)' : 'false'}</span></div>
               <div>hasVerifierKey: <span className={diagnosticError.hasVerifierKey ? 'text-emerald-600 font-bold' : 'text-red-500 font-bold'}>{diagnosticError.hasVerifierKey ? 'true (مفتاح verifier موجود في Storage)' : 'false (مفتاح verifier غير موجود!)'}</span></div>
-              <div>localStorage keys: <span className="font-sans text-slate-500">{diagnosticError.localStorageKeys?.length ? diagnosticError.localStorageKeys.join(', ') : 'لا توجد مفاتيح مؤهلة'}</span></div>
-              <div>sessionStorage keys: <span className="font-sans text-slate-500">{diagnosticError.sessionStorageKeys?.length ? diagnosticError.sessionStorageKeys.join(', ') : 'لا توجد مفاتيح مؤهلة'}</span></div>
+              <div>localStorage keys: <span className="font-sans text-slate-500">{diagnosticError.localStorageKeys?.length ? diagnosticError.localStorageKeys.join(', ') : 'لا توجد مفاتيح'}</span></div>
+              <div>sessionStorage keys: <span className="font-sans text-slate-500">{diagnosticError.sessionStorageKeys?.length ? diagnosticError.sessionStorageKeys.join(', ') : 'لا توجد مفاتيح'}</span></div>
             </div>
           </div>
 
