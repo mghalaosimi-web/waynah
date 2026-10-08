@@ -11,9 +11,9 @@
 [![Next.js](https://img.shields.io/badge/Next.js-v16.3-000000?style=for-the-badge&logo=next.js)](https://nextjs.org)
 [![Hono API](https://img.shields.io/badge/Hono API-v4.13-E36002?style=for-the-badge&logo=hono)](https://hono.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-v5.8-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v16-4169E1?style=for-the-badge&logo=postgresql)](https://postgresql.org)
-[![PostGIS](https://img.shields.io/badge/PostGIS-v3.4-00766E?style=for-the-badge&logo=qgis)](https://postgis.net)
-[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v17-4169E1?style=for-the-badge&logo=postgresql)](https://postgresql.org)
+[![PostGIS](https://img.shields.io/badge/PostGIS-v3.3-00766E?style=for-the-badge&logo=qgis)](https://postgis.net)
+[![Prisma](https://img.shields.io/badge/Prisma-v6.4-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io)
 
 [🌐 Web Application](https://waynah.vercel.app) &nbsp;|&nbsp; [🔌 API Gateway](https://waynah-api.vercel.app/health) &nbsp;|&nbsp; [📘 Architecture Specifications](ARCHITECTURE.md) &nbsp;|&nbsp; [🛡️ Security Policy](SECURITY.md)
 
@@ -38,7 +38,7 @@
 1. **العنوان غير الرسمي**: معظم الأماكن تُوصف بالأحياء والأزقة والمعالم البارزة وليس بالرموز البريدية أو الشوارع الرقمية.
 2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والمواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
 3. **غياب نظام الموثوقية**: صعوبة التمييز بين الأماكن التي تم فحصها وتأكيدها، والأماكن غير المعتمدة أو المغلقة.
-4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما يؤدي إلى فشل أنظمة البحث التقليدية.
+4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما تؤدي إلى فشل أنظمة البحث التقليدية.
 
 ---
 
@@ -47,9 +47,9 @@
 **WAYNAH / وَيْنَه؟** ليس مجرد خريطة تفاعلية، وليس مجرد دليل تجاري عابر. إنه **منصة جغرافية هندسية كاملة (Monorepo Platform)** تم بناؤها خصيصًا لتوفير:
 
 - 🗺️ **فهرسة جغرافية هرمية (Administrative Spatial Hierarchy)**: من المحافظة والمديرية والعزلة وصولاً إلى الحي والشارع والمعلم.
-- 🔍 **ملاحة واستكشاف فائق السرعة (Fuzzy & Spatial Search)**: محرك بحث مدعوم بمعالجة المصطلحات العربية واليمانية مع ترتيب النتائج حسبي القرب الجغرافي ونسبة التطابق.
-- 🛡️ **نموذج الثقة والتحقق المباشر (Trust & Verification Model)**: تصنيف دقيق لحالة الموثوقية (`UNVERIFIED`, `VERIFIED`, `CLAIMED`, `REPORTED`, `CLOSED`) مع تسجيل كافة التعديلات في سجل تدقيق غير قابل للتلاعب (`AuditLog`).
-- 🏢 **إدارة الفروع والممتلكات التجاري (Branch Claiming & RBAC)**: تمكين أصحاب الأعمال من تقديم طلبات ملكية الفروع وتوثيق بياناتهم بمرجعية إدارية محكمة.
+- 🔍 **ملاحة واستكشاف فائق السرعة (Fuzzy & Spatial Search)**: محرك بحث مدعوم بمعالجة المصطلحات العربية واليمانية مع ترتيب النتائج حسب القرب الجغرافي ونسبة التطابق.
+- 🛡️ **نموذج الثقة والتحقق المباشر (Trust & Verification Model)**: تصنيف دقيق لحالة الموثوقية (`UNVERIFIED`, `VERIFIED`, `CLAIMED`, `REPORTED`, `CLOSED`) مع تسجيل كافة التعديلات في سجل تدقيق محكم (`AuditLog`).
+- 🏢 **إدارة الفروع والممتلكات التجاري (Branch Claiming & RBAC)**: تمكين أصحاب الأعمال من تقديم طلبات ملكية الفروع وتوثيق بياناتهم بمرجعية إدارية سليمة.
 
 ---
 
@@ -85,7 +85,7 @@
        ┌─────────────────────────────────────────────────────────┐
        │                     DISCOVERY                           │
        │    (Result Delivery: Autocomplete, Drawer, Map Pin)     │
-       └─────────────────────────────────────────────────────────┘
+       └───────────────────────────┬─────────────────────────────┘
 ```
 
 ---
@@ -97,7 +97,7 @@
 ```text
 Yemen (جمهورية اليمن)
   │
-  ├── Governorate (المحافظة) — e.g. أمانة العاصمة / أمانة العاصمة, عدن, تعز, حضرموت
+  ├── Governorate (المحافظة) — e.g. أمانة العاصمة, عدن, تعز, حضرموت
   │     │
   │     └── District (المديرية) — e.g. مديرية التحرير, مديرية صيرة, مديرية المكلا
   │           │   (PostGIS MultiPolygon Boundary Indexing)
@@ -197,7 +197,6 @@ graph TD
     subgraph SharedPackages ["📦 Workspace Packages (packages/*)"]
         PKG_UI["🎨 @waynah/ui (Primitives: Button, Card, Badge, Input...)"]
         PKG_SHARED["📑 @waynah/shared (Types, Schemas, Permissions & RBAC)"]
-        PKG_MAPS["🗺️ @waynah/maps (Leaflet Map Shell, Markers & Clustering)"]
         PKG_SEARCH["🔍 @waynah/search (Normalization, Fuzzy Search & Ranking)"]
         PKG_CONFIG["⚙️ @waynah/config (TypeScript, ESLint & Prettier Rules)"]
     end
@@ -219,13 +218,12 @@ graph TD
 
     subgraph DataLayer ["🗄️ Database & Spatial Storage (packages/database)"]
         PRISMA_CLIENT["💎 Prisma ORM Client"]
-        MIGRATIONS["📜 Schema Migrations (7 Spatial & Entity Migrations)"]
-        POSTGRES_DB[("🐘 PostgreSQL 16 + PostGIS 3.4<br/>(Spatial Boundary Indexing & pg_trgm Search)")]
+        MIGRATIONS["📜 Schema Migrations (17 Spatial & Entity Migrations)"]
+        POSTGRES_DB[("🐘 PostgreSQL 17 + PostGIS 3.3.7<br/>(Spatial Boundary Indexing & pg_trgm Search)")]
     end
 
     ClientLayer --> PKG_UI
     ClientLayer --> PKG_SHARED
-    ClientLayer --> PKG_MAPS
     ClientLayer --> HONO_SERVER
 
     HONO_SERVER --> SEC_MIDDLEWARE
@@ -312,9 +310,9 @@ User Query ("مطعم شيباني صنعاء")
 | **Frontend Framework** | Next.js (App Router) | `v16.3.6` | بناء واجهات التطبيق التفاعلية وصفحات العرض الموزعة |
 | **UI Library & Styling** | React + Tailwind CSS | `v19.3` / `v4.3` | نظام التصميم وتوليف العناصر البصرية برمزية `#0F766E` |
 | **Map Engine** | Leaflet | `v1.9.4` | عرض الخرائط التفاعلية والتحكم في العلامات والتجمع مكانيًا |
-| **API Gateway Engine** | Hono Core | `v4.13.10` | خادم REST API سليم وعالي الأداء يدعم Vercel & Node |
-| **Database ORM** | Prisma ORM | `v5.x` | إدارة الاستعلامات وبناء كائنات الجداول والهجرات |
-| **Database & Spatial** | PostgreSQL + PostGIS | `v16` / `v3.4` | تخزين البيانات الجغرافية وإحداثيات النطاقات والمضلعات |
+| **API Gateway Engine** | Hono Core | `v4.13.10` | خادم REST API عالي الأداء يدعم Vercel & Node |
+| **Database ORM** | Prisma ORM | `v6.4.1` | إدارة الاستعلامات وبناء كائنات الجداول والهجرات |
+| **Database Engine (Prod)** | Supabase PostgreSQL + PostGIS | `v17` / `v3.3.7` | تخزين البيانات الجغرافية وإحداثيات النطاقات والمضلعات |
 | **Runtime Language** | TypeScript | `v5.8.2` | التحقق من صحة الأنواع والحرص على النزاهة البرمجية |
 | **Hosting & Infra** | Vercel + Supabase | Managed Cloud | الاستضافة المباشرة للويب والواجهة وقاعدة البيانات المكانية |
 
@@ -324,7 +322,7 @@ User Query ("مطعم شيباني صنعاء")
 
 يتبع **WAYNAH** معايير هندسية محكمة لحماية البيانات وإدارة الوصول:
 
-- 🔐 **إدارة الصلاحيات (RBAC - Role-Based Access Control)**: حظر العمليات الحساسة وتحديد صلاحيات الادوار (`SUPER_ADMIN`, `ADMIN`, `BUSINESS_OWNER`, `BUSINESS_MANAGER`, `USER`).
+- 🔐 **إدارة الصلاحيات (RBAC - Role-Based Access Control)**: حظر العمليات الحساسة وتحديد صلاحيات الأدوار (`SUPER_ADMIN`, `ADMIN`, `BUSINESS_OWNER`, `BUSINESS_MANAGER`, `USER`).
 - 📜 **سجل التدقيق الشامل (Persistent Audit Log)**: تسجيل عمليات تعديل البيانات، التوثيق، والمطالبات في جدول `AuditLog` بدون حصر أي كلمة مرور أو بيانات سرية.
 - 🛑 **الحماية من الهجمات**: استخدام `securityHeadersMiddleware` لحظر الثغرات الشائعة (XSS, Clickjacking, MIME Sniffing) وتحديد نطاق CORS بدقة.
 - ⚡ **آلية الأخطاء الآمنة (Safe Error Handler)**: منع تسريب تفاصيل الخادم الداخلية أو Stack Traces عند وقوع أخطاء في واجهة REST API.
@@ -354,7 +352,7 @@ waynah/
 │   ├── database/               # Prisma Schema, Migrations & PostGIS Utilities
 │   │   ├── prisma/
 │   │   │   ├── schema.prisma   # Master Database Schema
-│   │   │   └── migrations/     # 7 Executed Spatial Schema Migrations
+│   │   │   └── migrations/     # 17 Executed Spatial Schema Migrations
 │   │   └── src/spatial/        # Spatial Verification & Boundary Health
 │   │
 │   ├── search/                 # Arabic Normalization & Fuzzy Spatial Search Engine
@@ -364,7 +362,7 @@ waynah/
 │   │
 │   ├── shared/                 # Shared Zod Schemas, Permission Codes & Types
 │   ├── ui/                     # Primitives Design System (Button, Card, Badge...)
-│   ├── maps/                   # Map Component Layer & Leaflet Clustering
+│   ├── maps/                   # Map Component Layer & Leaflet Clustering (Source Directory)
 │   └── config/                 # Shared TypeScript & ESLint Rules
 │
 ├── docs/                       # Architecture Specs & Technical Studies
@@ -382,9 +380,9 @@ waynah/
 
 | المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
 | :--- | :--- | :--- | :--- |
-| **Web Application** | 🟢 Deployed & Verified | Vercel Edge Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
-| **API Gateway** | 🟢 Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتوفر نقطة `/health` |
-| **PostgreSQL + PostGIS** | 🟢 Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 7 وتفعيل ملحق PostGIS |
+| **Web Application** | 🟢 Deployed & Verified | Vercel Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
+| **API Gateway** | 🟢 Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتتوفر نقطة `/health` |
+| **PostgreSQL + PostGIS** | 🟢 Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 17 وتفعيل ملحق PostGIS |
 | **Public Launch Gate** | 🟡 Production Ready | Operational Launch Gate Audited | المنصة جاهزة تقنيًا؛ مرحلة الإطلاق العام تدريجية |
 
 ---
@@ -393,9 +391,9 @@ waynah/
 
 تم التثبت التقني من سلامة النظام من خلال:
 
-- ✅ **7 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
-- ✅ **17 حزمة اختبارات (Integration & Security Test Suites)**: تغطي الأمان، الصلاحيات، البحث الهجين، والتحقق المباشر.
-- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر جميع تطبيقات وحزم المونوريبو.
+- ✅ **17 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
+- ✅ **596 اختبار كلي (Integration & Security Test Suites)**: تغطي 577 اختبار API و 19 اختبار حزمة البحث.
+- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر 10 حزم وتطبيقات في المونوريبو.
 - ✅ **الربط والإنتاجية (Supabase Direct & Pooler Connectivity)**: تم ضبط روابط قواعد البيانات وقنوات الحماية.
 
 ---
@@ -406,14 +404,14 @@ waynah/
 
 ```text
 CURRENT (المطبّق والجاهز حاليًا)
-  ├── Next.js 16 Web App + Hono API + PostgreSQL/PostGIS
-  ├── Arabic & Spatial Fuzzy Search Engine
+  ├── Next.js 16 Web App + Hono API + PostgreSQL 17/PostGIS 3.3.7
+  ├── Arabic & Spatial Fuzzy Search Engine (@waynah/search)
   ├── Administrative Hierarchy & PostGIS Boundary Checks
   ├── Multi-Layer Trust & Observation Verification Engine
   └── Fine-grained RBAC & Persistent Audit Logs
 
 VALIDATED / READY FOR PROVISIONING (جاهز للربط والتوسعة)
-  ├── Redis Caching & BullMQ Background Workers
+  ├── Redis Caching & BullMQ Background Workers Topology
   └── WhatsApp & SMS Verification Dispatcher Package
 
 EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
@@ -425,14 +423,29 @@ EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
 
 ---
 
-## 18 — DEVELOPER & CREDITS
+## 18 — 👨‍💻 ABOUT THE DEVELOPER
 
 <div align="center">
 
-**Built by M.GH.AL**  
-*Lead Architecture & Software Engineering*
+### Mohammed Ghaleb AL-AOSIMI (`M.GH.AL`)
+**Full-Stack Developer · Software Engineer · Third-Year IT Student**
 
-مشروع **WAYNAH / وَيْنَه؟** هو ثمرة رؤية هندسية تهدف لتطوير البنية التحتية للمعلومات الجغرافية والمحلية في اليمن بأسلوب برمجي رصين وعالي الكفاءة.
+[![GitHub Profile](https://img.shields.io/badge/GitHub-mghalaosimi--web-181717?style=for-the-badge&logo=github)](https://github.com/mghalaosimi-web)
+
+</div>
+
+#### Profile Overview
+**Mohammed Ghaleb AL-AOSIMI** (under the engineering brand identity **`M.GH.AL`**) is a software engineer and third-year Information Technology student. His engineering focus centers on building practical, structured, production-oriented systems spanning data layers, backend infrastructure, and responsive user experiences rather than isolated demonstrations.
+
+#### Core Technical Competencies
+- **Frontend & UI Systems**: Next.js (App Router), React, TypeScript, JavaScript, Tailwind CSS, Arabic RTL Layout Engineering.
+- **Backend & API Systems**: Node.js, Hono API Gateway, RESTful Architecture, Fine-Grained RBAC, Persistent Audit Systems.
+- **Database & Spatial Systems**: PostgreSQL 17, PostGIS Spatial Extensions (`geography`, `ST_Covers`), Prisma ORM, SQLite, Drift, Firebase, Supabase.
+- **Infrastructure & Deployment**: Vercel Serverless Hosting, Supabase Managed Cloud Postgres, Monorepo Orchestration (Turborepo, pnpm Workspaces).
+- **Mobile & Cross-Platform**: Flutter, Android Native.
+
+#### Engineering Focus & Philosophy
+WAYNAH represents an independent engineering project developed under the **`M.GH.AL`** identity to solve real-world spatial discovery, administrative data hierarchy, and trust verification challenges within Yemen's geographic landscape.
 
 ---
 
@@ -458,5 +471,3 @@ pnpm dev
 ```
 
 *Web Application runs at `http://localhost:3000` | API Gateway runs at `http://localhost:4000`*
-
-</div>
