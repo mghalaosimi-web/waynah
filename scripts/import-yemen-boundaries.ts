@@ -5,10 +5,15 @@
  * import of UN OCHA Yemen COD-AB MultiPolygon district boundary geometries into PostgreSQL/PostGIS.
  */
 
-import 'dotenv/config';
+import dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-import { prisma } from '@waynah/database';
+
+// Ensure .env is loaded from workspace root
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(process.cwd(), '../../.env') });
+
+import { prisma, PrismaClient } from '@waynah/database';
 import {
   GeographyBoundaryService,
   type RawFeatureBoundaryInput,
@@ -26,8 +31,11 @@ function findGeoJsonFile(filename: string): string {
   return candidates[0]!;
 }
 
+import { prisma, PrismaClient } from '@waynah/database';
+
 async function runBoundaryImport() {
-  console.log('===============================================================');
+  try {
+    console.log('===============================================================');
   console.log('  WAYNAH-GEO-004 — ADMINISTRATIVE BOUNDARY INTEGRATION (PostGIS) ');
   console.log('===============================================================');
 
@@ -96,6 +104,9 @@ async function runBoundaryImport() {
   console.log('\n===============================================================');
   console.log('   ADMINISTRATIVE BOUNDARY IMPORT COMPLETED SUCCESSFULLY      ');
   console.log('===============================================================');
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 runBoundaryImport()

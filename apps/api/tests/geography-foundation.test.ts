@@ -74,6 +74,7 @@ function makeMockPrismaForGeography() {
       findMany: vi.fn().mockResolvedValue([makeDistrictMock()]),
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn().mockResolvedValue(makeDistrictMock()),
+      createMany: vi.fn().mockResolvedValue({ count: 1 }),
       update: vi.fn().mockResolvedValue(makeDistrictMock()),
     },
   } as unknown as MockedObject<PrismaClient>;
@@ -94,6 +95,7 @@ function makeMockPrismaFull() {
       findMany: vi.fn().mockResolvedValue([]),
       findUnique: vi.fn().mockResolvedValue(null),
       create: vi.fn(),
+      createMany: vi.fn().mockResolvedValue({ count: 0 }),
       update: vi.fn(),
       findFirst: vi.fn(),
     },
@@ -352,23 +354,21 @@ describe('GEO-001 — GeographyImportService (idempotent import)', () => {
     expect(prisma.governorate.create).toHaveBeenCalledOnce();
   });
 
-  it('Test 5b — re-importing with changed name issues UPDATE, not CREATE', async () => {
+  it('Test 5b — re-importing with changed name throws GeographyDriftError (strict drift policy)', async () => {
     (prisma.governorate.findUnique as ReturnType<typeof vi.fn>).mockResolvedValue(
       makeGovernorateMock({ nameEn: 'Old Name' })
     );
-    (prisma.governorate.update as ReturnType<typeof vi.fn>).mockResolvedValue(
-      makeGovernorateMock({ nameEn: 'Hajjah (Updated)' })
-    );
 
-    const result = await service.importGovernorate({
-      externalId: 'YE-HJ',
-      nameAr: 'حجة',
-      nameEn: 'Hajjah (Updated)',
-    });
+    await expect(
+      service.importGovernorate({
+        externalId: 'YE-HJ',
+        nameAr: 'حجة',
+        nameEn: 'Hajjah (Updated)',
+      })
+    ).rejects.toThrow(/DRIFT DETECTED/);
 
-    expect(result.action).toBe('UPDATED');
     expect(prisma.governorate.create).not.toHaveBeenCalled();
-    expect(prisma.governorate.update).toHaveBeenCalledOnce();
+    expect(prisma.governorate.update).not.toHaveBeenCalled();
   });
 
   it('Test 6a — valid governorate import creates expected entity', async () => {

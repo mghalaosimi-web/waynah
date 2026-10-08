@@ -344,94 +344,117 @@ export class GeographyPipelineService {
       );
     }
 
-    // 2. Execute controlled transaction for DataSource, Governorates, and Districts
-    return await this.prisma.$transaction(async (tx) => {
-      const sourceName = sourceMetadata?.name || input.sourceName || 'OCHA Yemen COD-AB';
-      const sourceType = sourceMetadata?.type || 'GEOGRAPHIC_COD_AB';
-      const reliabilityWeight = sourceMetadata?.reliabilityWeight ?? 1.0;
+    const sourceName = sourceMetadata?.name || input.sourceName || 'OCHA Yemen COD-AB';
+    const sourceType = sourceMetadata?.type || 'GEOGRAPHIC_COD_AB';
+    const reliabilityWeight = sourceMetadata?.reliabilityWeight ?? 1.0;
 
-      let dataSource = await tx.dataSource.findFirst({
-        where: { name: sourceName },
-      });
+    // ── PHASE 1: DataSource & Governorates Transaction ───────────────────────
+    const { dataSource, pcodeToGovIdMap, govCreated, govUpdated, govUnchanged } =
+      await this.prisma.$transaction(
+        async (tx) => {
+          let ds = await tx.dataSource.findFirst({
+            where: { name: sourceName },
+          });
 
-      if (!dataSource) {
-        dataSource = await tx.dataSource.create({
-          data: {
-            name: sourceName,
-            type: sourceType,
-            reliabilityWeight,
-          },
-        });
-      }
+          if (!ds) {
+            ds = await tx.dataSource.create({
+              data: {
+                name: sourceName,
+                type: sourceType,
+                reliabilityWeight,
+              },
+            });
+          }
 
-      // 3. Upsert Governorates & map P-codes to internal UUIDs
-      const pcodeToGovIdMap = new Map<string, string>();
-      let govCreated = 0;
-      let govUpdated = 0;
-      let govUnchanged = 0;
+          const map = new Map<string, string>();
+          let created = 0;
+          let updated = 0;
+          let unchanged = 0;
 
-      for (const govInput of input.governorates) {
-        const res = await this.importService.importGovernorate(
-          {
-            externalId: govInput.ADM1_PCODE,
-            nameAr: govInput.ADM1_AR,
-            nameEn: govInput.ADM1_EN,
-            latitude: govInput.latitude,
-            longitude: govInput.longitude,
-          },
-          tx
-        );
+          for (const govInput of input.governorates) {
+            const res = await this.importService.importGovernorate(
+              {
+                externalId: govInput.ADM1_PCODE,
+                nameAr: govInput.ADM1_AR,
+                nameEn: govInput.ADM1_EN,
+                latitude: govInput.latitude,
+                longitude: govInput.longitude,
+              },
+              tx
+            );
 
-        pcodeToGovIdMap.set(govInput.ADM1_PCODE.trim(), res.id);
+            map.set(govInput.ADM1_PCODE.trim(), res.id);
 
-        if (res.action === 'CREATED') govCreated++;
-        else if (res.action === 'UPDATED') govUpdated++;
-        else govUnchanged++;
-      }
+            if (res.action === 'CREATED') created++;
+            else if (res.action === 'UPDATED') updated++;
+            else unchanged++;
+          }
 
-      // 4. Upsert Districts
-      let distCreated = 0;
-      let distUpdated = 0;
-      let distUnchanged = 0;
+          return {
+            dataSource: ds,
+            pcodeToGovIdMap: map,
+            govCreated: created,
+            govUpdated: updated,
+            govUnchanged: unchanged,
+          };
+        },
+        { maxWait: 5000, timeout: 15000 }
+      );
 
-      for (const distInput of input.districts) {
+    // ── PHASE 2: Sequential District Chunk Transactions (Max 50 per batch) ───
+    const BATCH_SIZE = 50;
+    let distCreated = 0;
+    let distUpdated = 0;
+    let distUnchanged = 0;
+
+    const validGovIds = new Set(pcodeToGovIdMap.values());
+
+    const districtChunks: OchaCodAbDistrict[][] = [];
+    for (let i = 0; i < input.districts.length; i += BATCH_SIZE) {
+      districtChunks.push(input.districts.slice(i, i + BATCH_SIZE));
+    }
+
+    // Execute chunks sequentially (NO parallel execution)
+    for (const chunk of districtChunks) {
+      const batchInputs = chunk.map((distInput) => {
         const parentGovId = pcodeToGovIdMap.get(distInput.ADM1_PCODE.trim());
         if (!parentGovId) {
           throw new Error(
             `Unexpected pipeline failure: Parent governorate P-code "${distInput.ADM1_PCODE}" not mapped.`
           );
         }
+        return {
+          externalId: distInput.ADM2_PCODE,
+          governorateId: parentGovId,
+          nameAr: distInput.ADM2_AR,
+          nameEn: distInput.ADM2_EN,
+        };
+      });
 
-        const res = await this.importService.importDistrict(
-          {
-            externalId: distInput.ADM2_PCODE,
-            governorateId: parentGovId,
-            nameAr: distInput.ADM2_AR,
-            nameEn: distInput.ADM2_EN,
-          },
-          tx
-        );
+      const chunkResult = await this.importService.importDistrictBatch(
+        batchInputs,
+        validGovIds
+      );
 
-        if (res.action === 'CREATED') distCreated++;
-        else if (res.action === 'UPDATED') distUpdated++;
-        else distUnchanged++;
-      }
+      distCreated += chunkResult.created;
+      distUpdated += chunkResult.updated;
+      distUnchanged += chunkResult.unchanged;
+    }
 
-      return {
-        dataSourceId: dataSource.id,
-        dataSourceName: dataSource.name,
-        governorates: {
-          created: govCreated,
-          updated: govUpdated,
-          unchanged: govUnchanged,
-        },
-        districts: {
-          created: distCreated,
-          updated: distUpdated,
-          unchanged: distUnchanged,
-        },
-      };
-    });
+    return {
+      dataSourceId: dataSource.id,
+      dataSourceName: dataSource.name,
+      governorates: {
+        created: govCreated,
+        updated: govUpdated,
+        unchanged: govUnchanged,
+      },
+      districts: {
+        created: distCreated,
+        updated: distUpdated,
+        unchanged: distUnchanged,
+      },
+    };
   }
 
   /**

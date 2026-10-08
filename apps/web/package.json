@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@types/leaflet": "^1.9.22",
+    "@supabase/supabase-js": "^2.49.1",
     "@waynah/shared": "workspace:*",
     "@waynah/ui": "workspace:*",
     "clsx": "^2.1.1",

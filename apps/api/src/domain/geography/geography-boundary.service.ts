@@ -208,35 +208,85 @@ export class GeographyBoundaryService {
       );
     }
 
+    const BATCH_SIZE = 25;
+    const featureChunks: RawFeatureBoundaryInput[][] = [];
+    for (let i = 0; i < features.length; i += BATCH_SIZE) {
+      featureChunks.push(features.slice(i, i + BATCH_SIZE));
+    }
+
     let updatedCount = 0;
     let unmatchedCount = 0;
+    let batchIndex = 0;
 
-    await db.$transaction(async (tx) => {
-      for (const feat of features) {
+    for (const chunk of featureChunks) {
+      batchIndex++;
+      const startTime = Date.now();
+
+      // 1. Bulk Pre-fetch OUTSIDE transaction
+      const chunkPcodes = chunk.map((f) => f.ADM2_PCODE.trim());
+      const existingDistricts = await db.district.findMany({
+        where: {
+          externalId: {
+            in: chunkPcodes,
+          },
+        },
+        select: {
+          id: true,
+          externalId: true,
+        },
+      });
+
+      const pcodeToDistrictIdMap = new Map<string, string>(
+        existingDistricts
+          .filter((d: { id: string; externalId: string | null }) => d.externalId !== null)
+          .map((d: { id: string; externalId: string | null }) => [d.externalId!, d.id])
+      );
+
+      // 2. In-Memory Mapping & Validation OUTSIDE transaction
+      const preparedUpdates: Array<{ districtId: string; geoJsonStr: string }> = [];
+
+      for (const feat of chunk) {
         const pcode = feat.ADM2_PCODE.trim();
-        const multiGeom = ensureMultiPolygonGeoJSON(feat.geometry);
-        const geoJsonStr = JSON.stringify(multiGeom);
+        const districtId = pcodeToDistrictIdMap.get(pcode);
 
-        const district = await tx.district.findUnique({
-          where: { externalId: pcode },
-        });
-
-        if (!district) {
+        if (!districtId) {
           unmatchedCount++;
           continue;
         }
 
-        // PostGIS update using ST_SetSRID(ST_GeomFromGeoJSON(...), 4326)
-        await tx.$executeRaw`
-          UPDATE "districts"
-          SET "boundary" = ST_SetSRID(ST_GeomFromGeoJSON(${geoJsonStr}), 4326)::geography,
-              "updated_at" = NOW()
-          WHERE "id" = ${district.id};
-        `;
+        const multiGeom = ensureMultiPolygonGeoJSON(feat.geometry);
+        const geoJsonStr = JSON.stringify(multiGeom);
 
-        updatedCount++;
+        preparedUpdates.push({ districtId, geoJsonStr });
       }
-    });
+
+      // 3. Writes-Only Transaction (NO read queries inside tx, EXACTLY 1 BULK WRITE statement)
+      if (preparedUpdates.length > 0) {
+        const districtIds = preparedUpdates.map((u) => u.districtId);
+        const geoJsonStrs = preparedUpdates.map((u) => u.geoJsonStr);
+
+        let batchUpdatedCount = 0;
+        await db.$transaction(
+          async (tx: any) => {
+            await tx.$executeRaw`
+              UPDATE "districts" AS d
+              SET "boundary" = ST_SetSRID(ST_GeomFromGeoJSON(u.geojson), 4326)::geography,
+                  "updated_at" = NOW()
+              FROM UNNEST(${districtIds}::text[], ${geoJsonStrs}::text[]) AS u(id, geojson)
+              WHERE d."id"::text = u.id;
+            `;
+            batchUpdatedCount = preparedUpdates.length;
+          },
+          { maxWait: 5000, timeout: 15000 }
+        );
+        updatedCount += batchUpdatedCount;
+      }
+
+      const durationMs = Date.now() - startTime;
+      console.log(
+        `   [BATCH ${batchIndex}/${featureChunks.length}] processed ${chunk.length} boundaries in ${durationMs}ms (Total DB updated: ${updatedCount})`
+      );
+    }
 
     return {
       updatedCount,

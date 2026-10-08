@@ -393,6 +393,132 @@ export class AuthService {
   }
 
   /**
+   * Authenticates user using Google OAuth via Supabase access token.
+   * Verifies token cryptographically via Supabase Auth API, matches/creates WAYNAH user,
+   * and issues standard WAYNAH session token.
+   */
+  public async authenticateGoogleUser(
+    accessToken: string,
+    ip: string = '127.0.0.1'
+  ): Promise<{ success: boolean; data?: AuthSuccessPayload; error?: string }> {
+    if (!accessToken || typeof accessToken !== 'string' || !accessToken.trim()) {
+      return { success: false, error: 'توكن التوثيق مطلوب' };
+    }
+
+    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://jtltakhmgsptnjxymdmm.supabase.co';
+    const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+
+    let supabaseUser: any = null;
+
+    try {
+      const response = await fetch(`${supabaseUrl.replace(/\/$/, '')}/auth/v1/user`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${accessToken.trim()}`,
+          apikey: supabaseAnonKey,
+        },
+      });
+
+      if (!response.ok) {
+        await AuditLogger.logAuthFailure('POST', '/v1/auth/google', ip, 'Invalid or expired Supabase token');
+        return { success: false, error: 'توكن التوثيق غير صالح أو منتهي الصلاحية' };
+      }
+
+      supabaseUser = await response.json();
+    } catch {
+      return { success: false, error: 'تعذر الاتصال بمزود التوثيق Supabase' };
+    }
+
+    if (!supabaseUser || !supabaseUser.id || !supabaseUser.email) {
+      await AuditLogger.logAuthFailure('POST', '/v1/auth/google', ip, 'Missing identity in Supabase token');
+      return { success: false, error: 'بيانات الهوية غير مكتملة في توكن التوثيق' };
+    }
+
+    // Verify provider is Google
+    const provider = supabaseUser.app_metadata?.provider;
+    const identities = supabaseUser.identities || [];
+    const isGoogleProvider = provider === 'google' || identities.some((i: any) => i.provider === 'google');
+
+    if (!isGoogleProvider) {
+      await AuditLogger.logAuthFailure('POST', '/v1/auth/google', ip, 'Provider mismatch: non-Google token');
+      return { success: false, error: 'مزود الهوية يجب أن يكون Google' };
+    }
+
+    const email = supabaseUser.email.trim().toLowerCase();
+    const name =
+      supabaseUser.user_metadata?.full_name ||
+      supabaseUser.user_metadata?.name ||
+      email.split('@')[0];
+
+    // Find existing user or create a new user safely
+    let user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (user) {
+      // If user exists and email is not verified, mark it as verified since Google verified it
+      if (!user.emailVerified) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: {
+            emailVerified: true,
+            emailVerifiedAt: new Date(),
+          },
+        });
+      }
+    } else {
+      // Create new User record with safe unusable password hash
+      try {
+        user = await this.prisma.user.create({
+          data: {
+            name,
+            email,
+            passwordHash: '!oauth_google_unusable_pass',
+            role: 'USER',
+            emailVerified: true,
+            emailVerifiedAt: new Date(),
+          },
+        });
+      } catch (err: any) {
+        // Handle race condition for unique constraint P2002
+        if (err?.code === 'P2002') {
+          const found = await this.prisma.user.findUnique({ where: { email } });
+          if (!found) {
+            return { success: false, error: 'فشل إنشاء حساب المستخدم' };
+          }
+          user = found;
+        } else {
+          return { success: false, error: 'حدث خطأ أثناء حفظ بيانات المستخدم' };
+        }
+      }
+    }
+
+    // Issue standard WAYNAH session token (7 days validity)
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
+    await this.prisma.session.create({
+      data: {
+        userId: user.id,
+        token,
+        expiresAt,
+      },
+    });
+
+    const actor = AuthService.buildActorFromUser(user);
+    const userRes = AuthService.toUserResponse(user);
+
+    await AuditLogger.logAuthSuccess('POST', '/v1/auth/google', user.id, actor.type, ip);
+
+    return {
+      success: true,
+      data: {
+        user: userRes,
+        actor,
+        token,
+      },
+    };
+  }
+
+  /**
    * Destroys an active session (Logout).
    */
   public async logout(

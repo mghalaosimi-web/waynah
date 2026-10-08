@@ -145,6 +145,53 @@ export function createAuthRouter(prismaClient?: PrismaClient) {
   });
 
   /**
+   * POST /v1/auth/google
+   * Authenticates user using Google OAuth access token via Supabase Auth API.
+   */
+  router.post('/google', authRateLimiter, async (c) => {
+    try {
+      const body = await c.req.json().catch(() => ({}));
+      const accessToken = typeof body.accessToken === 'string' ? body.accessToken.trim() : '';
+
+      if (!accessToken) {
+        return c.json(
+          ApiResponse.error('توكن التوثيق مطلوب', 'INVALID_INPUT'),
+          400
+        );
+      }
+
+      const ip = c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || '127.0.0.1';
+      const result = await authService.authenticateGoogleUser(accessToken, ip);
+
+      if (!result.success || !result.data) {
+        return c.json(
+          ApiResponse.error(result.error || 'فشل توثيق حساب Google', 'INVALID_CREDENTIALS'),
+          401
+        );
+      }
+
+      // Set HttpOnly session cookie
+      setCookie(c, 'waynah_session', result.data.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Lax',
+        path: '/',
+        maxAge: 7 * 24 * 60 * 60,
+      });
+
+      return c.json(
+        ApiResponse.success({
+          user: result.data.user,
+          actor: result.data.actor,
+          token: result.data.token,
+        })
+      );
+    } catch (err) {
+      return c.json(ApiResponse.error('حدث خطأ أثناء التوثيق بـ Google', 'SERVER_ERROR'), 500);
+    }
+  });
+
+  /**
    * POST /v1/auth/logout
    * Invalidates active session and clears session cookie.
    */

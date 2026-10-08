@@ -1187,6 +1187,18 @@ export class ApiClient {
   }
 
   /**
+   * Login with Google OAuth Token (Auth API)
+   */
+  public async loginWithGoogle(data: {
+    accessToken: string;
+  }): Promise<ApiResponse<AuthResponseData>> {
+    return this.request<AuthResponseData>('/v1/auth/google', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /**
    * Logout User (Auth API)
    */
   public async logout(): Promise<ApiResponse<{ message: string }>> {

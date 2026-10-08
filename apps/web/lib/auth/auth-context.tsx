@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { type Actor, ANONYMOUS_ACTOR } from '@waynah/shared';
 import { apiClient, type UserData } from '../api/api-client';
+import { supabase } from '../supabase';
 
 export interface AuthContextType {
   actor: Actor;
@@ -11,6 +12,8 @@ export interface AuthContextType {
   emailVerified: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogle: () => Promise<{ success: boolean; error?: string }>;
+  loginWithGoogleToken: (accessToken: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   refreshAuth: () => Promise<void>;
@@ -78,6 +81,59 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
       return { success: false, error: errorMessage };
     } catch (err: unknown) {
+      setIsLoading(false);
+      return { success: false, error: 'حدث خطأ غير متوقع أثناء الاتصال بالخادم' };
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const redirectUrl = typeof window !== 'undefined' 
+        ? `${window.location.origin}/callback` 
+        : 'https://waynah.vercel.app/callback';
+      
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
+      });
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true };
+    } catch {
+      return { success: false, error: 'تعذر بدء عملية تسجيل الدخول بـ Google' };
+    }
+  };
+
+  const loginWithGoogleToken = async (accessToken: string) => {
+    setIsLoading(true);
+    try {
+      const res = await apiClient.loginWithGoogle({ accessToken });
+      if (res.success && res.data) {
+        setActor(res.data.actor as Actor);
+        setUser(res.data.user);
+        setIsAuthenticated(true);
+        setIsLoading(false);
+        return { success: true };
+      }
+
+      const errorMessage =
+        typeof res.error === 'object' && res.error?.message
+          ? res.error.message
+          : typeof res.error === 'string'
+          ? res.error
+          : 'فشل تسجيل الدخول بواسطة Google';
+
+      setIsLoading(false);
+      return { success: false, error: errorMessage };
+    } catch {
       setIsLoading(false);
       return { success: false, error: 'حدث خطأ غير متوقع أثناء الاتصال بالخادم' };
     }
@@ -210,6 +266,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailVerified,
         isLoading,
         login,
+        loginWithGoogle,
+        loginWithGoogleToken,
         register,
         logout,
         refreshAuth,

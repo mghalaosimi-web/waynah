@@ -89,9 +89,13 @@ function makeMockPrismaForImportExecution() {
         }
         return Promise.resolve(null);
       }),
-      findMany: vi.fn().mockImplementation(({ where }: { where?: { governorateId?: string } } = {}) => {
+      findMany: vi.fn().mockImplementation(({ where }: { where?: { governorateId?: string; externalId?: { in?: string[] } } } = {}) => {
         const list = Array.from(distMap.values());
         if (where?.governorateId) return Promise.resolve(list.filter(d => d.governorateId === where.governorateId));
+        if (where?.externalId?.in) {
+          const inSet = new Set(where.externalId.in);
+          return Promise.resolve(list.filter(d => inSet.has(d.externalId)));
+        }
         return Promise.resolve(list);
       }),
       create: vi.fn().mockImplementation(({ data }: { data: any }) => {
@@ -99,6 +103,14 @@ function makeMockPrismaForImportExecution() {
         const rec = { id, ...data, createdAt: new Date(), updatedAt: new Date() };
         distMap.set(id, rec);
         return Promise.resolve(rec);
+      }),
+      createMany: vi.fn().mockImplementation(({ data }: { data: any[] }) => {
+        for (const item of data) {
+          const id = `dist-${item.externalId || Math.random().toString(36).substring(7)}`;
+          const rec = { id, ...item, createdAt: new Date(), updatedAt: new Date() };
+          distMap.set(id, rec);
+        }
+        return Promise.resolve({ count: data.length });
       }),
       update: vi.fn().mockImplementation(({ where, data }: { where: { id: string }; data: any }) => {
         const existing = distMap.get(where.id);
@@ -275,7 +287,7 @@ describe('WAYNAH-GEO-003 — Controlled Yemen Geographic Import', () => {
     expect(mockPrisma._state.distMap.size).toBe(1);
   });
 
-  it('Test 13 — Existing Governorate is updated idempotently', async () => {
+  it('Test 13 — Existing Governorate with different data triggers GeographyDriftError', async () => {
     const inputInitial: OchaCodAbDatasetInput = {
       governorates: [{ ADM1_PCODE: 'YE17', ADM1_AR: 'حجة', ADM1_EN: 'Hajjah' }],
       districts: [],
@@ -286,13 +298,10 @@ describe('WAYNAH-GEO-003 — Controlled Yemen Geographic Import', () => {
       governorates: [{ ADM1_PCODE: 'YE17', ADM1_AR: 'حجة', ADM1_EN: 'Hajjah (Official)' }],
       districts: [],
     };
-    const updateResult = await pipeline.executeUpsert(inputUpdate);
-
-    expect(updateResult.governorates.updated).toBe(1);
-    expect(updateResult.governorates.created).toBe(0);
+    await expect(pipeline.executeUpsert(inputUpdate)).rejects.toThrow(/DRIFT DETECTED/);
   });
 
-  it('Test 14 — Existing District is updated idempotently', async () => {
+  it('Test 14 — Existing District with different data triggers GeographyDriftError', async () => {
     const inputInitial: OchaCodAbDatasetInput = {
       governorates: [{ ADM1_PCODE: 'YE17', ADM1_AR: 'حجة', ADM1_EN: 'Hajjah' }],
       districts: [{ ADM2_PCODE: 'YE1704', ADM1_PCODE: 'YE17', ADM2_AR: 'عبس', ADM2_EN: 'Abs' }],
@@ -303,10 +312,7 @@ describe('WAYNAH-GEO-003 — Controlled Yemen Geographic Import', () => {
       governorates: [{ ADM1_PCODE: 'YE17', ADM1_AR: 'حجة', ADM1_EN: 'Hajjah' }],
       districts: [{ ADM2_PCODE: 'YE1704', ADM1_PCODE: 'YE17', ADM2_AR: 'عبس', ADM2_EN: 'Abs City' }],
     };
-    const updateResult = await pipeline.executeUpsert(inputUpdate);
-
-    expect(updateResult.districts.updated).toBe(1);
-    expect(updateResult.districts.created).toBe(0);
+    await expect(pipeline.executeUpsert(inputUpdate)).rejects.toThrow(/DRIFT DETECTED/);
   });
 
   it('Test 15 — Missing source record is NOT deleted on partial import', async () => {

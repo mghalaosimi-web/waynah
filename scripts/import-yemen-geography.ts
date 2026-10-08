@@ -6,12 +6,14 @@
  */
 
 import 'dotenv/config';
-import { prisma } from '@waynah/database';
+import { createDirectPrismaClient } from '@waynah/database';
 import { GeographySourceReader } from '../apps/api/src/domain/geography/geography-source-reader.js';
 import { GeographyPipelineService } from '../apps/api/src/domain/geography/geography-pipeline.service.js';
 
 async function runControlledImport() {
-  console.log('===============================================================');
+  const prisma = createDirectPrismaClient();
+  try {
+    console.log('===============================================================');
   console.log('       WAYNAH-GEO-003 — CONTROLLED YEMEN GEOGRAPHIC IMPORT      ');
   console.log('===============================================================');
 
@@ -97,6 +99,9 @@ async function runControlledImport() {
   console.log('\n===============================================================');
   console.log('       CONTROLLED GEOGRAPHIC IMPORT COMPLETED SUCCESSFULLY      ');
   console.log('===============================================================');
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 runControlledImport()
