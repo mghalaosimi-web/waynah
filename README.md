@@ -15,13 +15,19 @@
 [![PostGIS](https://img.shields.io/badge/PostGIS-v3.3-00766E?style=for-the-badge&logo=qgis)](https://postgis.net)
 [![Prisma](https://img.shields.io/badge/Prisma-v6.4-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io)
 
-[🌐 Web Application](https://waynah.vercel.app) &nbsp;|&nbsp; [🔌 API Gateway](https://waynah-api.vercel.app/health) &nbsp;|&nbsp; [📘 Architecture Specifications](ARCHITECTURE.md) &nbsp;|&nbsp; [🛡️ Security Policy](SECURITY.md)
+[🌐 Web Application](https://waynah.vercel.app) &nbsp;|&nbsp; [🔌 API Gateway](https://waynah-api.vercel.app/health) &nbsp;|&nbsp; [📐 Architecture Specs](ARCHITECTURE.md) &nbsp;|&nbsp; [🛡️ Security Policy](SECURITY.md) &nbsp;|&nbsp; [👨‍💻 Developer Profile](#18-—-the-engineer-behind-waynah)
 
 </div>
 
 ---
 
-## 01 — THE QUESTION: وَيْنَه؟ (WHERE IS IT?)
+## 01 — THE HERO
+
+**WAYNAH / وَيْنَه؟** مشروع هندسي مستقل يهدف لبناء وتطوير البنية التحتية للمعلومات الجغرافية والمحلية في اليمن. يُدار المشروع وفق هوية بصريّة هادئة باسم **"Calm Local Atlas — أطلس محلي هادئ"** تحت توقيع المطور والمهندس **M.GH.AL**.
+
+---
+
+## 02 — THE QUESTION: وَيْنَه؟ (WHERE IS IT?)
 
 > **هناك أماكن يعرفها الناس... لكن يصعب وصفها رقميًا.**  
 > سوق شعبية، شارع جانبي، قرية بعيدة، عيادة محلية، أو محل تجاري صغير في حارة.  
@@ -31,29 +37,29 @@
 
 ---
 
-## 02 — THE CORE PROBLEM
+## 03 — THE REAL PROBLEM
 
 تفتقر البيانات المكانية والتجارية المحلية في اليمن إلى الفهرسة الموحدة والموثوقية المستمرة:
 
 1. **العنوان غير الرسمي**: معظم الأماكن تُوصف بالأحياء والأزقة والمعالم البارزة وليس بالرموز البريدية أو الشوارع الرقمية.
 2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والمواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
 3. **غياب نظام الموثوقية**: صعوبة التمييز بين الأماكن التي تم فحصها وتأكيدها، والأماكن غير المعتمدة أو المغلقة.
-4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما تؤدي إلى فشل أنظمة البحث التقليدية.
+4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما يؤدي إلى فشل أنظمة البحث التقليدية.
 
 ---
 
-## 03 — WHAT IS WAYNAH?
+## 04 — WHAT IS WAYNAH?
 
 **WAYNAH / وَيْنَه؟** ليس مجرد خريطة تفاعلية، وليس مجرد دليل تجاري عابر. إنه **منصة جغرافية هندسية كاملة (Monorepo Platform)** تم بناؤها خصيصًا لتوفير:
 
 - 🗺️ **فهرسة جغرافية هرمية (Administrative Spatial Hierarchy)**: من المحافظة والمديرية والعزلة وصولاً إلى الحي والشارع والمعلم.
 - 🔍 **ملاحة واستكشاف فائق السرعة (Fuzzy & Spatial Search)**: محرك بحث مدعوم بمعالجة المصطلحات العربية واليمانية مع ترتيب النتائج حسب القرب الجغرافي ونسبة التطابق.
 - 🛡️ **نموذج الثقة والتحقق المباشر (Trust & Verification Model)**: تصنيف دقيق لحالة الموثوقية (`UNVERIFIED`, `VERIFIED`, `CLAIMED`, `REPORTED`, `CLOSED`) مع تسجيل كافة التعديلات في سجل تدقيق محكم (`AuditLog`).
-- 🏢 **إدارة الفروع والممتلكات التجاري (Branch Claiming & RBAC)**: تمكين أصحاب الأعمال من تقديم طلبات ملكية الفروع وتوثيق بياناتهم بمرجعية إدارية سليمة.
+- 🏢 **إدارة الفروع والممتلكات التجارية (Branch Claiming & RBAC)**: تمكين أصحاب الأعمال من تقديم طلبات ملكية الفروع وتوثيق بياناتهم بمرجعية إدارية سليمة.
 
 ---
 
-## 04 — THE WAYNAH CORE MODEL
+## 05 — THE CORE MODEL
 
 يعتمد WAYNAH على النموذج الخماسي للاكتشاف المكاني:
 
@@ -90,7 +96,7 @@
 
 ---
 
-## 05 — GEOGRAPHIC MODEL (WHERE?)
+## 06 — GEOGRAPHIC INTELLIGENCE
 
 يتعامل WAYNAH مع الجغرافيا اليمنية من خلال هيكل رمزي وهندسي محدد باستخدام تقنيات PostGIS المكانية (`geography(MultiPolygon, 4326)` & `geography(Point, 4326)`):
 
@@ -112,11 +118,11 @@ Yemen (جمهورية اليمن)
   │           │                       └── Coordinates: PostGIS Point (Latitude, Longitude)
 ```
 
-> **تنبيه الهندسة المكانية**: يتم التحقق في الكود من مطابقة إحداثيات المكان (`PlaceLocation`) لمديرية المكان المحددة. في حال تعارض الإحداثيات الجغرافية مع المديرية، يطلق النظام استثناء هندسي صريح (`GEOGRAPHIC_CONTEXT_MISMATCH`).
+> **تنبيه الهندسة المكانية**: يتم التحقق في الكود عبر `GeographySpatialResolutionService` باستخدام استعلام PostGIS `ST_Covers(d.boundary, ST_SetSRID(ST_MakePoint(lng, lat), 4326))`. في حال تعارض الإحداثيات الجغرافية للمكان مع المديرية المحددة، يطلق الخادم استثناءً هندسيًا صريحًا بحرمانه وتمرير رمز الخطأ `GEOGRAPHIC_CONTEXT_MISMATCH`.
 
 ---
 
-## 06 — TRUST & FRESHNESS MODEL
+## 07 — TRUST & DATA FRESHNESS
 
 لا يعتمد WAYNAH على الادعاء المباشر لدقة البيانات، بل يبني الموثوقية عبر متوالية تدقيق متعددة الطبقات:
 
@@ -144,7 +150,7 @@ flowchart LR
 
 ---
 
-## 07 — WEB EXPERIENCE & PRODUCT SHOWCASE
+## 08 — PRODUCT EXPERIENCE
 
 تم تصميم واجهات **WAYNAH Web** بهوية بصرية هادئة تحت طابع **"Calm Local Atlas — أطلس محلي هادئ"** باستخدام منصة Next.js 16 وتوليفات Tailwind CSS v4 مع خريطة Leaflet المتفاعلة.
 
@@ -157,27 +163,6 @@ flowchart LR
 ### 2. Platform Operations & Spatial Analytics Console
 ![Waynah Admin Console](docs/images/admin_dashboard.png)
 *الشكل 2: لوحة التحكم الإدارية لمتابعة حالة مؤشرات الأداء المكانية، النزاعات الناتجة عن البيانات، مراجعة مطالب الملكية وسجلات الموثوقية.*
-
----
-
-## 08 — SCREENSHOT GALLERY & SYSTEM JOURNEYS
-
-<table align="center">
-  <tr>
-    <td width="50%" align="center">
-      <b>01 — Discover & Explore Places</b><br/>
-      <img src="docs/images/web_app.png" alt="Discover" width="100%"/>
-      <br/>
-      <i>استكشاف الخريطة المكانية مع تحديد فئات الأماكن والتفاعلات السريعة.</i>
-    </td>
-    <td width="50%" align="center">
-      <b>02 — Spatial Operations & Verification Console</b><br/>
-      <img src="docs/images/admin_dashboard.png" alt="Admin Dashboard" width="100%"/>
-      <br/>
-      <i>مراجعة الأماكن المكتشفة، البلاغات، وإدارة صلاحيات النظام الإداري.</i>
-    </td>
-  </tr>
-</table>
 
 ---
 
@@ -239,7 +224,7 @@ graph TD
 
 ---
 
-## 10 — DATABASE & DATA MODEL SCHEMATIC
+## 10 — DATA & SPATIAL MODEL
 
 يعتمد نموذج البيانات على العلاقات التالية داخل `packages/database/prisma/schema.prisma`:
 
@@ -268,7 +253,7 @@ User (المستخدم)
 
 ---
 
-## 11 — SEARCH & DISCOVERY FLOW
+## 11 — SEARCH & DISCOVERY
 
 تم تطوير حزمة `@waynah/search` خصيصًا لضمان فهم طبيعة المصطلحات الجغرافية والتجارية في اليمن:
 
@@ -299,7 +284,7 @@ User Query ("مطعم شيباني صنعاء")
 
 ---
 
-## 12 — TECHNOLOGY STACK
+## 12 — ENGINEERING STACK
 
 تم التثبت من إصدارات المكتبات والتقنيات المستخدمة مباشرة من مستودع المشروع:
 
@@ -320,7 +305,7 @@ User Query ("مطعم شيباني صنعاء")
 
 ## 13 — SECURITY & GOVERNANCE
 
-يتبع **WAYNAH** معايير هندسية محكمة لحماية البيانات وإدارة الوصول:
+يتبع **WAYNAH** معايير هندسية محكمة لحماية البيانات وإدارة الوصول (Security Hardened & Verified Controls):
 
 - 🔐 **إدارة الصلاحيات (RBAC - Role-Based Access Control)**: حظر العمليات الحساسة وتحديد صلاحيات الأدوار (`SUPER_ADMIN`, `ADMIN`, `BUSINESS_OWNER`, `BUSINESS_MANAGER`, `USER`).
 - 📜 **سجل التدقيق الشامل (Persistent Audit Log)**: تسجيل عمليات تعديل البيانات، التوثيق، والمطالبات في جدول `AuditLog` بدون حصر أي كلمة مرور أو بيانات سرية.
@@ -329,7 +314,31 @@ User Query ("مطعم شيباني صنعاء")
 
 ---
 
-## 14 — REPOSITORY & WORKSPACE STRUCTURE
+## 14 — PRODUCTION STATUS
+
+| المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
+| :--- | :--- | :--- | :--- |
+| **Web Application** | 🟢 Production Deployed & Verified | Vercel Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
+| **API Gateway** | 🟢 Production Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتتوفر نقطة `/health` (HTTP 200) |
+| **PostgreSQL + PostGIS** | 🟢 Production Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 17 وتفعيل ملحق PostGIS |
+| **Public Launch Gate** | 🟡 Production Ready (Controlled Rollout) | Operational Launch Gate Audited | التشر الإنتاجي محقق ومفحص؛ مرحلة الإطلاق العام تدريجية ومبوبة |
+
+> **تنبيه الإطلاق**: النشر الإنتاجي (Production Deployment) نشط ومفحص تقنيًا. الإطلاق العام للجمهور (Public Launch) يُدار بشكل تدريجي ومسيطر عليه.
+
+---
+
+## 15 — VERIFIED ENGINEERING STATUS
+
+تم التثبت التقني من سلامة النظام من خلال:
+
+- ✅ **17 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
+- ✅ **596 اختبار كلي (Integration & Security Test Suites)**: تغطي 577 اختبار API و 19 اختبار حزمة البحث.
+- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر 10 حزم وتطبيقات في المونوريبو.
+- ✅ **الربط والإنتاجية (Supabase Direct & Pooler Connectivity)**: تم ضبط روابط قواعد البيانات وقنوات الحماية.
+
+---
+
+## 16 — REPOSITORY STRUCTURE
 
 ```text
 waynah/
@@ -376,28 +385,6 @@ waynah/
 
 ---
 
-## 15 — PRODUCTION & DEPLOYMENT STATUS
-
-| المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
-| :--- | :--- | :--- | :--- |
-| **Web Application** | 🟢 Deployed & Verified | Vercel Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
-| **API Gateway** | 🟢 Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتتوفر نقطة `/health` |
-| **PostgreSQL + PostGIS** | 🟢 Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 17 وتفعيل ملحق PostGIS |
-| **Public Launch Gate** | 🟡 Production Ready | Operational Launch Gate Audited | المنصة جاهزة تقنيًا؛ مرحلة الإطلاق العام تدريجية |
-
----
-
-## 16 — VERIFIED ENGINEERING STATUS
-
-تم التثبت التقني من سلامة النظام من خلال:
-
-- ✅ **17 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
-- ✅ **596 اختبار كلي (Integration & Security Test Suites)**: تغطي 577 اختبار API و 19 اختبار حزمة البحث.
-- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر 10 حزم وتطبيقات في المونوريبو.
-- ✅ **الربط والإنتاجية (Supabase Direct & Pooler Connectivity)**: تم ضبط روابط قواعد البيانات وقنوات الحماية.
-
----
-
 ## 17 — FUTURE VISION & EXPLORATORY DIRECTIONS
 
 حرصًا على الدقة والشفافية البرمجية، تم تمييز المكونات الحالية عن المخططات المستقبلية:
@@ -414,7 +401,7 @@ VALIDATED / READY FOR PROVISIONING (جاهز للربط والتوسعة)
   ├── Redis Caching & BullMQ Background Workers Topology
   └── WhatsApp & SMS Verification Dispatcher Package
 
-EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
+EXPLORATORY / HYPOTHESIS (رؤية مستقبلية قيد الدراسة)
   ├── PWA Offline Tile Caching for Low-Bandwidth Yemen Connectivity
   ├── React Native / Expo Mobile Apps (iOS & Android)
   ├── pgvector AI Natural Language Location Assistant
@@ -423,9 +410,11 @@ EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
 
 ---
 
-## 18 — 👨‍💻 ABOUT THE DEVELOPER
+## 18 — THE ENGINEER BEHIND WAYNAH
 
 <div align="center">
+
+![Developer Visual Header](docs/images/developer_visual.png)
 
 ### Mohammed Ghaleb AL-AOSIMI (`M.GH.AL`)
 **Full-Stack Developer · Software Engineer · Third-Year IT Student**
@@ -435,7 +424,7 @@ EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
 </div>
 
 #### Profile Overview
-**Mohammed Ghaleb AL-AOSIMI** (under the engineering brand identity **`M.GH.AL`**) is a software engineer and third-year Information Technology student. His engineering focus centers on building practical, structured, production-oriented systems spanning data layers, backend infrastructure, and responsive user experiences rather than isolated demonstrations.
+**Mohammed Ghaleb AL-AOSIMI** (under the engineering brand identity **`M.GH.AL`**) is a software engineer and third-year Information Technology student. His engineering philosophy centers on building practical, structured, production-oriented software systems spanning data layers, backend infrastructure, and responsive user experiences rather than isolated demonstrations.
 
 #### Core Technical Competencies
 - **Frontend & UI Systems**: Next.js (App Router), React, TypeScript, JavaScript, Tailwind CSS, Arabic RTL Layout Engineering.
@@ -444,12 +433,22 @@ EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
 - **Infrastructure & Deployment**: Vercel Serverless Hosting, Supabase Managed Cloud Postgres, Monorepo Orchestration (Turborepo, pnpm Workspaces).
 - **Mobile & Cross-Platform**: Flutter, Android Native.
 
-#### Engineering Focus & Philosophy
-WAYNAH represents an independent engineering project developed under the **`M.GH.AL`** identity to solve real-world spatial discovery, administrative data hierarchy, and trust verification challenges within Yemen's geographic landscape.
+#### Project Connection
+**WAYNAH / وَيْنَه؟** represents an independent engineering project developed under the **`M.GH.AL`** identity to solve real-world spatial discovery, administrative data hierarchy, and trust verification challenges within Yemen's geographic landscape.
 
 ---
 
-### Quick Start (Local Development)
+## 19 — PROJECT LINKS
+
+- 🌐 **Web Application**: [https://waynah.vercel.app](https://waynah.vercel.app)
+- 🔌 **API Gateway Health**: [https://waynah-api.vercel.app/health](https://waynah-api.vercel.app/health)
+- 📐 **Architecture Specification**: [ARCHITECTURE.md](ARCHITECTURE.md)
+- 🛡️ **Security Policy**: [SECURITY.md](SECURITY.md)
+- 👨‍💻 **Developer GitHub**: [https://github.com/mghalaosimi-web](https://github.com/mghalaosimi-web)
+
+---
+
+## 20 — QUICK START (LOCAL DEVELOPMENT)
 
 ```bash
 # 1. Clone the repository
