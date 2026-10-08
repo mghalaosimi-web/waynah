@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" style="background:#0b1317; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <defs>
+    <linearGradient id="bg-grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#091115"/>
+      <stop offset="100%" stop-color="#0f1f26"/>
+    </linearGradient>
+    <linearGradient id="teal-grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg-grad2)"/>
+
+  <!-- Subtle Map Boundary Overlay Pattern -->
+  <g stroke="#14B8A6" stroke-opacity="0.08" stroke-width="1.5" fill="none">
+    <polygon points="150,120 280,100 350,180 310,290 190,320 120,240"/>
+    <polygon points="350,180 490,140 560,250 480,340 310,290"/>
+    <polygon points="560,250 720,220 810,320 730,420 480,340"/>
+    <polygon points="720,220 920,200 1020,310 910,430 810,320"/>
+  </g>
+
+  <!-- Header -->
+  <rect x="60" y="50" width="180" height="32" rx="16" fill="#0F766E" fill-opacity="0.2" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="150" y="71" text-anchor="middle" fill="#14B8A6" font-size="13" font-weight="700" letter-spacing="1">DEVELOPER VISUAL #07</text>
+
+  <text x="60" y="125" fill="#FFFFFF" font-size="32" font-weight="800">M.GH.AL Data Ingestion &amp; Spatial Boundary Pipeline</text>
+  <text x="60" y="155" fill="#94A3B8" font-size="16" font-weight="400">Automated administrative boundary import &amp; PostGIS geometry validation engine</text>
+
+  <!-- Flow Steps -->
+  <!-- Step 1: OCHA Boundary Datasets -->
+  <rect x="60" y="210" width="240" height="400" rx="16" fill="#111c23" stroke="#1e2d37" stroke-width="1.5"/>
+  <rect x="80" y="230" width="200" height="32" rx="8" fill="#1E293B"/>
+  <text x="180" y="251" text-anchor="middle" fill="#38BDF8" font-size="13" font-weight="700">01 — RAW SOURCE DATA</text>
+  <text x="80" y="295" fill="#FFFFFF" font-size="16" font-weight="700">OCHA &amp; UN Boundaries</text>
+  <text x="80" y="325" fill="#94A3B8" font-size="13">• GeoJSON Administrative Polygons</text>
+  <text x="80" y="350" fill="#94A3B8" font-size="13">• PCode External Identifiers</text>
+  <text x="80" y="375" fill="#94A3B8" font-size="13">• Raw Longitude / Latitude CSVs</text>
+  <text x="80" y="400" fill="#94A3B8" font-size="13">• Field Landmark Observations</text>
+  <rect x="80" y="540" width="200" height="40" rx="8" fill="#16252f" stroke="#38BDF8" stroke-width="1"/>
+  <text x="180" y="565" text-anchor="middle" fill="#38BDF8" font-size="12" font-weight="700">Multi-Source Ingestion</text>
+
+  <!-- Arrow 1 -->
+  <path d="M 310 410 L 340 410" stroke="#0F766E" stroke-width="3" fill="none"/>
+  <polygon points="340,405 350,410 340,415" fill="#0F766E"/>
+
+  <!-- Step 2: Cleaner & Normalizer Script -->
+  <rect x="360" y="210" width="240" height="400" rx="16" fill="#111c23" stroke="#1e2d37" stroke-width="1.5"/>
+  <rect x="380" y="230" width="200" height="32" rx="8" fill="#1E293B"/>
+  <text x="480" y="251" text-anchor="middle" fill="#34D399" font-size="13" font-weight="700">02 — TS ETL SCRIPTS</text>
+  <text x="380" y="295" fill="#FFFFFF" font-size="16" font-weight="700">Boundary &amp; Geometry Import</text>
+  <text x="380" y="325" fill="#94A3B8" font-size="13">• `import-yemen-boundaries.ts`</text>
+  <text x="380" y="350" fill="#94A3B8" font-size="13">• `import-yemen-geography.ts`</text>
+  <text x="380" y="375" fill="#94A3B8" font-size="13">• MultiPolygon WKT Conversion</text>
+  <text x="380" y="400" fill="#94A3B8" font-size="13">• Coordinate Range Sanitization</text>
+  <rect x="380" y="540" width="200" height="40" rx="8" fill="#16252f" stroke="#34D399" stroke-width="1"/>
+  <text x="480" y="565" text-anchor="middle" fill="#34D399" font-size="12" font-weight="700">Automated Pipeline</text>
+
+  <!-- Arrow 2 -->
+  <path d="M 610 410 L 640 410" stroke="#0F766E" stroke-width="3" fill="none"/>
+  <polygon points="640,405 650,410 640,415" fill="#0F766E"/>
+
+  <!-- Step 3: PostGIS Spatial Resolution -->
+  <rect x="660" y="210" width="240" height="400" rx="16" fill="#111c23" stroke="#1e2d37" stroke-width="1.5"/>
+  <rect x="680" y="230" width="200" height="32" rx="8" fill="#1E293B"/>
+  <text x="780" y="251" text-anchor="middle" fill="#FBBF24" font-size="13" font-weight="700">03 — SPATIAL VALIDATION</text>
+  <text x="680" y="295" fill="#FFFFFF" font-size="16" font-weight="700">ST_Covers Boundary Check</text>
+  <text x="680" y="325" fill="#94A3B8" font-size="13">• District MultiPolygon Indexing</text>
+  <text x="680" y="350" fill="#94A3B8" font-size="13">• Place Location Point Indexing</text>
+  <text x="680" y="375" fill="#94A3B8" font-size="13">• Containment Verification</text>
+  <text x="680" y="400" fill="#94A3B8" font-size="13">• Discrepancy Error Shield</text>
+  <rect x="680" y="540" width="200" height="40" rx="8" fill="#16252f" stroke="#FBBF24" stroke-width="1"/>
+  <text x="780" y="565" text-anchor="middle" fill="#FBBF24" font-size="12" font-weight="700">GEOGRAPHIC_CONTEXT_MISMATCH</text>
+
+  <!-- Arrow 3 -->
+  <path d="M 910 410 L 940 410" stroke="#0F766E" stroke-width="3" fill="none"/>
+  <polygon points="940,405 950,410 940,415" fill="#0F766E"/>
+
+  <!-- Step 4: Indexed Spatial Database -->
+  <rect x="960" y="210" width="180" height="400" rx="16" fill="#111c23" stroke="#0F766E" stroke-width="2"/>
+  <rect x="975" y="230" width="150" height="32" rx="8" fill="#0F766E"/>
+  <text x="1050" y="251" text-anchor="middle" fill="#FFFFFF" font-size="13" font-weight="700">04 — DATABASE</text>
+  <text x="975" y="295" fill="#FFFFFF" font-size="15" font-weight="700">PostGIS Storage</text>
+  <text x="975" y="325" fill="#94A3B8" font-size="12">• PostgreSQL 17</text>
+  <text x="975" y="350" fill="#94A3B8" font-size="12">• PostGIS 3.3.7</text>
+  <text x="975" y="375" fill="#94A3B8" font-size="12">• GiST Spatial Index</text>
+  <text x="975" y="400" fill="#94A3B8" font-size="12">• Supabase Pooler</text>
+  <rect x="975" y="540" width="150" height="40" rx="8" fill="url(#teal-grad2)"/>
+  <text x="1050" y="565" text-anchor="middle" fill="#FFFFFF" font-size="12" font-weight="700">Verified Database</text>
+</svg>

@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" style="background:#091115; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <defs>
+    <linearGradient id="bg-grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080e12"/>
+      <stop offset="100%" stop-color="#10202a"/>
+    </linearGradient>
+    <linearGradient id="teal-btn" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#bg-grad3)"/>
+
+  <!-- Header -->
+  <rect x="60" y="45" width="220" height="32" rx="16" fill="#0F766E" fill-opacity="0.2" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="170" y="66" text-anchor="middle" fill="#14B8A6" font-size="13" font-weight="700" letter-spacing="1">PUBLIC LAUNCH ROADMAP</text>
+
+  <text x="60" y="115" fill="#FFFFFF" font-size="32" font-weight="800">WAYNAH Production Deployment &amp; Rollout Roadmap</text>
+  <text x="60" y="145" fill="#94A3B8" font-size="15" font-weight="400">Strictly separating active production deployment baseline from controlled public launch phases</text>
+
+  <!-- Roadmap Progression Timeline -->
+  <line x1="100" y1="360" x2="1100" y2="360" stroke="#1e2d37" stroke-width="4"/>
+
+  <!-- Phase 1: Production Baseline (Completed) -->
+  <circle cx="200" cy="360" r="24" fill="#0F766E" stroke="#14B8A6" stroke-width="3"/>
+  <text x="200" y="366" text-anchor="middle" fill="#FFFFFF" font-size="14" font-weight="800">01</text>
+
+  <rect x="100" y="190" width="200" height="130" rx="12" fill="#111c23" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="115" y="215" fill="#2DD4BF" font-size="14" font-weight="700">CURRENT BASELINE</text>
+  <text x="115" y="240" fill="#FFFFFF" font-size="15" font-weight="700">Production Deployed</text>
+  <text x="115" y="265" fill="#94A3B8" font-size="12">• Vercel Web &amp; Hono API</text>
+  <text x="115" y="285" fill="#94A3B8" font-size="12">• Supabase Postgres 17 / PostGIS</text>
+  <text x="115" y="305" fill="#94A3B8" font-size="12">• 17 Migrations &amp; 596 Tests</text>
+
+  <rect x="100" y="410" width="200" height="190" rx="12" fill="#111c23" stroke="#1e2d37" stroke-width="1"/>
+  <text x="115" y="435" fill="#38BDF8" font-size="13" font-weight="700">Verified Health:</text>
+  <text x="115" y="460" fill="#E2E8F0" font-size="12">• `/health` returns 200 OK</text>
+  <text x="115" y="480" fill="#E2E8F0" font-size="12">• 27/27 Web routes built</text>
+  <text x="115" y="500" fill="#E2E8F0" font-size="12">• 0 Typecheck errors</text>
+  <text x="115" y="520" fill="#E2E8F0" font-size="12">• Spatial integrity active</text>
+  <rect x="115" y="545" width="170" height="30" rx="6" fill="url(#teal-btn)"/>
+  <text x="200" y="565" text-anchor="middle" fill="#FFFFFF" font-size="11" font-weight="700">DEPLOYED &amp; AUDITED</text>
+
+  <!-- Phase 2: Launch Gate Audit (Active) -->
+  <circle cx="500" cy="360" r="24" fill="#1E293B" stroke="#F59E0B" stroke-width="3"/>
+  <text x="500" y="366" text-anchor="middle" fill="#F59E0B" font-size="14" font-weight="800">02</text>
+
+  <rect x="400" y="190" width="200" height="130" rx="12" fill="#111c23" stroke="#F59E0B" stroke-width="1.5"/>
+  <text x="415" y="215" fill="#FBBF24" font-size="14" font-weight="700">LAUNCH GATE AUDIT</text>
+  <text x="415" y="240" fill="#FFFFFF" font-size="15" font-weight="700">Operational Readiness</text>
+  <text x="415" y="265" fill="#94A3B8" font-size="12">• Security Policy Verification</text>
+  <text x="415" y="285" fill="#94A3B8" font-size="12">• Database Backup Schema</text>
+  <text x="415" y="305" fill="#94A3B8" font-size="12">• Admin Bootstrap Credentials</text>
+
+  <rect x="400" y="410" width="200" height="190" rx="12" fill="#111c23" stroke="#1e2d37" stroke-width="1"/>
+  <text x="415" y="435" fill="#FBBF24" font-size="13" font-weight="700">Control Gate:</text>
+  <text x="415" y="460" fill="#E2E8F0" font-size="12">• Controlled Rollout</text>
+  <text x="415" y="480" fill="#E2E8F0" font-size="12">• Production Ready Status</text>
+  <text x="415" y="500" fill="#E2E8F0" font-size="12">• Zero false public claims</text>
+  <text x="415" y="520" fill="#E2E8F0" font-size="12">• Yemen traffic optimization</text>
+  <rect x="415" y="545" width="170" height="30" rx="6" fill="#1E293B" stroke="#F59E0B" stroke-width="1"/>
+  <text x="500" y="565" text-anchor="middle" fill="#FBBF24" font-size="11" font-weight="700">PRODUCTION READY</text>
+
+  <!-- Phase 3: Controlled Public Rollout (Planned) -->
+  <circle cx="800" cy="360" r="24" fill="#1E293B" stroke="#60A5FA" stroke-width="3"/>
+  <text x="800" y="366" text-anchor="middle" fill="#60A5FA" font-size="14" font-weight="800">03</text>
+
+  <rect x="700" y="190" width="200" height="130" rx="12" fill="#111c23" stroke="#3B82F6" stroke-width="1.5"/>
+  <text x="715" y="215" fill="#60A5FA" font-size="14" font-weight="700">CONTROLLED LAUNCH</text>
+  <text x="715" y="240" fill="#FFFFFF" font-size="15" font-weight="700">Phased Public Access</text>
+  <text x="715" y="265" fill="#94A3B8" font-size="12">• Merchant Onboarding</text>
+  <text x="715" y="285" fill="#94A3B8" font-size="12">• Governorate Expansion</text>
+  <text x="715" y="305" fill="#94A3B8" font-size="12">• Public Map Access</text>
+
+  <rect x="700" y="410" width="200" height="190" rx="12" fill="#111c23" stroke="#1e2d37" stroke-width="1"/>
+  <text x="715" y="435" fill="#60A5FA" font-size="13" font-weight="700">Rollout Phase:</text>
+  <text x="715" y="460" fill="#E2E8F0" font-size="12">• Sanaa &amp; Aden initial seeds</text>
+  <text x="715" y="480" fill="#E2E8F0" font-size="12">• Verified Merchant Claims</text>
+  <text x="715" y="500" fill="#E2E8F0" font-size="12">• Community Corrections</text>
+  <text x="715" y="520" fill="#E2E8F0" font-size="12">• Public Launch Declaration</text>
+  <rect x="715" y="545" width="170" height="30" rx="6" fill="#1E293B" stroke="#3B82F6" stroke-width="1"/>
+  <text x="800" y="565" text-anchor="middle" fill="#60A5FA" font-size="11" font-weight="700">PLANNED ROLLOUT</text>
+
+  <!-- Phase 4: Full Platform Scale (Future) -->
+  <circle cx="1030" cy="360" r="24" fill="#1E293B" stroke="#A78BFA" stroke-width="3"/>
+  <text x="1030" y="366" text-anchor="middle" fill="#A78BFA" font-size="14" font-weight="800">04</text>
+
+  <rect x="950" y="190" width="180" height="130" rx="12" fill="#111c23" stroke="#8B5CF6" stroke-width="1.5"/>
+  <text x="965" y="215" fill="#A78BFA" font-size="14" font-weight="700">FULL PLATFORM</text>
+  <text x="965" y="240" fill="#FFFFFF" font-size="15" font-weight="700">National Ecosystem</text>
+  <text x="965" y="265" fill="#94A3B8" font-size="12">• Mobile PWA Sync</text>
+  <text x="965" y="285" fill="#94A3B8" font-size="12">• AI Location RAG</text>
+  <text x="965" y="305" fill="#94A3B8" font-size="12">• Full Yemen Index</text>
+
+  <rect x="950" y="410" width="180" height="190" rx="12" fill="#111c23" stroke="#1e2d37" stroke-width="1"/>
+  <text x="965" y="435" fill="#A78BFA" font-size="13" font-weight="700">Future Vision:</text>
+  <text x="965" y="460" fill="#E2E8F0" font-size="12">• Complete spatial coverage</text>
+  <text x="965" y="480" fill="#E2E8F0" font-size="12">• Offline-first mobile apps</text>
+  <text x="965" y="500" fill="#E2E8F0" font-size="12">• Merchant Subscriptions</text>
+  <text x="965" y="520" fill="#E2E8F0" font-size="12">• Regional Intelligence</text>
+  <rect x="965" y="545" width="150" height="30" rx="6" fill="#1E293B" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="1040" y="565" text-anchor="middle" fill="#A78BFA" font-size="11" font-weight="700">FUTURE HYPOTHESIS</text>
+</svg>

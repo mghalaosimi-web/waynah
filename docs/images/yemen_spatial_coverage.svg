@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" style="background:#091217; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+  <defs>
+    <linearGradient id="map-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#071015"/>
+      <stop offset="100%" stop-color="#0e1d24"/>
+    </linearGradient>
+    <linearGradient id="teal-accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0F766E"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="675" fill="url(#map-bg)"/>
+
+  <!-- Stylized Yemen Spatial Map Contours -->
+  <g stroke="#14B8A6" stroke-opacity="0.25" stroke-width="1.8" fill="#0F766E" fill-opacity="0.06">
+    <!-- Sanaa & North -->
+    <polygon points="350,150 480,130 550,220 500,320 380,350 300,260"/>
+    <!-- Hodeidah & West Coast -->
+    <polygon points="200,250 300,260 380,350 320,480 220,490 160,370"/>
+    <!-- Aden & South Coast -->
+    <polygon points="380,350 500,320 650,380 720,490 560,530 390,480"/>
+    <!-- Taiz & Central Highlands -->
+    <polygon points="320,480 390,480 430,550 340,580 280,530"/>
+    <!-- Hadramout & East -->
+    <polygon points="650,380 880,310 1020,390 940,510 720,490"/>
+    <!-- Al Mahrah & Far East -->
+    <polygon points="1020,390 1140,360 1180,440 1090,520 940,510"/>
+  </g>
+
+  <!-- Interactive Map Pins & Coordinates -->
+  <!-- Pin 1: Sanaa -->
+  <circle cx="420" cy="220" r="10" fill="#14B8A6" fill-opacity="0.3"/>
+  <circle cx="420" cy="220" r="5" fill="#14B8A6"/>
+  <rect x="440" y="200" width="140" height="32" rx="6" fill="#111c23" stroke="#14B8A6" stroke-width="1"/>
+  <text x="450" y="221" fill="#FFFFFF" font-size="12" font-weight="700">أمانة العاصمة / Sanaa</text>
+
+  <!-- Pin 2: Aden -->
+  <circle cx="480" cy="500" r="10" fill="#38BDF8" fill-opacity="0.3"/>
+  <circle cx="480" cy="500" r="5" fill="#38BDF8"/>
+  <rect x="500" y="480" width="120" height="32" rx="6" fill="#111c23" stroke="#38BDF8" stroke-width="1"/>
+  <text x="510" y="501" fill="#FFFFFF" font-size="12" font-weight="700">عدن / Aden</text>
+
+  <!-- Pin 3: Taiz -->
+  <circle cx="360" cy="520" r="10" fill="#F59E0B" fill-opacity="0.3"/>
+  <circle cx="360" cy="520" r="5" fill="#F59E0B"/>
+  <rect x="230" y="505" width="110" height="32" rx="6" fill="#111c23" stroke="#F59E0B" stroke-width="1"/>
+  <text x="240" y="526" fill="#FFFFFF" font-size="12" font-weight="700">تعز / Taiz</text>
+
+  <!-- Pin 4: Mukalla -->
+  <circle cx="820" cy="440" r="10" fill="#A78BFA" fill-opacity="0.3"/>
+  <circle cx="820" cy="440" r="5" fill="#A78BFA"/>
+  <rect x="840" y="420" width="140" height="32" rx="6" fill="#111c23" stroke="#A78BFA" stroke-width="1"/>
+  <text x="850" y="441" fill="#FFFFFF" font-size="12" font-weight="700">المكلا / Mukalla</text>
+
+  <!-- Header Overlay -->
+  <rect x="60" y="45" width="240" height="32" rx="16" fill="#0F766E" fill-opacity="0.2" stroke="#0F766E" stroke-width="1.5"/>
+  <text x="180" y="66" text-anchor="middle" fill="#14B8A6" font-size="13" font-weight="700" letter-spacing="1">YEMEN SPATIAL COVERAGE</text>
+
+  <text x="60" y="115" fill="#FFFFFF" font-size="32" font-weight="800">WAYNAH Yemen Spatial Discovery &amp; Administrative Coverage</text>
+  <text x="60" y="145" fill="#94A3B8" font-size="15" font-weight="400">PostGIS administrative MultiPolygon indexing across Yemen's Governorates, Districts &amp; Uzlahs</text>
+
+  <!-- Stats Overlay Box -->
+  <rect x="60" y="550" width="1080" height="80" rx="16" fill="#0d161d" stroke="#1f2f3d" stroke-width="1.5"/>
+
+  <text x="120" y="585" fill="#FFFFFF" font-size="16" font-weight="800">PostGIS SRID 4326</text>
+  <text x="120" y="608" fill="#94A3B8" font-size="12">Native Geography Points &amp; MultiPolygons</text>
+
+  <line x1="330" y1="570" x2="330" y2="610" stroke="#1f2f3d" stroke-width="1"/>
+
+  <text x="370" y="585" fill="#FFFFFF" font-size="16" font-weight="800">ST_Covers Validation</text>
+  <text x="370" y="608" fill="#94A3B8" font-size="12">Administrative Boundary Containment</text>
+
+  <line x1="590" y1="570" x2="590" y2="610" stroke="#1f2f3d" stroke-width="1"/>
+
+  <text x="630" y="585" fill="#FFFFFF" font-size="16" font-weight="800">pg_trgm Fuzzy Search</text>
+  <text x="630" y="608" fill="#94A3B8" font-size="12">Arabic Orthographic Term Normalization</text>
+
+  <line x1="860" y1="570" x2="860" y2="610" stroke="#1f2f3d" stroke-width="1"/>
+
+  <text x="900" y="585" fill="#FFFFFF" font-size="16" font-weight="800">Multi-Layer Trust</text>
+  <text x="900" y="608" fill="#94A3B8" font-size="12">VerificationStatus &amp; Persistent AuditLog</text>
+</svg>

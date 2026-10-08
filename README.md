@@ -42,9 +42,9 @@
 تفتقر البيانات المكانية والتجارية المحلية في اليمن إلى الفهرسة الموحدة والموثوقية المستمرة:
 
 1. **العنوان غير الرسمي**: معظم الأماكن تُوصف بالأحياء والأزقة والمعالم البارزة وليس بالرموز البريدية أو الشوارع الرقمية.
-2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والم مواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
+2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والمواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
 3. **غياب نظام الموثوقية**: صعوبة التمييز بين الأماكن التي تم فحصها وتأكيدها، والأماكن غير المعتمدة أو المغلقة.
-4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما تؤدي إلى فشل أنظمة البحث التقليدية.
+4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما يؤدي إلى فشل أنظمة البحث التقليدية.
 
 ---
 
@@ -96,10 +96,13 @@
 
 ---
 
-## 06 — GEOGRAPHIC INTELLIGENCE
+## 06 — GEOGRAPHIC INTELLIGENCE & SPATIAL COVERAGE
 
 ![Geographic Spatial Hierarchy](docs/images/geographic_hierarchy.png)
-*الشكل الهيكلي: التسلسل الجغرافي الإداري في اليمن ونماذج PostGIS المكانية (MultiPolygon & Point).*
+*الشكل الهيكلي 1: التسلسل الجغرافي الإداري في اليمن ونماذج PostGIS المكانية (MultiPolygon & Point).*
+
+![Yemen Spatial Discovery & Administrative Coverage](docs/images/yemen_spatial_coverage.svg)
+*الشكل الهيكلي 2: نطاقات التغطية الجغرافية والاستعلام المكاني للمحافظات والمديريات اليمنية.*
 
 يتعامل WAYNAH مع الجغرافيا اليمنية من خلال هيكل رمزي وهندسي محدد باستخدام تقنيات PostGIS المكانية (`geography(MultiPolygon, 4326)` & `geography(Point, 4326)`):
 
@@ -181,10 +184,13 @@ flowchart LR
 
 ---
 
-## 09 — SYSTEM ARCHITECTURE
+## 09 — SYSTEM ARCHITECTURE & DATA PIPELINE
 
 ![Monorepo Layered Topology Architecture](docs/images/monorepo_architecture.png)
-*الشكل المعماري: طبقات المونوريبو المسؤولة عن الربط بين الويب، الحزم المشتركة، بوابات REST API، وقاعدة البيانات المكانية.*
+*الشكل المعماري 1: طبقات المونوريبو المسؤولة عن الربط بين الويب، الحزم المشتركة، بوابات REST API، وقاعدة البيانات المكانية.*
+
+![Geographic Data Ingestion & Import Pipeline](docs/images/data_ingestion_pipeline.svg)
+*الشكل المعماري 2: مسارات معالجة واستيراد الحدود الجغرافية ومطابقة النطاقات عبر سكربتات TypeScript واستعلامات PostGIS.*
 
 يعمل WAYNAH كبنية مونوريبو (Monorepo Architecture) متكاملة تدار بواسطة Turborepo و pnpm workspaces:
 
@@ -338,7 +344,10 @@ User Query ("مطعم شيباني صنعاء")
 
 ---
 
-## 14 — PRODUCTION STATUS
+## 14 — PRODUCTION STATUS & PUBLIC LAUNCH ROADMAP
+
+![Production Deployment & Rollout Roadmap](docs/images/public_launch_roadmap.svg)
+*خارطة الطريق 1: التمييز الهندسي الدقيق بين النشر الإنتاجي المطبق والنشر التدريجي والإطلاق العام.*
 
 | المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
 | :--- | :--- | :--- | :--- |
@@ -399,7 +408,7 @@ waynah/
 │   └── config/                 # Shared TypeScript & ESLint Rules
 │
 ├── docs/                       # Architecture Specs & Technical Studies
-│   ├── images/                 # Official System Diagrams & Screenshots (14 Visual Assets)
+│   ├── images/                 # Official System Diagrams & Screenshots (20 Visual Assets)
 │   └── WAYNAH_BUILD_SPECIFICATION.md
 │
 ├── docker/                     # Docker Compose (PostgreSQL 16 + PostGIS 3.4)
@@ -410,6 +419,9 @@ waynah/
 ---
 
 ## 17 — FUTURE VISION & EXPLORATORY DIRECTIONS
+
+![WAYNAH Future Architecture & System Expansion Roadmap](docs/images/future_vision_architecture.svg)
+*الشكل المعماري 1: خارطة المستقبل ورؤية التخزين المؤقت، التطبيقات الذاتية، وطبقة ذكاء المتجهات pgvector AI.*
 
 حرصًا على الدقة والشفافية البرمجية، تم تمييز المكونات الحالية عن المخططات المستقبلية:
 
@@ -457,12 +469,12 @@ EXPLORATORY / HYPOTHESIS (رؤية مستقبلية قيد الدراسة)
 - **Infrastructure & Deployment**: Vercel Serverless Hosting, Supabase Managed Cloud Postgres, Monorepo Orchestration (Turborepo, pnpm Workspaces).
 - **Mobile & Cross-Platform**: Flutter, Android Native.
 
-#### Developer Engineering Gallery (M.GH.AL in Action)
+#### Developer Engineering Gallery (M.GH.AL in Action — 7 Visual Assets)
 
 <table align="center">
   <tr>
     <td width="50%" align="center">
-      <b>01 — Geographic Data Engineering & PostGIS</b><br/>
+      <b>01 — Spatial Data Engineering &amp; PostGIS</b><br/>
       <img src="docs/images/dev_spatial_engineering.png" alt="Spatial Data Engineering" width="100%"/>
       <br/>
       <i>هندسة البيانات المكانية واستعلامات النطاقات الجغرافية لليمن.</i>
@@ -476,13 +488,27 @@ EXPLORATORY / HYPOTHESIS (رؤية مستقبلية قيد الدراسة)
   </tr>
   <tr>
     <td width="50%" align="center">
-      <b>03 — Production Infrastructure & System Health</b><br/>
+      <b>03 — Production Infrastructure &amp; System Health</b><br/>
       <img src="docs/images/dev_production_monitoring.png" alt="Production Infrastructure" width="100%"/>
       <br/>
       <i>متابعة النشر الإنتاجي ومؤشرات الأداء على Vercel و Supabase.</i>
     </td>
     <td width="50%" align="center">
-      <b>04 — Product Builder & Spatial Intelligence Core</b><br/>
+      <b>04 — Future Vision Roadmap Planning</b><br/>
+      <img src="docs/images/dev_future_roadmap.svg" alt="Future Vision Roadmap" width="100%"/>
+      <br/>
+      <i>تخطيط ركائز المستقبل والتوسعة المكانية وذكاء الاصطناعي.</i>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <b>05 — Data Ingestion &amp; Boundary Import</b><br/>
+      <img src="docs/images/dev_data_ingestion.svg" alt="Data Ingestion &amp; Import" width="100%"/>
+      <br/>
+      <i>إدارة وظائف استيراد الحدود الجغرافية ومطابقة النطاقات.</i>
+    </td>
+    <td width="50%" align="center">
+      <b>06 — Product Builder &amp; Spatial Core</b><br/>
       <img src="docs/images/hero_visual.png" alt="Product Builder Core" width="100%"/>
       <br/>
       <i>تطوير النواة المكانية ومحرك البحث الهجين والاستكشاف الجغرافي.</i>
