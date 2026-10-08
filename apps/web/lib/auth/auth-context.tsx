@@ -88,10 +88,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithGoogle = async () => {
     try {
-      const redirectUrl = typeof window !== 'undefined' 
-        ? `${window.location.origin}/callback` 
-        : 'https://waynah.vercel.app/callback';
-      
+      const redirectUrl =
+        typeof window !== 'undefined'
+          ? window.location.origin + '/callback'
+          : 'https://waynah.vercel.app/callback';
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
