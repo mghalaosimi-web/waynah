@@ -67,32 +67,6 @@ function getHashParamNames(): string[] {
   }
 }
 
-function ensurePkceVerifierInStorage(): boolean {
-  if (typeof window === 'undefined' || !window.localStorage) return false;
-
-  try {
-    const defaultKey = 'sb-jtltakhmgsptnjxymdmm-auth-token-code-verifier';
-    const existingDefault = window.localStorage.getItem(defaultKey);
-    if (existingDefault) return true;
-
-    // Search for any flow-specific PKCE verifier key created by Supabase JS client
-    for (let i = 0; i < window.localStorage.length; i++) {
-      const key = window.localStorage.key(i);
-      if (key && key.includes('code-verifier')) {
-        const val = window.localStorage.getItem(key);
-        if (val) {
-          window.localStorage.setItem(defaultKey, val);
-          return true;
-        }
-      }
-    }
-  } catch {
-    // Ignore storage read/write errors
-  }
-
-  return false;
-}
-
 export default function AuthCallbackPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -165,8 +139,6 @@ export default function AuthCallbackPage() {
 
         // 1. If authorization code is present in URL, exchange PKCE code for Supabase session
         if (code) {
-          ensurePkceVerifierInStorage();
-
           const preExchangeDiag = getSafeStorageKeys();
           console.log('[OAuth PKCE Diagnostic - Pre-Exchange]', {
             hasVerifierKey: preExchangeDiag.hasVerifierKey,
