@@ -13,6 +13,48 @@ interface DiagnosticError {
   supabaseMessage?: string;
   supabaseName?: string;
   supabaseStatus?: number | string;
+  origin?: string;
+  pathname?: string;
+  hasCode?: boolean;
+  localStorageKeys?: string[];
+  sessionStorageKeys?: string[];
+  hasVerifierKey?: boolean;
+}
+
+function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys: string[]; hasVerifierKey: boolean } {
+  const localStorageKeys: string[] = [];
+  const sessionStorageKeys: string[] = [];
+
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
+          localStorageKeys.push(key);
+        }
+      }
+    }
+  } catch {
+    // Ignore storage access errors
+  }
+
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      for (let i = 0; i < window.sessionStorage.length; i++) {
+        const key = window.sessionStorage.key(i);
+        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
+          sessionStorageKeys.push(key);
+        }
+      }
+    }
+  } catch {
+    // Ignore storage access errors
+  }
+
+  const allKeys = [...localStorageKeys, ...sessionStorageKeys];
+  const hasVerifierKey = allKeys.some(k => k.toLowerCase().includes('verifier') || k.toLowerCase().includes('code-verifier'));
+
+  return { localStorageKeys, sessionStorageKeys, hasVerifierKey };
 }
 
 export default function AuthCallbackPage() {
@@ -32,15 +74,21 @@ export default function AuthCallbackPage() {
       const errorParam = rawErrorDesc || rawError;
 
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'غير محدد';
+      const storageDiag = getSafeStorageKeys();
 
-      // Log non-sensitive diagnostics only (Booleans only, no codes/tokens/secrets)
-      console.log('[OAuth Callback Diagnostics]', {
+      // Log non-sensitive PKCE and storage diagnostics only (Keys and Booleans only, no codes/tokens/secrets/values)
+      console.log('[OAuth PKCE Diagnostic - Callback Entry]', {
         origin,
+        pathname,
         hasCode: Boolean(code),
         hasError: Boolean(rawError),
         hasErrorDescription: Boolean(rawErrorDesc),
         supabaseUrl,
+        localStorageKeys: storageDiag.localStorageKeys,
+        sessionStorageKeys: storageDiag.sessionStorageKeys,
+        hasVerifierKey: storageDiag.hasVerifierKey,
       });
 
       if (errorParam) {
@@ -53,6 +101,12 @@ export default function AuthCallbackPage() {
               'تحتوي استجابة التوثيق على رمز خطأ مباشر من الموفر.'
             ],
             supabaseMessage: errorParam,
+            origin,
+            pathname,
+            hasCode: Boolean(code),
+            localStorageKeys: storageDiag.localStorageKeys,
+            sessionStorageKeys: storageDiag.sessionStorageKeys,
+            hasVerifierKey: storageDiag.hasVerifierKey,
           });
         }
         return;
@@ -63,12 +117,23 @@ export default function AuthCallbackPage() {
 
         // 1. If authorization code is present in URL, exchange PKCE code for Supabase session
         if (code) {
+          const preExchangeDiag = getSafeStorageKeys();
+          console.log('[OAuth PKCE Diagnostic - Pre-Exchange]', {
+            hasVerifierKey: preExchangeDiag.hasVerifierKey,
+            localStorageKeys: preExchangeDiag.localStorageKeys,
+            sessionStorageKeys: preExchangeDiag.sessionStorageKeys,
+          });
+
           const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-          console.log('[OAuth Callback Diagnostics] exchangeCodeForSession result:', {
+          const postExchangeDiag = getSafeStorageKeys();
+          console.log('[OAuth PKCE Diagnostic - Post-Exchange]', {
             exchangeResult: error ? 'failure' : 'success',
             hasSession: Boolean(data?.session),
             hasAccessToken: Boolean(data?.session?.access_token),
+            hasVerifierKeyAfterExchange: postExchangeDiag.hasVerifierKey,
+            localStorageKeysAfterExchange: postExchangeDiag.localStorageKeys,
+            sessionStorageKeysAfterExchange: postExchangeDiag.sessionStorageKeys,
           });
 
           if (error) {
@@ -82,6 +147,12 @@ export default function AuthCallbackPage() {
                 supabaseMessage: error.message,
                 supabaseName: error.name,
                 supabaseStatus: (error as any).status || (error as any).code,
+                origin,
+                pathname,
+                hasCode: Boolean(code),
+                localStorageKeys: storageDiag.localStorageKeys,
+                sessionStorageKeys: storageDiag.sessionStorageKeys,
+                hasVerifierKey: storageDiag.hasVerifierKey,
               });
             }
             return;
@@ -113,6 +184,12 @@ export default function AuthCallbackPage() {
                 'استدعاء exchangeCodeForSession لم يعطِ session/access_token.'
               ],
               supabaseMessage: 'تعذر الحصول على توكن التوثيق من Google بعد إجراء التبادل.',
+              origin,
+              pathname,
+              hasCode: Boolean(code),
+              localStorageKeys: storageDiag.localStorageKeys,
+              sessionStorageKeys: storageDiag.sessionStorageKeys,
+              hasVerifierKey: storageDiag.hasVerifierKey,
             });
           }
           return;
@@ -142,6 +219,12 @@ export default function AuthCallbackPage() {
                 'فشل إنشاء الجلسة في خادم WAYNAH (POST /v1/auth/google).'
               ],
               supabaseMessage: result.error || 'فشل توثيق حساب Google مع النظام',
+              origin,
+              pathname,
+              hasCode: Boolean(code),
+              localStorageKeys: storageDiag.localStorageKeys,
+              sessionStorageKeys: storageDiag.sessionStorageKeys,
+              hasVerifierKey: storageDiag.hasVerifierKey,
             });
           }
         }
@@ -158,6 +241,12 @@ export default function AuthCallbackPage() {
             supabaseMessage: errorObj?.message || 'حدث خطأ غير متوقع أثناء إكمال التوثيق',
             supabaseName: errorObj?.name,
             supabaseStatus: errorObj?.status,
+            origin,
+            pathname,
+            hasCode: Boolean(code),
+            localStorageKeys: storageDiag.localStorageKeys,
+            sessionStorageKeys: storageDiag.sessionStorageKeys,
+            hasVerifierKey: storageDiag.hasVerifierKey,
           });
         }
       }
@@ -183,7 +272,7 @@ export default function AuthCallbackPage() {
                 {diagnosticError.title}
               </h1>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                نتائج التشخيص الأمني لمسار OAuth
+                نتائج التشخيص الأمني لمسار OAuth و PKCE
               </p>
             </div>
           </div>
@@ -197,6 +286,20 @@ export default function AuthCallbackPage() {
                 <li key={idx}>{item}</li>
               ))}
             </ul>
+          </div>
+
+          <div className="space-y-2 bg-slate-100 dark:bg-slate-800/80 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-xs">
+            <div className="font-semibold text-slate-800 dark:text-slate-200 mb-1">
+              تشخيص تخزين المتصفح و PKCE:
+            </div>
+            <div className="grid grid-cols-1 gap-1 text-[11px] font-mono text-slate-700 dark:text-slate-300 break-all">
+              <div>origin: <span className="text-emerald-600 dark:text-emerald-400 font-sans">{diagnosticError.origin}</span></div>
+              <div>pathname: <span className="text-emerald-600 dark:text-emerald-400 font-sans">{diagnosticError.pathname}</span></div>
+              <div>hasCode: <span className="font-bold">{diagnosticError.hasCode ? 'true (موجود)' : 'false (غير موجود)'}</span></div>
+              <div>hasVerifierKey: <span className={diagnosticError.hasVerifierKey ? 'text-emerald-600 font-bold' : 'text-red-500 font-bold'}>{diagnosticError.hasVerifierKey ? 'true (مفتاح verifier موجود في Storage)' : 'false (مفتاح verifier غير موجود!)'}</span></div>
+              <div>localStorage keys: <span className="font-sans text-slate-500">{diagnosticError.localStorageKeys?.length ? diagnosticError.localStorageKeys.join(', ') : 'لا توجد مفاتيح مؤهلة'}</span></div>
+              <div>sessionStorage keys: <span className="font-sans text-slate-500">{diagnosticError.sessionStorageKeys?.length ? diagnosticError.sessionStorageKeys.join(', ') : 'لا توجد مفاتيح مؤهلة'}</span></div>
+            </div>
           </div>
 
           <div className="space-y-3 border-t border-slate-100 dark:border-slate-800 pt-4 text-xs">

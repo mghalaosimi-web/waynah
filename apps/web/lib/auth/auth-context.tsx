@@ -93,6 +93,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ? window.location.origin + '/callback'
           : 'https://waynah.vercel.app/callback';
 
+      if (typeof window !== 'undefined') {
+        const preKeys = getSafeStorageKeys();
+        console.log('[OAuth PKCE Diagnostic - Pre-Redirect]', {
+          origin: window.location.origin,
+          pathname: window.location.pathname,
+          localStorageKeys: preKeys.localStorageKeys,
+          sessionStorageKeys: preKeys.sessionStorageKeys,
+          hasVerifierKey: preKeys.hasVerifierKey,
+        });
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -104,6 +115,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         },
       });
 
+      if (typeof window !== 'undefined') {
+        const postKeys = getSafeStorageKeys();
+        console.log('[OAuth PKCE Diagnostic - Post-signInWithOAuth]', {
+          origin: window.location.origin,
+          pathname: window.location.pathname,
+          localStorageKeys: postKeys.localStorageKeys,
+          sessionStorageKeys: postKeys.sessionStorageKeys,
+          hasVerifierKey: postKeys.hasVerifierKey,
+        });
+      }
+
       if (error) {
         return { success: false, error: error.message };
       }
@@ -112,6 +134,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: false, error: 'تعذر بدء عملية تسجيل الدخول بـ Google' };
     }
   };
+
+function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys: string[]; hasVerifierKey: boolean } {
+  const localStorageKeys: string[] = [];
+  const sessionStorageKeys: string[] = [];
+
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const key = window.localStorage.key(i);
+        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
+          localStorageKeys.push(key);
+        }
+      }
+    }
+  } catch {
+    // Ignore storage access errors
+  }
+
+  try {
+    if (typeof window !== 'undefined' && window.sessionStorage) {
+      for (let i = 0; i < window.sessionStorage.length; i++) {
+        const key = window.sessionStorage.key(i);
+        if (key && (key.includes('sb') || key.includes('supabase') || key.includes('auth') || key.includes('pkce') || key.includes('verifier') || key.includes('code'))) {
+          sessionStorageKeys.push(key);
+        }
+      }
+    }
+  } catch {
+    // Ignore storage access errors
+  }
+
+  const allKeys = [...localStorageKeys, ...sessionStorageKeys];
+  const hasVerifierKey = allKeys.some(k => k.toLowerCase().includes('verifier') || k.toLowerCase().includes('code-verifier'));
+
+  return { localStorageKeys, sessionStorageKeys, hasVerifierKey };
+}
 
   const loginWithGoogleToken = async (accessToken: string) => {
     setIsLoading(true);
