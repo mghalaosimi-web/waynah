@@ -1,245 +1,462 @@
-# 📍 Waynah (وينها) — Enterprise Location Discovery & Navigation Platform
+<div align="center">
 
-[![Turborepo](https://img.shields.io/badge/Turborepo-v2.4-blue.svg)](https://turbo.build)
-[![Next.js](https://img.shields.io/badge/Next.js-v15-black.svg)](https://nextjs.org)
-[![TypeScript](https://img.shields.io/badge/TypeScript-v5.8-blue.svg)](https://typescriptlang.org)
-[![Prisma](https://img.shields.io/badge/Prisma-ORM-5A67D8.svg)](https://prisma.io)
-[![pnpm](https://img.shields.io/badge/pnpm-v12.8-orange.svg)](https://pnpm.io)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+# WAYNAH | وَيْنَه؟
+### دليلك الموثوق أينما كنت في اليمن — Local Geographic Intelligence & Trust Platform
 
-> **Waynah (وينها)** is a modern, enterprise-grade monorepo platform designed for high-performance location discovery, spatial directory navigation, service indexing, and real-time mapping.
+![WAYNAH Hero Visual](docs/images/hero_visual.png)
+
+**Engineered Location Discovery · Spatial Hierarchy · Multi-Source Verification · Local Trust**
+
+[![Turborepo](https://img.shields.io/badge/Turborepo-v2.4-000000?style=for-the-badge&logo=turborepo)](https://turbo.build)
+[![Next.js](https://img.shields.io/badge/Next.js-v16.3-000000?style=for-the-badge&logo=next.js)](https://nextjs.org)
+[![Hono API](https://img.shields.io/badge/Hono API-v4.13-E36002?style=for-the-badge&logo=hono)](https://hono.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-v5.8-3178C6?style=for-the-badge&logo=typescript)](https://typescriptlang.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-v16-4169E1?style=for-the-badge&logo=postgresql)](https://postgresql.org)
+[![PostGIS](https://img.shields.io/badge/PostGIS-v3.4-00766E?style=for-the-badge&logo=qgis)](https://postgis.net)
+[![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://prisma.io)
+
+[🌐 Web Application](https://waynah.vercel.app) &nbsp;|&nbsp; [🔌 API Gateway](https://waynah-api.vercel.app/health) &nbsp;|&nbsp; [📘 Architecture Specifications](ARCHITECTURE.md) &nbsp;|&nbsp; [🛡️ Security Policy](SECURITY.md)
+
+</div>
 
 ---
 
-## 🖼️ Application Dashboards & User Experience
+## 01 — THE QUESTION: وَيْنَه؟ (WHERE IS IT?)
+
+> **هناك أماكن يعرفها الناس... لكن يصعب وصفها رقميًا.**  
+> سوق شعبية، شارع جانبي، قرية بعيدة، عيادة محلية، أو محل تجاري صغير في حارة.  
+> عندما يسأل أي شخص في اليمن: **"وَيْنَه؟"** — الإجابة ليست مجرد إحداثيات خطية صامتة، بل سياق جغرافي كامل، طريقة وصول، هاتف للتواصل، وتأكيد موثوق بأن المعلومة حقيقية وحديثة.
+
+**WAYNAH / وَيْنَه؟** يحول سؤال *"أين المكان؟"* من مجرد استعلام نصي عشوائي إلى **بنية معلومات جغرافية منظمة وقابلة للاكتشاف والتحقق (Geographic Intelligence & Discovery System)**.
+
+---
+
+## 02 — THE CORE PROBLEM
+
+تفتقر البيانات المكانية والتجارية المحلية في اليمن إلى الفهرسة الموحدة والموثوقية المستمرة:
+
+1. **العنوان غير الرسمي**: معظم الأماكن تُوصف بالأحياء والأزقة والمعالم البارزة وليس بالرموز البريدية أو الشوارع الرقمية.
+2. **تشتت مصادر البيانات**: تضارب الأرقام والهواتف والمواقع بين المصادر المختلفة دون معرفة أيها الأحدث أو الأكثر دقة.
+3. **غياب نظام الموثوقية**: صعوبة التمييز بين الأماكن التي تم فحصها وتأكيدها، والأماكن غير المعتمدة أو المغلقة.
+4. **تعدد اللغات والصيغ النصية**: اختلاف كتابة الأسماء العربية (مثل: *صنعاء / صنعاء القديمة / مديرية التحرير*) مما يؤدي إلى فشل أنظمة البحث التقليدية.
+
+---
+
+## 03 — WHAT IS WAYNAH?
+
+**WAYNAH / وَيْنَه؟** ليس مجرد خريطة تفاعلية، وليس مجرد دليل تجاري عابر. إنه **منصة جغرافية هندسية كاملة (Monorepo Platform)** تم بناؤها خصيصًا لتوفير:
+
+- 🗺️ **فهرسة جغرافية هرمية (Administrative Spatial Hierarchy)**: من المحافظة والمديرية والعزلة وصولاً إلى الحي والشارع والمعلم.
+- 🔍 **ملاحة واستكشاف فائق السرعة (Fuzzy & Spatial Search)**: محرك بحث مدعوم بمعالجة المصطلحات العربية واليمانية مع ترتيب النتائج حسبي القرب الجغرافي ونسبة التطابق.
+- 🛡️ **نموذج الثقة والتحقق المباشر (Trust & Verification Model)**: تصنيف دقيق لحالة الموثوقية (`UNVERIFIED`, `VERIFIED`, `CLAIMED`, `REPORTED`, `CLOSED`) مع تسجيل كافة التعديلات في سجل تدقيق غير قابل للتلاعب (`AuditLog`).
+- 🏢 **إدارة الفروع والممتلكات التجاري (Branch Claiming & RBAC)**: تمكين أصحاب الأعمال من تقديم طلبات ملكية الفروع وتوثيق بياناتهم بمرجعية إدارية محكمة.
+
+---
+
+## 04 — THE WAYNAH CORE MODEL
+
+يعتمد WAYNAH على النموذج الخماسي للاكتشاف المكاني:
+
+```text
+       ┌─────────────────────────────────────────────────────────┐
+       │                       WHERE?                            │
+       │     (Geographic Context: Boundary, Point, Uzlah)       │
+       └───────────────────────────┬─────────────────────────────┘
+                                   │
+                                   ▼
+       ┌─────────────────────────────────────────────────────────┐
+       │                       WHAT?                             │
+       │       (Entity Context: Place, Category, Business)       │
+       └───────────────────────────┬─────────────────────────────┘
+                                   │
+                                   ▼
+       ┌─────────────────────────────────────────────────────────┐
+       │                    HOW TO REACH?                        │
+       │    (Navigation Context: Coordinates, Phone, Address)   │
+       └───────────────────────────┬─────────────────────────────┘
+                                   │
+                                   ▼
+       ┌─────────────────────────────────────────────────────────┐
+       │                       TRUST?                            │
+       │ (Verification: Confidence Score, Freshness, Verification)│
+       └───────────────────────────┬─────────────────────────────┘
+                                   │
+                                   ▼
+       ┌─────────────────────────────────────────────────────────┐
+       │                     DISCOVERY                           │
+       │    (Result Delivery: Autocomplete, Drawer, Map Pin)     │
+       └─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 05 — GEOGRAPHIC MODEL (WHERE?)
+
+يتعامل WAYNAH مع الجغرافيا اليمنية من خلال هيكل رمزي وهندسي محدد باستخدام تقنيات PostGIS المكانية (`geography(MultiPolygon, 4326)` & `geography(Point, 4326)`):
+
+```text
+Yemen (جمهورية اليمن)
+  │
+  ├── Governorate (المحافظة) — e.g. أمانة العاصمة / أمانة العاصمة, عدن, تعز, حضرموت
+  │     │
+  │     └── District (المديرية) — e.g. مديرية التحرير, مديرية صيرة, مديرية المكلا
+  │           │   (PostGIS MultiPolygon Boundary Indexing)
+  │           │
+  │           ├── Uzlah / Neighborhood (العزلة / الحي) — [Spatial Resolution Layer]
+  │           │     │
+  │           │     └── Settlement / Village (القرية / التجمع السكني)
+  │           │           │
+  │           │           └── Landmark / Street (المعلم / الشارع)
+  │           │                 │
+  │           │                 └── Place / Branch (المكان / الفرع)
+  │           │                       └── Coordinates: PostGIS Point (Latitude, Longitude)
+```
+
+> **تنبيه الهندسة المكانية**: يتم التحقق في الكود من مطابقة إحداثيات المكان (`PlaceLocation`) لمديرية المكان المحددة. في حال تعارض الإحداثيات الجغرافية مع المديرية، يطلق النظام استثناء هندسي صريح (`GEOGRAPHIC_CONTEXT_MISMATCH`).
+
+---
+
+## 06 — TRUST & FRESHNESS MODEL
+
+لا يعتمد WAYNAH على الادعاء المباشر لدقة البيانات، بل يبني الموثوقية عبر متوالية تدقيق متعددة الطبقات:
+
+```mermaid
+flowchart LR
+    A[Data Source / Raw Observation] --> B[Confidence Scoring Engine]
+    B --> C{Conflict Detection}
+    C -- No Conflict --> D[Verification Pipeline]
+    C -- Conflicting Data --> E[DataConflict Resolution Log]
+    E --> D
+    D --> F[Status Assignment]
+    F --> G[UNVERIFIED]
+    F --> H[VERIFIED]
+    F --> I[CLAIMED]
+    F --> J[REPORTED / CLOSED]
+    F --> K[Persistent Audit Log]
+```
+
+### مستويات توثيق الأماكن (`VerificationStatus`):
+1. **UNVERIFIED (غير موثق)**: مكان مضاف من مصدر أولي أو ملحوظة مكتشفة لم تخضع بعد للفحص الإداري.
+2. **VERIFIED (موثق إداريًا)**: تم فحص وتأكيد بيانات المكان وإحداثياته من قبل فريق الإدارة أو المصادر المعتمدة.
+3. **CLAIMED (مملوك للفرع)**: تم تأكيد ملكية هذا الفرع لعلامة تجارية أو نشاط تجاري مسجل وموثق (`BusinessVerification`).
+4. **REPORTED (بلاغ مغلق/مشكوك)**: مكان وردت بشأنه بلاغات عن تغيير نشاطه أو خطأ بياناته.
+5. **CLOSED (مغلق نهائيًا)**: نشاط تجاري أو معلم لم يعد قائمًا على الواقع.
+
+---
+
+## 07 — WEB EXPERIENCE & PRODUCT SHOWCASE
+
+تم تصميم واجهات **WAYNAH Web** بهوية بصرية هادئة تحت طابع **"Calm Local Atlas — أطلس محلي هادئ"** باستخدام منصة Next.js 16 وتوليفات Tailwind CSS v4 مع خريطة Leaflet المتفاعلة.
 
 ### 1. Interactive Location Discovery & Navigation Web App
-![Waynah Web App Interface](docs/images/web_app.png)
-*Figure 1: Waynah web interface featuring interactive vector map, bilingual Arabic/English autocomplete search, category filters, and location details drawer.*
+![Waynah Web Interface](docs/images/web_app.png)
+*الشكل 1: الواجهة الرئيسية لاستكشاف الأماكن مع الخريطة التفاعلية، البحث اللحظي، القوائم الجانبية لتفاصيل الأماكن، والفلترة حسب التصنيفات.*
 
 ---
 
 ### 2. Platform Operations & Spatial Analytics Console
 ![Waynah Admin Console](docs/images/admin_dashboard.png)
-*Figure 2: Admin management console displaying spatial index metrics, search throughput, active database health, and location verification logs.*
+*الشكل 2: لوحة التحكم الإدارية لمتابعة حالة مؤشرات الأداء المكانية، النزاعات الناتجة عن البيانات، مراجعة مطالب الملكية وسجلات الموثوقية.*
 
 ---
 
-## 🏗️ Monorepo Architecture & Data Flow
+## 08 — SCREENSHOT GALLERY & SYSTEM JOURNEYS
+
+<table align="center">
+  <tr>
+    <td width="50%" align="center">
+      <b>01 — Discover & Explore Places</b><br/>
+      <img src="docs/images/web_app.png" alt="Discover" width="100%"/>
+      <br/>
+      <i>استكشاف الخريطة المكانية مع تحديد فئات الأماكن والتفاعلات السريعة.</i>
+    </td>
+    <td width="50%" align="center">
+      <b>02 — Spatial Operations & Verification Console</b><br/>
+      <img src="docs/images/admin_dashboard.png" alt="Admin Dashboard" width="100%"/>
+      <br/>
+      <i>مراجعة الأماكن المكتشفة، البلاغات، وإدارة صلاحيات النظام الإداري.</i>
+    </td>
+  </tr>
+</table>
+
+---
+
+## 09 — SYSTEM ARCHITECTURE
+
+يعمل WAYNAH كبنية مونوريبو (Monorepo Architecture) متكاملة تدار بواسطة Turborepo و pnpm workspaces:
 
 ```mermaid
 graph TD
     subgraph ClientLayer ["🎨 Client Layer (apps/web)"]
-        UI_PUBLIC["🌐 (public)<br/>Map, Places & Search"]
-        UI_CLIENT["👤 (client)<br/>Favorites & Requests"]
-        UI_BUSINESS["🏢 (business)<br/>Branch Claiming & Dashboard"]
-        UI_ADMIN["🛡️ (admin)<br/>Admin Console & Conflicts"]
+        UI_PUBLIC["🌐 Public Map, Search & Place Details"]
+        UI_AUTH["🔐 Authentication & Profile Management"]
+        UI_BUSINESS["🏢 Business Dashboard & Branch Claiming"]
+        UI_ADMIN["🛡️ Admin Verification & Spatial Console"]
     end
 
-    subgraph SharedPackages ["📦 Shared Packages (packages/*)"]
-        PKG_UI["🎨 packages/ui<br/>Button, Card, Badge..."]
-        PKG_SHARED["📑 packages/shared<br/>Types, Schemas, Permissions"]
-        PKG_MAPS["🗺️ packages/maps<br/>Markers, Layers, Clusters"]
-        PKG_SEARCH["🔍 packages/search<br/>Fuzzy Search & Ranking"]
+    subgraph SharedPackages ["📦 Workspace Packages (packages/*)"]
+        PKG_UI["🎨 @waynah/ui (Primitives: Button, Card, Badge, Input...)"]
+        PKG_SHARED["📑 @waynah/shared (Types, Schemas, Permissions & RBAC)"]
+        PKG_MAPS["🗺️ @waynah/maps (Leaflet Map Shell, Markers & Clustering)"]
+        PKG_SEARCH["🔍 @waynah/search (Normalization, Fuzzy Search & Ranking)"]
+        PKG_CONFIG["⚙️ @waynah/config (TypeScript, ESLint & Prettier Rules)"]
     end
 
-    subgraph ApiLayer ["⚙️ Core API Layer (apps/api)"]
-        ROUTES["🔌 routes/v1<br/>(Admin, Auth, Business, Geo, Search, User)"]
-        MIDDLEWARE["🛡️ middleware<br/>(Auth, RBAC, Rate-Limit, Audit Log)"]
+    subgraph ApiLayer ["⚙️ API Gateway & Domain Core (apps/api)"]
+        HONO_SERVER["⚡ Hono API Core Engine (Node.js & Vercel Runtime)"]
+        SEC_MIDDLEWARE["🛡️ Middleware: Security Headers, CORS, Auth & RBAC"]
+        AUDIT_SYS["📜 Audit Logger & Security Event Dispatcher"]
 
-        subgraph DomainServices ["🧠 Domain Services"]
-            DOM_BUSINESS["🏢 Business & Claims"]
-            DOM_GEO["🌍 Geography & Spatial (PostGIS)"]
-            DOM_DISCOVERY["🔎 Discovery & Entity Resolution"]
-            DOM_INTEL["📊 Confidence Scoring"]
-            DOM_USER["👥 User & Favorites"]
-            DOM_ADMIN["🛡️ Admin Verification"]
+        subgraph DomainServices ["🧠 Domain Application Modules"]
+            DOM_SEARCH["🔍 Search & Fuzzy Term Normalization"]
+            DOM_GEO["🌍 Spatial Boundaries & PostGIS Geography"]
+            DOM_TRUST["🛡️ Trust, Observations & Conflict Engine"]
+            DOM_BIZ["🏢 Business, Branch Claiming & Verification"]
+            DOM_USER["👥 Users, Favorites & Service Requests"]
+            DOM_ADMIN["👑 Admin Operations & Verification Logs"]
         end
     end
 
-    subgraph DataLayer ["🗄️ Database & Spatial Layer (packages/database)"]
-        PRISMA["💎 Prisma ORM Client"]
-        MIGRATIONS["📜 7 Database Migrations"]
-        POSTGIS[("🐘 PostgreSQL + PostGIS<br/>(Spatial Boundaries & Yemen Geography)")]
+    subgraph DataLayer ["🗄️ Database & Spatial Storage (packages/database)"]
+        PRISMA_CLIENT["💎 Prisma ORM Client"]
+        MIGRATIONS["📜 Schema Migrations (7 Spatial & Entity Migrations)"]
+        POSTGRES_DB[("🐘 PostgreSQL 16 + PostGIS 3.4<br/>(Spatial Boundary Indexing & pg_trgm Search)")]
     end
 
     ClientLayer --> PKG_UI
     ClientLayer --> PKG_SHARED
     ClientLayer --> PKG_MAPS
-    ClientLayer --> ROUTES
+    ClientLayer --> HONO_SERVER
 
-    ROUTES --> MIDDLEWARE
-    MIDDLEWARE --> DomainServices
-
+    HONO_SERVER --> SEC_MIDDLEWARE
+    SEC_MIDDLEWARE --> DomainServices
+    DomainServices --> AUDIT_SYS
     DomainServices --> PKG_SHARED
     DomainServices --> PKG_SEARCH
-    DomainServices --> PRISMA
+    DomainServices --> PRISMA_CLIENT
 
-    PRISMA --> MIGRATIONS
-    MIGRATIONS --> POSTGIS
+    PRISMA_CLIENT --> MIGRATIONS
+    MIGRATIONS --> POSTGRES_DB
 ```
 
 ---
 
-## 🗺️ Master System Tree (Present & Future)
+## 10 — DATABASE & DATA MODEL SCHEMATIC
+
+يعتمد نموذج البيانات على العلاقات التالية داخل `packages/database/prisma/schema.prisma`:
 
 ```text
-====================================================================================================
-                                 📍 WAYNAH - MASTER SYSTEM TREE (PRESENT & FUTURE)
-====================================================================================================
+Governorate (المحافظة)
+ └── District (المديرية) [Boundary: MultiPolygon 4326]
+      └── Place (المكان / المعلم)
+           ├── PlaceLocation [Geom: Point 4326]
+           ├── Category (التصنيف)
+           ├── Business (الشركة / العلامة التجارية)
+           │    ├── BusinessVerification (التوثيق التجاري)
+           │    ├── BusinessMember (الأعضاء والرتب)
+           │    ├── BranchClaim (طلبات ملكية الفروع)
+           │    ├── Product (المنتجات المعروضة)
+           │    └── ServiceItem (الخدمات المقدمة)
+           ├── PlaceObservation (ملحوظات المصادر الجغرافية)
+           ├── DataConflict (نزاعات وتعارضات البيانات)
+           ├── Favorite (المفضلات للمستخدمين)
+           └── Review (التقييمات والمراجعات)
 
- 📂 [waynah] (Monorepo Root)
- ├── 🟢 ⚙️ package.json                # Root dependencies & scripts
- ├── 🟢 ⚙️ pnpm-workspace.yaml          # PNPM Workspaces (apps/* & packages/*)
- ├── 🟢 ⚙️ turbo.json                   # Turborepo build orchestrator & caching
- ├── 🟢 🐳 docker-compose.yml          # PostgreSQL 16 + PostGIS 3.4
- ├── 🔮 🐳 docker-compose.prod.yml     # [Future] Redis Queue + MinIO S3 + Nginx Gateway
- ├── 🟢 🔑 .env                         # Local environment variables
- └── 🟢 📘 README.md                    # Core platform guide
-
- │
- ├── 🟢 📁 [apps] (Executable Applications)
- │   │
- │   ├── 🟢 📁 [api] (Express API & Domain Core)
- │   │   ├── 🟢 📄 index.ts / server.ts # Server entry points
- │   │   ├── 🟢 📁 [src/config]       # security.config.ts
- │   │   ├── 🟢 📁 [src/middleware]   # auth, authorization (RBAC), rate-limit, audit-log, logging
- │   │   ├── 🟢 📁 [src/routes/v1]    # admin, auth, business, discovery, geography, search, user
- │   │   │   └── 🔮 [src/routes/v2]   # [Future] GraphQL & Mobile Optimization Routes
- │   │   ├── 🟢 📁 [src/domain]       # 🧠 Domain Business Logic:
- │   │   │   ├── 🟢 📁 admin          # admin.service, admin-verification.service
- │   │   │   ├── 🟢 📁 business       # business.service, business-verification (Branch Claiming)
- │   │   │   ├── 🟢 📁 discovery      # discovery-orchestrator, ingestion, entity-resolution
- │   │   │   ├── 🟢 📁 geography      # geography, geography-spatial-resolution (PostGIS)
- │   │   │   ├── 🟢 📁 intelligence   # confidence-scoring.service
- │   │   │   ├── 🟢 📁 search         # search.service
- │   │   │   ├── 🟢 📁 user           # user-favorites, user-requests
- │   │   │   ├── 🔮 📁 notifications  # [Future] WhatsApp / SMS / Push Notifications Engine
- │   │   │   ├── 🔮 📁 billing        # [Future] Verified Business Subscriptions & Billing
- │   │   │   └── 🔮 📁 ai-assistant   # [Future] Natural Language Location AI Assistant
- │   │   └── 🟢 📁 [tests]            # 🧪 17 Test Suites (Security, Geography, Domain, Auth)
- │   │
- │   ├── 🟢 📁 [web] (Next.js 14 Web Application)
- │   │   ├── 🟢 📁 [app]               # App Router: (public), (auth), (client), (business), admin
- │   │   ├── 🟢 📁 [components]        # Domain, Layout, Maps, Navigation, Filters
- │   │   ├── 🟢 📁 [lib]               # api-client, auth-context, map-shell, permission-guard
- │   │   └── 🔮 📁 [pwa]               # [Future] Offline PWA Cache Layer
- │   │
- │   ├── 🔮 📁 [mobile]                # 🚀 [Future] React Native / Expo Mobile App (iOS & Android)
- │   │   ├── 🔮 📁 ios                 # iOS Native Project
- │   │   ├── 🔮 📁 android             # Android Native Project
- │   │   └── 🔮 📁 src                 # Offline Vector Maps & Native GPS Tracking
- │   │
- │   └── 🔮 📁 [workers]               # 🚀 [Future] Background Queue Workers (BullMQ & Redis)
- │       ├── 🔮 📄 geocoding-job.ts    # Async Geocoding & Boundary Resolution
- │       └── 🔮 📄 sync-scheduler.ts   # Continuous Data Ingestion Scheduler
- │
- ├── 🟢 📁 [packages] (Shared Workspace Packages)
- │   ├── 🟢 📁 [database]             # 💎 Prisma ORM & PostGIS Spatial DB
- │   │   ├── 🟢 📁 prisma/schema.prisma # Central Prisma Data Schema
- │   │   ├── 🟢 📁 prisma/migrations    # 7 Spatial & Structural Schema Migrations
- │   │   ├── 🟢 📁 src/spatial          # health.ts, resolution.ts (PostGIS Resolution)
- │   │   └── 🔮 📁 src/seeders          # [Future] Large Scale Seed Generator
- │   │
- │   ├── 🟢 📁 [shared]               # 📑 Shared Constants, Types & Zod Schemas
- │   │   ├── 🟢 📁 constants          # permissions.ts (RBAC), error-codes.ts
- │   │   ├── 🟢 📁 schemas            # discovery, pagination, search
- │   │   └── 🟢 📁 types              # auth.types, response.types
- │   │
- │   ├── 🟢 📁 [ui]                   # 🎨 Design System & Primitive UI Components
- │   │   └── 🟢 📁 src/primitives    # Button, Card, Badge, Input, Skeleton, Spinner, Container...
- │   │
- │   ├── 🟢 📁 [maps]                 # 🗺️ Map Components, Markers, Layers & Clustering
- │   │   ├── 🟢 📁 src/clustering      # Marker Cluster Algorithms
- │   │   └── 🔮 📁 src/offline-tiles   # [Future] Vector Tile Offline Caching
- │   │
- │   ├── 🟢 📁 [search]               # 🔍 Spatial Search, Fuzzy Matching & Ranking Engine
- │   │   ├── 🟢 📁 src/normalization   # Arabic & Yemen Geographic Term Normalization
- │   │   └── 🔮 📁 src/vector-search  # [Future] pgvector AI Semantic Search
- │   │
- │   ├── 🔮 📁 [notifications]        # 🚀 [Future] WhatsApp API & Push Dispatcher
- │   ├── 🔮 📁 [offline-sync]         # 🚀 [Future] Low-Bandwidth Yemen Data Sync Engine
- │   └── 🟢 📁 [config]               # ⚙️ Shared ESLint, TypeScript & Prettier Configs
- │
- ├── 🟢 📁 [docs] (Architecture & Formal Specification Studies)
- │   ├── 🟢 📄 WAYNAH_BUILD_SPECIFICATION.md
- │   ├── 🟢 📄 WAYNAH_PHASE_3_DOMAIN_MODEL_STUDY_V1_2.md
- │   ├── 🟢 📄 WAYNAH_PHASE_4_SYSTEM_ARCHITECTURE_STUDY_V1_0.md
- │   ├── 🟢 📄 WAYNAH_PHASE_5_UX_UI_SYSTEM_STUDY_V1_0.md
- │   ├── 🟢 📄 YEMEN_GEOGRAPHIC_IMPORT_SPECIFICATION.md
- │   └── 🔮 📄 WAYNAH_PHASE_6_PRODUCTION_DEVOPS_PLAN.md # [Future] CI/CD & Production Guide
- │
- ├── 🟢 📁 [scripts] (Data Pipelines & Import Utilities)
- │   ├── 🟢 📜 import-yemen-boundaries.ts # Import Yemen Administrative Boundaries to PostGIS
- │   ├── 🟢 📜 import-yemen-geography.ts  # Import & Seed Yemen Geographic Landmark Data
- │   ├── 🟢 📁 data                        # Data Cleaning, Normalization & Export Tools
- │   └── 🔮 📁 etl                         # [Future] Large Scale Spatial Data Extraction Pipeline
- │
- └── 🟢 📁 [tests] (E2E & Integration Verification Suites)
-====================================================================================================
+User (المستخدم)
+ ├── Session & AccountToken (الجلسات وتأكيد الحساب)
+ ├── Favorite & ServiceRequest (الطلبات والمفضلات)
+ └── AuditLog (سجل العمليات والفعاليات والأمن)
 ```
 
 ---
 
-## 🌟 Key Features
+## 11 — SEARCH & DISCOVERY FLOW
 
-- 🗺️ **Interactive Vector Mapping**: Fast, responsive mapping with custom cluster pins and location drawers.
-- 🔎 **Fast Hybrid Search Engine**: Instant autocomplete, category filtering, fuzzy search, and spatial proximity sorting.
-- 🏢 **Monorepo Architecture (Turborepo + pnpm)**: Modular package structure with shared UI component library, database client, and configurations.
-- 🌐 **Bilingual Support (Arabic / English)**: Full RTL/LTR responsive layouts and localized search index support.
-- 🔐 **Enterprise Security & Role Access**: Fine-grained RBAC permissions for business managers, administrators, and users.
+تم تطوير حزمة `@waynah/search` خصيصًا لضمان فهم طبيعة المصطلحات الجغرافية والتجارية في اليمن:
+
+```text
+User Query ("مطعم شيباني صنعاء")
+       │
+       ▼
+[Term Normalization]
+  • Removal of Arabic Diacritics (التشكيل)
+  • Normalization of Alef variants (أ/إ/آ -> ا), Teh Marbuta (ة -> ه), Alef Maksura (ى -> ي)
+  • Extraction of Geographic Stop Words & Aliases
+       │
+       ▼
+[Spatial & Trigram Query Execution]
+  • PostGIS ST_DWithin / ST_Distance (if coordinates provided)
+  • PostgreSQL pg_trgm Fuzzy Name Matching
+       │
+       ▼
+[Multi-Factor Ranking Engine]
+  • Name Similarity Score (Trigram Match)
+  • Distance Penalty / Proximity Score
+  • Verification Weight (VERIFIED/CLAIMED places get ranking boost)
+       │
+       ▼
+[Paginated Response Payload]
+  • Return formatted places with verification badge and spatial drawer info
+```
 
 ---
 
-## 🚀 Quick Start & Installation
+## 12 — TECHNOLOGY STACK
 
-### Prerequisites
-- Node.js 18+
-- pnpm 12+
-- Docker & Docker Compose
+تم التثبت من إصدارات المكتبات والتقنيات المستخدمة مباشرة من مستودع المشروع:
 
-### 1. Clone Repository & Install Dependencies
+| الطبقة / المكون | التقنية المستعملة | الإصدار | الغرض والوظيفة |
+| :--- | :--- | :--- | :--- |
+| **Monorepo Build System** | Turborepo | `v2.4.4` | تنسيق البناء السريع وتسريع التخزين البصري والمهام |
+| **Package Manager** | pnpm Workspaces | `v12.8.1` | إدارة الحزم المتعددة والاعتمادات المشتركة بكفاءة عالية |
+| **Frontend Framework** | Next.js (App Router) | `v16.3.6` | بناء واجهات التطبيق التفاعلية وصفحات العرض الموزعة |
+| **UI Library & Styling** | React + Tailwind CSS | `v19.3` / `v4.3` | نظام التصميم وتوليف العناصر البصرية برمزية `#0F766E` |
+| **Map Engine** | Leaflet | `v1.9.4` | عرض الخرائط التفاعلية والتحكم في العلامات والتجمع مكانيًا |
+| **API Gateway Engine** | Hono Core | `v4.13.10` | خادم REST API سليم وعالي الأداء يدعم Vercel & Node |
+| **Database ORM** | Prisma ORM | `v5.x` | إدارة الاستعلامات وبناء كائنات الجداول والهجرات |
+| **Database & Spatial** | PostgreSQL + PostGIS | `v16` / `v3.4` | تخزين البيانات الجغرافية وإحداثيات النطاقات والمضلعات |
+| **Runtime Language** | TypeScript | `v5.8.2` | التحقق من صحة الأنواع والحرص على النزاهة البرمجية |
+| **Hosting & Infra** | Vercel + Supabase | Managed Cloud | الاستضافة المباشرة للويب والواجهة وقاعدة البيانات المكانية |
+
+---
+
+## 13 — SECURITY & GOVERNANCE
+
+يتبع **WAYNAH** معايير هندسية محكمة لحماية البيانات وإدارة الوصول:
+
+- 🔐 **إدارة الصلاحيات (RBAC - Role-Based Access Control)**: حظر العمليات الحساسة وتحديد صلاحيات الادوار (`SUPER_ADMIN`, `ADMIN`, `BUSINESS_OWNER`, `BUSINESS_MANAGER`, `USER`).
+- 📜 **سجل التدقيق الشامل (Persistent Audit Log)**: تسجيل عمليات تعديل البيانات، التوثيق، والمطالبات في جدول `AuditLog` بدون حصر أي كلمة مرور أو بيانات سرية.
+- 🛑 **الحماية من الهجمات**: استخدام `securityHeadersMiddleware` لحظر الثغرات الشائعة (XSS, Clickjacking, MIME Sniffing) وتحديد نطاق CORS بدقة.
+- ⚡ **آلية الأخطاء الآمنة (Safe Error Handler)**: منع تسريب تفاصيل الخادم الداخلية أو Stack Traces عند وقوع أخطاء في واجهة REST API.
+
+---
+
+## 14 — REPOSITORY & WORKSPACE STRUCTURE
+
+```text
+waynah/
+├── apps/
+│   ├── api/                    # Hono REST API Server & Domain Services
+│   │   ├── src/
+│   │   │   ├── config/         # Security & Environment Configs
+│   │   │   ├── domain/         # Domain Modules (Admin, Business, Geo, Trust...)
+│   │   │   ├── middleware/     # Security, Auth, Logging & Rate-Limit
+│   │   │   ├── routes/v1/      # REST Endpoint Handlers
+│   │   │   └── server.ts       # Hono Server Setup & Vercel Handler
+│   │   └── tests/              # API Integration & Unit Tests
+│   │
+│   └── web/                    # Next.js 16 Web Application
+│       ├── app/                # App Router Routes ((public), (auth), (admin)...)
+│       ├── components/         # Page Components, Drawers & Map Shell
+│       └── lib/                # API Client, Auth Context & Permissions Guard
+│
+├── packages/
+│   ├── database/               # Prisma Schema, Migrations & PostGIS Utilities
+│   │   ├── prisma/
+│   │   │   ├── schema.prisma   # Master Database Schema
+│   │   │   └── migrations/     # 7 Executed Spatial Schema Migrations
+│   │   └── src/spatial/        # Spatial Verification & Boundary Health
+│   │
+│   ├── search/                 # Arabic Normalization & Fuzzy Spatial Search Engine
+│   │   └── src/
+│   │       ├── normalization/  # Yemen Geography & Text Normalizer
+│   │       └── ranking/        # Search Weight & Scoring Algorithms
+│   │
+│   ├── shared/                 # Shared Zod Schemas, Permission Codes & Types
+│   ├── ui/                     # Primitives Design System (Button, Card, Badge...)
+│   ├── maps/                   # Map Component Layer & Leaflet Clustering
+│   └── config/                 # Shared TypeScript & ESLint Rules
+│
+├── docs/                       # Architecture Specs & Technical Studies
+│   ├── images/                 # Official System Diagrams & Screenshots
+│   └── WAYNAH_BUILD_SPECIFICATION.md
+│
+├── docker/                     # Docker Compose (PostgreSQL 16 + PostGIS 3.4)
+├── scripts/                    # Geographic Boundary & Data Ingestion Pipelines
+└── package.json                # Master Monorepo Root Script Configuration
+```
+
+---
+
+## 15 — PRODUCTION & DEPLOYMENT STATUS
+
+| المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
+| :--- | :--- | :--- | :--- |
+| **Web Application** | 🟢 Deployed & Verified | Vercel Edge Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
+| **API Gateway** | 🟢 Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتوفر نقطة `/health` |
+| **PostgreSQL + PostGIS** | 🟢 Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 7 وتفعيل ملحق PostGIS |
+| **Public Launch Gate** | 🟡 Production Ready | Operational Launch Gate Audited | المنصة جاهزة تقنيًا؛ مرحلة الإطلاق العام تدريجية |
+
+---
+
+## 16 — VERIFIED ENGINEERING STATUS
+
+تم التثبت التقني من سلامة النظام من خلال:
+
+- ✅ **7 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
+- ✅ **17 حزمة اختبارات (Integration & Security Test Suites)**: تغطي الأمان، الصلاحيات، البحث الهجين، والتحقق المباشر.
+- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر جميع تطبيقات وحزم المونوريبو.
+- ✅ **الربط والإنتاجية (Supabase Direct & Pooler Connectivity)**: تم ضبط روابط قواعد البيانات وقنوات الحماية.
+
+---
+
+## 17 — FUTURE VISION & EXPLORATORY DIRECTIONS
+
+حرصًا على الدقة والشفافية البرمجية، تم تمييز المكونات الحالية عن المخططات المستقبلية:
+
+```text
+CURRENT (المطبّق والجاهز حاليًا)
+  ├── Next.js 16 Web App + Hono API + PostgreSQL/PostGIS
+  ├── Arabic & Spatial Fuzzy Search Engine
+  ├── Administrative Hierarchy & PostGIS Boundary Checks
+  ├── Multi-Layer Trust & Observation Verification Engine
+  └── Fine-grained RBAC & Persistent Audit Logs
+
+VALIDATED / READY FOR PROVISIONING (جاهز للربط والتوسعة)
+  ├── Redis Caching & BullMQ Background Workers
+  └── WhatsApp & SMS Verification Dispatcher Package
+
+EXPLORATORY / FUTURE VISION (رؤية مستقبلية قيد الدراسة)
+  ├── PWA Offline Tile Caching for Low-Bandwidth Yemen Connectivity
+  ├── React Native / Expo Mobile Apps (iOS & Android)
+  ├── pgvector AI Natural Language Location Assistant
+  └── Unified Local Commerce & Merchant Subscription System
+```
+
+---
+
+## 18 — DEVELOPER & CREDITS
+
+<div align="center">
+
+**Built by M.GH.AL**  
+*Lead Architecture & Software Engineering*
+
+مشروع **WAYNAH / وَيْنَه؟** هو ثمرة رؤية هندسية تهدف لتطوير البنية التحتية للمعلومات الجغرافية والمحلية في اليمن بأسلوب برمجي رصين وعالي الكفاءة.
+
+---
+
+### Quick Start (Local Development)
+
 ```bash
+# 1. Clone the repository
 git clone https://github.com/mghalaosimi-web/waynah.git
 cd waynah
+
+# 2. Install workspace dependencies
 pnpm install
-```
 
-### 2. Launch Local Database Containers
-```bash
+# 3. Start local PostgreSQL + PostGIS container
 pnpm db:up
-```
 
-### 3. Generate Prisma Client & Run Migrations
-```bash
+# 4. Generate Prisma client & apply database migrations
 pnpm db:generate
 pnpm db:migrate
-```
 
-### 4. Start Development Mode (Turborepo Orchestrator)
-```bash
+# 5. Launch local development server (Turbo Orchestrator)
 pnpm dev
 ```
-- **Web App**: `http://localhost:3000`
-- **API Gateway**: `http://localhost:4000`
 
----
+*Web Application runs at `http://localhost:3000` | API Gateway runs at `http://localhost:4000`*
 
-## 🧪 Build & Verification Commands
-
-```bash
-# Type check all packages and apps
-pnpm typecheck
-
-# Lint codebase across monorepo
-pnpm lint
-
-# Production build
-pnpm build
-```
-
----
-
-## 📄 License
-
-This project is open-source and licensed under the [MIT License](LICENSE).
+</div>
