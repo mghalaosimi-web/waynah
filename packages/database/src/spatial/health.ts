@@ -15,9 +15,14 @@ export interface SpatialConnectionHealth {
  */
 export async function verifySpatialConnection(): Promise<SpatialConnectionHealth> {
   try {
-    const result = await prisma.$queryRaw<PostGISVersionResult[]>`
+    const queryPromise = prisma.$queryRaw<PostGISVersionResult[]>`
       SELECT PostGIS_Full_Version() as postgis_full_version;
     `;
+    const timeoutPromise = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Spatial database query timeout (3s limit exceeded)')), 3000)
+    );
+
+    const result = await Promise.race([queryPromise, timeoutPromise]);
 
     if (result && result.length > 0 && result[0]?.postgis_full_version) {
       return {
