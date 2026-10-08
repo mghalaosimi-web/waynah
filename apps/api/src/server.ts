@@ -56,10 +56,16 @@ export function createServer(prismaClient = prisma) {
   app.use('*', requestLoggerMiddleware);
   app.use('*', createAuthMiddleware(prismaClient));
 
-  // Health Check Endpoint (Public API)
+  // Health Check Endpoint (Public API) - Resilient, non-blocking for Serverless
   app.get('/health', async (c) => {
     try {
-      const spatialHealth = await verifySpatialConnection();
+      const dbPromise = verifySpatialConnection();
+      const timeoutPromise = new Promise<{ connected: boolean; error: string }>((resolve) =>
+        setTimeout(() => resolve({ connected: false, error: 'Database check pending (2s limit)' }), 2000)
+      );
+
+      const spatialHealth = await Promise.race([dbPromise, timeoutPromise]);
+
       return c.json(
         ApiResponse.success({
           status: 'ok',
@@ -70,8 +76,11 @@ export function createServer(prismaClient = prisma) {
     } catch (error) {
       console.error('Healthcheck database error:', error);
       return c.json(
-        ApiResponse.error('Database connection failed', 'DATABASE_CONNECTION_ERROR'),
-        500
+        ApiResponse.success({
+          status: 'degraded',
+          database: { connected: false, error: 'Database check failed' },
+          timestamp: new Date().toISOString(),
+        })
       );
     }
   });
