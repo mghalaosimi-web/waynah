@@ -19,8 +19,7 @@ const API_BASE_URL =
   getEnv('API_URL') ||
   'http://localhost:3000';
 
-const API_KEY =
-  getEnv('INGESTION_API_KEY') || 'dev-ingestion-key-do-not-use-in-prod';
+const API_KEY = getEnv('INGESTION_API_KEY') || '';
 
 async function fetchApi<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;

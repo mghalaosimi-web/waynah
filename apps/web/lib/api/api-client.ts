@@ -691,6 +691,7 @@ export const MOCK_DEMO_PLACES: PlaceSearchResult[] = [
 
 export class ApiClient {
   private baseUrl: string;
+  private readonly authRequestTimeoutMs = 15_000;
 
   constructor(baseUrl?: string) {
     const envUrl = process.env.NEXT_PUBLIC_API_URL;
@@ -704,7 +705,8 @@ export class ApiClient {
   private async request<T>(
     endpoint: string,
     options: RequestInit = {},
-    customApiKey?: string
+    customApiKey?: string,
+    timeoutMs?: number
   ): Promise<ApiResponse<T>> {
     const url = `${this.baseUrl}${endpoint}`;
     const headers: Record<string, string> = {
@@ -716,10 +718,14 @@ export class ApiClient {
       headers['X-API-Key'] = customApiKey;
     }
 
+    const controller = timeoutMs ? new AbortController() : undefined;
+    const timeout = controller ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+
     try {
       const response = await fetch(url, {
         credentials: 'include',
         ...options,
+        ...(controller ? { signal: controller.signal } : {}),
         headers,
       });
 
@@ -734,7 +740,16 @@ export class ApiClient {
       }
 
       return data as ApiResponse<T>;
-    } catch (_err: unknown) {
+    } catch (err: unknown) {
+      if (controller?.signal.aborted) {
+        return {
+          success: false,
+          error: endpoint === '/v1/auth/register'
+            ? 'انتهت مهلة الاتصال أثناء التسجيل. قد يكون الخادم أكمل إنشاء الحساب؛ تحقّق من إمكانية تسجيل الدخول قبل إعادة المحاولة.'
+            : 'انتهت مهلة الاتصال بخادم المصادقة. يرجى المحاولة مرة أخرى.',
+        };
+      }
+
       // Prototype Mock Fallback Logic when server is offline and mock mode is explicitly enabled
       const enableMock = process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === 'true';
 
@@ -1149,6 +1164,8 @@ export class ApiClient {
         success: false,
         error: 'تعذر الاتصال بخادم الواجهة البرمجية، يرجى المحاولة لاحقاً.',
       };
+    } finally {
+      if (timeout) clearTimeout(timeout);
     }
   }
 
@@ -1170,7 +1187,7 @@ export class ApiClient {
     return this.request<AuthResponseData>('/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    }, undefined, this.authRequestTimeoutMs);
   }
 
   /**
@@ -1183,7 +1200,7 @@ export class ApiClient {
     return this.request<AuthResponseData>('/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    }, undefined, this.authRequestTimeoutMs);
   }
 
   /**
@@ -1195,7 +1212,7 @@ export class ApiClient {
     return this.request<AuthResponseData>('/v1/auth/google', {
       method: 'POST',
       body: JSON.stringify(data),
-    });
+    }, undefined, this.authRequestTimeoutMs);
   }
 
   /**
@@ -1211,7 +1228,7 @@ export class ApiClient {
    * Get Current Identity (Auth API)
    */
   public async getMe(): Promise<ApiResponse<MeResponseData>> {
-    return this.request<MeResponseData>('/v1/auth/me');
+    return this.request<MeResponseData>('/v1/auth/me', {}, undefined, this.authRequestTimeoutMs);
   }
 
   /**
@@ -1946,4 +1963,3 @@ export class ApiClient {
 }
 
 export const apiClient = new ApiClient();
-

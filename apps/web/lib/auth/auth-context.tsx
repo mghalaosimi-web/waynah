@@ -67,7 +67,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setActor(res.data.actor as Actor);
         setUser(res.data.user);
         setIsAuthenticated(true);
-        setIsLoading(false);
         return { success: true };
       }
 
@@ -78,11 +77,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ? res.error
           : 'فشل تسجيل الدخول';
 
-      setIsLoading(false);
       return { success: false, error: errorMessage };
-    } catch (err: unknown) {
-      setIsLoading(false);
+    } catch {
       return { success: false, error: 'حدث خطأ غير متوقع أثناء الاتصال بالخادم' };
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -175,7 +174,6 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
         setActor(res.data.actor as Actor);
         setUser(res.data.user);
         setIsAuthenticated(true);
-        setIsLoading(false);
         return { success: true };
       }
 
@@ -186,11 +184,11 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
           ? res.error
           : 'فشل تسجيل الدخول بواسطة Google';
 
-      setIsLoading(false);
       return { success: false, error: errorMessage };
     } catch {
-      setIsLoading(false);
       return { success: false, error: 'حدث خطأ غير متوقع أثناء الاتصال بالخادم' };
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -202,7 +200,6 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
         setActor(res.data.actor as Actor);
         setUser(res.data.user);
         setIsAuthenticated(true);
-        setIsLoading(false);
         return { success: true };
       }
 
@@ -213,11 +210,11 @@ function getSafeStorageKeys(): { localStorageKeys: string[]; sessionStorageKeys:
           ? res.error
           : 'فشل إنشاء الحساب';
 
-      setIsLoading(false);
       return { success: false, error: errorMessage };
-    } catch (err: unknown) {
-      setIsLoading(false);
+    } catch {
       return { success: false, error: 'حدث خطأ غير متوقع أثناء الاتصال بالخادم' };
+    } finally {
+      setIsLoading(false);
     }
   };
 

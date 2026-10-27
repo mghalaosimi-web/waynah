@@ -4,13 +4,20 @@
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createServer } from '../src/server.js';
-import { prisma as defaultPrisma, DuplicateCandidateStatus } from '@waynah/database';
+import type { PrismaClient } from '@waynah/database';
+
+/**
+ * Unit tests use a no-op mock Prisma client to avoid real DB connections.
+ * This matches the pattern used across all other unit test files in this suite.
+ * These tests verify HTTP contract and permission guards only (401/403 responses).
+ */
+const mockPrisma = {} as PrismaClient;
 
 describe('WAYNAH Phase 9 Unit C — Moderation Pipeline & Admin API Tests', () => {
   let app: ReturnType<typeof createServer>;
 
   beforeEach(() => {
-    app = createServer(defaultPrisma);
+    app = createServer(mockPrisma);
   });
 
   // 1. DataConflict Listing

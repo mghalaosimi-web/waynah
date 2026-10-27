@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../../../lib/auth/auth-context';
@@ -73,6 +73,7 @@ export default function AuthCallbackPage() {
   const { loginWithGoogleToken } = useAuth();
   const [statusMessage, setStatusMessage] = useState('جاري إكمال تسجيل الدخول بواسطة Google...');
   const [diagnosticError, setDiagnosticError] = useState<DiagnosticError | null>(null);
+  const inFlightExchangesRef = useRef<Map<string, Promise<{ session: any; error: any }>>>(new Map());
 
   useEffect(() => {
     let isSubscribed = true;
@@ -139,20 +140,32 @@ export default function AuthCallbackPage() {
 
         // 1. If authorization code is present in URL, exchange PKCE code for Supabase session
         if (code) {
-          const preExchangeDiag = getSafeStorageKeys();
-          console.log('[OAuth PKCE Diagnostic - Pre-Exchange]', {
-            hasVerifierKey: preExchangeDiag.hasVerifierKey,
-            localStorageKeys: preExchangeDiag.localStorageKeys,
-            sessionStorageKeys: preExchangeDiag.sessionStorageKeys,
-          });
+          let exchangePromise = inFlightExchangesRef.current.get(code);
 
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+          if (!exchangePromise) {
+            const preExchangeDiag = getSafeStorageKeys();
+            console.log('[OAuth PKCE Diagnostic - Pre-Exchange]', {
+              hasVerifierKey: preExchangeDiag.hasVerifierKey,
+              localStorageKeys: preExchangeDiag.localStorageKeys,
+              sessionStorageKeys: preExchangeDiag.sessionStorageKeys,
+            });
+
+            exchangePromise = supabase.auth.exchangeCodeForSession(code)
+              .then((res) => ({ session: res.data?.session || null, error: res.error || null }))
+              .catch((err) => ({ session: null, error: err }));
+
+            inFlightExchangesRef.current.set(code, exchangePromise);
+          } else {
+            console.log('[OAuth PKCE Diagnostic] Reusing active in-flight exchange Promise for code');
+          }
+
+          const { session, error } = await exchangePromise;
 
           const postExchangeDiag = getSafeStorageKeys();
           console.log('[OAuth PKCE Diagnostic - Post-Exchange]', {
             exchangeResult: error ? 'failure' : 'success',
-            hasSession: Boolean(data?.session),
-            hasAccessToken: Boolean(data?.session?.access_token),
+            hasSession: Boolean(session),
+            hasAccessToken: Boolean(session?.access_token),
             hasVerifierKeyAfterExchange: postExchangeDiag.hasVerifierKey,
             localStorageKeysAfterExchange: postExchangeDiag.localStorageKeys,
             sessionStorageKeysAfterExchange: postExchangeDiag.sessionStorageKeys,
@@ -183,7 +196,8 @@ export default function AuthCallbackPage() {
             }
             return;
           }
-          accessToken = data.session?.access_token || null;
+
+          accessToken = session?.access_token || null;
         } else {
           // 2. Fallback: check existing session from Supabase client
           const { data } = await supabase.auth.getSession();

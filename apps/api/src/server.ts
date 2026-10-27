@@ -35,8 +35,11 @@ export function createServer(prismaClient = prisma) {
         // Allow server-to-server or non-browser requests (no origin header)
         if (!origin) return securityConfig.corsOrigins[0] || '*';
 
+        const normalizedOrigin = origin.replace(/\/+$/, '');
+
         if (
           securityConfig.corsOrigins.includes('*') ||
+          securityConfig.corsOrigins.includes(normalizedOrigin) ||
           securityConfig.corsOrigins.includes(origin)
         ) {
           return origin;

@@ -27,8 +27,8 @@ export const securityConfig = {
 
   // CORS configuration
   corsOrigins: process.env.CORS_ORIGIN
-    ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean)
-    : DEFAULT_CORS_ORIGINS,
+    ? process.env.CORS_ORIGIN.split(',').map((origin) => origin.trim().replace(/\/+$/, '')).filter(Boolean)
+    : DEFAULT_CORS_ORIGINS.map((origin) => origin.replace(/\/+$/, '')),
 
   // Rate Limiting defaults (In-Memory)
   rateLimit: {

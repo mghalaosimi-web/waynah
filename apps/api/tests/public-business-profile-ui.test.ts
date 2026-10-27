@@ -14,7 +14,9 @@
 
 import { describe, it, expect, beforeAll } from 'vitest';
 import { createBusinessRouter } from '../src/routes/v1/business.routes.js';
+import { createServer } from '../src/server.js';
 import { Hono } from 'hono';
+import type { PrismaClient } from '@waynah/database';
 import { filterValidMarkers, type MapMarkerData } from '../../web/lib/maps/map-types.js';
 
 // Mock Prisma Client matching database contracts
@@ -123,11 +125,15 @@ function createMockPrisma() {
 
 describe('WAYNAH-SLICE6A — Public Business Profile & Branch Explorer API & UI Contract', () => {
   let app: Hono;
+  // Full server instance (with auth middleware) used for private endpoint tests
+  let fullApp: ReturnType<typeof createServer>;
 
   beforeAll(() => {
     const mockPrisma = createMockPrisma();
     app = new Hono();
     app.route('/v1/businesses', createBusinessRouter(mockPrisma));
+    // createServer with a no-op mock provides all middleware (auth returns 401 without DB)
+    fullApp = createServer({} as PrismaClient);
   });
 
   describe('1. Routing & Public Access Boundary', () => {
@@ -153,7 +159,8 @@ describe('WAYNAH-SLICE6A — Public Business Profile & Branch Explorer API & UI 
     });
 
     it('Private endpoint GET /v1/businesses/:id denies unauthenticated access (401 Unauthorized)', async () => {
-      const res = await app.request('/v1/businesses/biz-6a-001');
+      // Uses fullApp (createServer) which includes auth middleware — returns 401 immediately without DB
+      const res = await fullApp.request('/v1/businesses/biz-6a-001');
       expect(res.status).toBe(401);
     });
   });
