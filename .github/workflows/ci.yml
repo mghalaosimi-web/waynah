@@ -17,9 +17,9 @@ concurrency:
 
 jobs:
   quality:
-    name: Typecheck and tests
+    name: Typecheck, tests, and build
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     env:
       NODE_ENV: test
       DATABASE_URL: postgresql://postgres:postgrespassword@localhost:5432/waynah_ci?schema=public
@@ -49,3 +49,6 @@ jobs:
 
       - name: Search package test suite
         run: pnpm --filter @waynah/search test --reporter=dot
+
+      - name: Workspace production build
+        run: pnpm build
