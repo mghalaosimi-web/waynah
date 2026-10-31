@@ -1,6 +1,5 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
-import { handle } from 'hono/vercel';
 import { cors } from 'hono/cors';
 import { prisma, verifySpatialConnection } from '@waynah/database';
 import { securityConfig } from './config/security.config.js';
@@ -180,4 +179,5 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
-export default handle(app);
+// Export the Hono app directly so Vercel can adapt Node requests to Web Requests.
+export default app;
