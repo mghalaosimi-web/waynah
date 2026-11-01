@@ -37,7 +37,7 @@ export function createServer(
         // Allow server-to-server or non-browser requests (no origin header)
         if (!origin) return securityConfig.corsOrigins[0] || '*';
 
-        const normalizedOrigin = origin.replace(/\\/+$/, '');
+        const normalizedOrigin = origin.replace(/\/+$/, '');
 
         if (
           securityConfig.corsOrigins.includes('*') ||
@@ -164,7 +164,7 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   const gracefulShutdown = async (signal: string) => {
     if (isShuttingDown) return;
     isShuttingDown = true;
-    console.log(`\\nReceived ${signal}. Gracefully shutting down WAYNAH API Server...`);
+    console.log(`\nReceived ${signal}. Gracefully shutting down WAYNAH API Server...`);
 
     server.close(async () => {
       console.log('HTTP server closed.');
