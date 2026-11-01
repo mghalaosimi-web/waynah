@@ -22,7 +22,10 @@ import { createNotificationRouter } from './routes/v1/notification.routes.js';
 import { AuditLogger } from './utils/audit-logger.js';
 import { ApiResponse } from './utils/api-response.js';
 
-export function createServer(prismaClient = prisma) {
+export function createServer(
+  prismaClient = prisma,
+  spatialConnectionCheck: typeof verifySpatialConnection = verifySpatialConnection
+) {
   AuditLogger.setPrismaClient(prismaClient);
   const app = new Hono();
 
@@ -34,7 +37,7 @@ export function createServer(prismaClient = prisma) {
         // Allow server-to-server or non-browser requests (no origin header)
         if (!origin) return securityConfig.corsOrigins[0] || '*';
 
-        const normalizedOrigin = origin.replace(/\/+$/, '');
+        const normalizedOrigin = origin.replace(/\\/+$/, '');
 
         if (
           securityConfig.corsOrigins.includes('*') ||
@@ -61,7 +64,7 @@ export function createServer(prismaClient = prisma) {
   // Health Check Endpoint (Public API) - Resilient, non-blocking for Serverless
   app.get('/health', async (c) => {
     try {
-      const dbPromise = verifySpatialConnection();
+      const dbPromise = spatialConnectionCheck();
       const timeoutPromise = new Promise<{ connected: boolean; error: string }>((resolve) =>
         setTimeout(() => resolve({ connected: false, error: 'Database check pending (2s limit)' }), 2000)
       );
@@ -70,7 +73,7 @@ export function createServer(prismaClient = prisma) {
 
       return c.json(
         ApiResponse.success({
-          status: 'ok',
+          status: spatialHealth.connected ? 'ok' : 'degraded',
           database: spatialHealth,
           timestamp: new Date().toISOString(),
         })
@@ -161,7 +164,7 @@ if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   const gracefulShutdown = async (signal: string) => {
     if (isShuttingDown) return;
     isShuttingDown = true;
-    console.log(`\nReceived ${signal}. Gracefully shutting down WAYNAH API Server...`);
+    console.log(`\\nReceived ${signal}. Gracefully shutting down WAYNAH API Server...`);
 
     server.close(async () => {
       console.log('HTTP server closed.');
