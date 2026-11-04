@@ -79,6 +79,9 @@ OpenMapX is the strongest single repository to study for the overall map-service
 7. The public production API has two recorded blockers: database connectivity/datasource validation (Issue #5) and missing allowed-origin response for the real web origin on CORS preflight (Issue #9).
 8. Draft PR #8 improves the public health payload so disconnected database state is reported as `degraded` and internal Prisma diagnostics are not exposed. Its CI is reported green, but production database connectivity remains unresolved and preview verification is blocked by Vercel SSO.
 9. Production migration application state is explicitly unverified while the database connection is failing. Repository migration files are not proof that production migrations were applied.
+10. The `/places` public route is being completed as an API-backed directory in PR #11; it must show only real API results and honest loading/error/empty states.
+11. Admin analytics, categories, places and streets routes are currently header-only stubs. The existing admin API does not expose all required list/CRUD/analytics capabilities; tracked in Issue #12 rather than filling the screens with mock data.
+12. An empty `apps/web/app/(public)/page.tsx` and a second partial `apps/web/src/app/` tree need route-root verification before any deletion or consolidation.
 
 ## 5. Ordered execution plan
 
@@ -102,6 +105,8 @@ OpenMapX is the strongest single repository to study for the overall map-service
 | WAYNAH-BLK-03 | Lint commands are placeholders | GitHub Issue #10; add real ESLint/TypeScript lint configuration and required CI step in a dedicated PR. | Typecheck, tests, build, static review. |
 | WAYNAH-BLK-04 | Vercel SSO blocks unauthenticated preview verification | PR #8 preview cannot be treated as publicly verified until owner-authorized access is available. | CI verification and code review; defer live browser acceptance. |
 | WAYNAH-BLK-05 | Third-party map/search/routing data quality and hosting not yet proven for Yemen | Requires a controlled Hajjah benchmark and hosting/cost review. | Build adapters and isolated prototypes without changing production providers. |
+| WAYNAH-BLK-06 | Vercel deployment quota exceeded | GitHub's Vercel integration reported `api-deployments-free-per-day` and “more than 100” deployments; retry after 24 hours or review the hosting plan. | Continue GitHub Actions, code review, docs and non-deploying tests. |
+| WAYNAH-BLK-07 | Admin UI routes lack matching backend capabilities | Issue #12 records header-only pages and missing admin list/CRUD/analytics endpoints. | Complete API contracts, permissions, tests and safe read-only UI slices; do not fabricate admin data. |
 
 ## 7. Non-negotiable safety rules
 
