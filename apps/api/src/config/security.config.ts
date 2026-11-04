@@ -17,10 +17,17 @@ const DEFAULT_CORS_ORIGINS = IS_PRODUCTION
       'http://127.0.0.1:3001',
     ];
 
+const isLoopbackOrigin = (origin: string) =>
+  /^https?:\\/\\/(?:localhost|127\\.0\\.0\\.1|\\[::1\\])(?::\\d+)?$/i.test(origin);
+
 const CONFIGURED_CORS_ORIGINS = (process.env.CORS_ORIGIN || '')
   .split(',')
   .map((origin) => origin.trim().replace(/\/+$/, ''))
-  .filter((origin) => Boolean(origin) && !(IS_PRODUCTION && origin === '*'));
+  .filter(
+    (origin) =>
+      Boolean(origin) &&
+      !(IS_PRODUCTION && (origin === '*' || isLoopbackOrigin(origin)))
+  );
 
 const CORS_ORIGINS = Array.from(
   new Set([...DEFAULT_CORS_ORIGINS, ...CONFIGURED_CORS_ORIGINS])
