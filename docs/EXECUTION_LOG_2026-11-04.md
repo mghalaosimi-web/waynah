@@ -39,7 +39,7 @@ All listed pull requests remain Draft. None has been merged or deployed.
 
 ## Hosting / preview blocker
 
-Vercel's GitHub integration reported `api-deployments-free-per-day` and “more than 100” deployments, with a retry window of 24 hours. This prevents a new Vercel preview deployment and visual browser acceptance for the current PRs.
+Vercel's GitHub integration returned the `build-rate-limit` failure and an upgrade/rate-limit target; the integration message reported more than 100 deployments and a 24-hour retry window. This prevents a new Vercel preview deployment and visual browser acceptance for the current PRs.
 
 This is a hosting quota failure, not evidence that the application build failed: GitHub Actions production builds passed on the exact commits listed above. No alternate production deployment was attempted.
 
