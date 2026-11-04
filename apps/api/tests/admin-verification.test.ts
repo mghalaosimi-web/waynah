@@ -182,6 +182,20 @@ function makeMockPrisma() {
         return Promise.resolve(null);
       }),
     },
+    place: { count: vi.fn().mockResolvedValue(20) },
+    category: { count: vi.fn().mockResolvedValue(8) },
+    governorate: { count: vi.fn().mockResolvedValue(22) },
+    district: { count: vi.fn().mockResolvedValue(333) },
+    dataSource: { count: vi.fn().mockResolvedValue(3) },
+    placeObservation: {
+      count: vi.fn().mockResolvedValue(120),
+    },
+    dataConflict: { count: vi.fn().mockResolvedValue(0) },
+    review: { count: vi.fn().mockResolvedValue(0) },
+    auditLog: {
+      count: vi.fn().mockResolvedValue(0),
+      findMany: vi.fn().mockResolvedValue([]),
+    },
     $transaction: vi.fn().mockImplementation((cb) =>
       cb({
         business: {
@@ -367,6 +381,19 @@ describe('WAYNAH-ADMIN-001 — Admin Foundation & Verification Review Tests', ()
     expect(data.success).toBe(true);
     expect(data.data.id).toBe(verificationId);
     expect(data.data.business.name).toBe('مجموعة المجد التجارية');
+  });
+
+  it('Admin can access the protected analytics overview', async () => {
+    const res = await app.request('/v1/admin/analytics/overview', {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.data.summary.placesTotal).toBe(20);
+    expect(data.data.summary.businessesTotal).toBe(0);
+    expect(data.data.summary.auditEventsLast7Days).toBe(0);
   });
 
   // --- REVIEW ACTION & TRANSITION TESTS ---
