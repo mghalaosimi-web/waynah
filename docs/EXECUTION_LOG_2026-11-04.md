@@ -17,6 +17,7 @@
 
 | PR | Scope | Exact head commit | GitHub Actions |
 |---|---|---|---|
+| [#8](https://github.com/mghalaosimi-web/waynah/pull/8) | Health endpoint reports degraded state when database is disconnected and avoids leaking internal Prisma diagnostics | `7664bab41d89a750b7b13d537c1ce4d9a555c806` | Existing draft baseline; preview acceptance remains blocked by protected access |
 | [#11](https://github.com/mghalaosimi-web/waynah/pull/11) | Yemen/Hajjah map defaults, URL coordinate validation, API-backed public places directory, production mock-data guard, integration/licensing baseline | `84611e5433441d4567c6cfaf428afa278ee22c44` | Passed: install, TypeScript, API tests, search tests, production build |
 | [#13](https://github.com/mghalaosimi-web/waynah/pull/13) | CORS allowlist hardening; canonical production web origin is retained when extra origins are configured | `8368b83750126eebb951b203dd61755bc3b9fba9` | Passed: install, TypeScript, API tests, search tests, production build |
 | [#14](https://github.com/mghalaosimi-web/waynah/pull/14) | Protected, privacy-minimized operational analytics endpoint and dashboard using existing tables | `cf47e77bfa2e0a753fb1c98b34117f5fdf3de9e2` | Passed: install, TypeScript, API tests, search tests, production build |
