@@ -75,7 +75,10 @@ export function createServer(
         ApiResponse.success({
           status: spatialHealth.connected ? 'ok' : 'degraded',
           database: spatialHealth.connected
-            ? { connected: true, postgisVersion: spatialHealth.postgisVersion }
+            ? {
+                connected: true,
+                postgisVersion: 'postgisVersion' in spatialHealth ? spatialHealth.postgisVersion : undefined,
+              }
             : { connected: false, error: 'Database connection unavailable' },
           timestamp: new Date().toISOString(),
         })
