@@ -44,6 +44,7 @@ export const PERMISSIONS = {
   ADMIN_REVIEWS_MODERATE: 'admin.reviews.moderate',
   ADMIN_DUPLICATES_MANAGE: 'admin.duplicates.manage',
   ADMIN_PLACES_HISTORY_READ: 'admin.places.history.read',
+  ADMIN_PLACES_READ: 'admin.places.read',
   ADMIN_USERS_MANAGE: 'admin.users.manage',
   ADMIN_VERIFICATION_READ: 'admin.verification.read',
   ADMIN_VERIFICATION_REVIEW: 'admin.verification.review',
