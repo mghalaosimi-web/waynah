@@ -220,5 +220,79 @@ export class AdminService {
       data: { status: 'IGNORED' },
     });
   }
+  /**
+   * Returns real, read-only operational metrics for the admin analytics page.
+   * Sensitive request metadata (IP, actor ID, free-form metadata) is deliberately excluded.
+   */
+  async getAnalyticsOverview() {
+    const generatedAt = new Date();
+    const sevenDaysAgo = new Date(generatedAt.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const [
+      placesTotal,
+      placesVerified,
+      placesUnverified,
+      businessesTotal,
+      categoriesTotal,
+      governoratesTotal,
+      districtsTotal,
+      dataSourcesTotal,
+      observationsTotal,
+      observationsPending,
+      openConflictsTotal,
+      reviewsTotal,
+      auditEventsLast7Days,
+      recentAuditEvents,
+    ] = await Promise.all([
+      this.prisma.place.count(),
+      this.prisma.place.count({ where: { verificationStatus: 'VERIFIED' } }),
+      this.prisma.place.count({ where: { verificationStatus: 'UNVERIFIED' } }),
+      this.prisma.business.count(),
+      this.prisma.category.count(),
+      this.prisma.governorate.count(),
+      this.prisma.district.count(),
+      this.prisma.dataSource.count(),
+      this.prisma.placeObservation.count(),
+      this.prisma.placeObservation.count({ where: { status: 'PENDING' } }),
+      this.prisma.dataConflict.count({ where: { status: 'OPEN' } }),
+      this.prisma.review.count(),
+      this.prisma.auditLog.count({ where: { createdAt: { gte: sevenDaysAgo } } }),
+      this.prisma.auditLog.findMany({
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: 8,
+        select: {
+          id: true,
+          eventType: true,
+          action: true,
+          actorType: true,
+          resourceType: true,
+          resourceId: true,
+          createdAt: true,
+        },
+      }),
+    ]);
+
+    return {
+      generatedAt: generatedAt.toISOString(),
+      periodDays: 7,
+      summary: {
+        placesTotal,
+        placesVerified,
+        placesUnverified,
+        businessesTotal,
+        categoriesTotal,
+        governoratesTotal,
+        districtsTotal,
+        dataSourcesTotal,
+        observationsTotal,
+        observationsPending,
+        openConflictsTotal,
+        reviewsTotal,
+        auditEventsLast7Days,
+      },
+      recentAuditEvents,
+    };
+  }
+
 }
 
