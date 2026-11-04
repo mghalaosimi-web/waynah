@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createServer } from '../src/server.js';
 import { securityConfig } from '../src/config/security.config.js';
+import { AdminService } from '../src/domain/admin/admin.service.js';
 import type { PrismaClient } from '@waynah/database';
 
 function makeAnalyticsPrisma() {
@@ -42,29 +43,25 @@ function makeAnalyticsPrisma() {
 }
 
 describe('Admin analytics overview', () => {
-  it('requires authentication', async () => {
+  it('rejects anonymous and system-service requests without admin.audit.read', async () => {
     const app = createServer(makeAnalyticsPrisma());
-    const response = await app.request('/v1/admin/analytics/overview');
 
-    expect(response.status).toBe(401);
+    const anonymous = await app.request('/v1/admin/analytics/overview');
+    expect(anonymous.status).toBe(401);
+
+    const systemService = await app.request('/v1/admin/analytics/overview', {
+      headers: { 'X-API-Key': securityConfig.ingestionApiKey },
+    });
+    expect(systemService.status).toBe(403);
   });
 
-  it('returns real aggregates and a privacy-minimized recent audit list to an authorized admin key', async () => {
+  it('returns real aggregates and a privacy-minimized recent audit list from the service', async () => {
     const prisma = makeAnalyticsPrisma();
-    const app = createServer(prisma);
+    const service = new AdminService(prisma);
+    const result = await service.getAnalyticsOverview();
 
-    const response = await app.request('/v1/admin/analytics/overview', {
-      headers: {
-        'X-API-Key': securityConfig.ingestionApiKey,
-      },
-    });
-
-    expect(response.status).toBe(200);
-    const payload = await response.json();
-
-    expect(payload.success).toBe(true);
-    expect(payload.data.periodDays).toBe(7);
-    expect(payload.data.summary).toMatchObject({
+    expect(result.periodDays).toBe(7);
+    expect(result.summary).toMatchObject({
       placesTotal: 20,
       placesVerified: 7,
       placesUnverified: 12,
@@ -79,9 +76,9 @@ describe('Admin analytics overview', () => {
       reviewsTotal: 10,
       auditEventsLast7Days: 21,
     });
-    expect(payload.data.recentAuditEvents).toHaveLength(1);
-    expect(payload.data.recentAuditEvents[0]).not.toHaveProperty('ip');
-    expect(payload.data.recentAuditEvents[0]).not.toHaveProperty('metadata');
+    expect(result.recentAuditEvents).toHaveLength(1);
+    expect(result.recentAuditEvents[0]).not.toHaveProperty('ip');
+    expect(result.recentAuditEvents[0]).not.toHaveProperty('metadata');
     expect(prisma.auditLog.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         take: 8,
