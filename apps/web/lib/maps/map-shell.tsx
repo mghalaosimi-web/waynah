@@ -2,7 +2,14 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { cn, Button } from '@waynah/ui';
-import { GeoPoint, MapMarkerData, filterValidMarkers, isValidCoordinate } from './map-types';
+import {
+  GeoPoint,
+  MapMarkerData,
+  filterValidMarkers,
+  isValidCoordinate,
+  WAYNAH_DEFAULT_MAP_CENTER,
+  WAYNAH_DEFAULT_MAP_ZOOM,
+} from './map-types';
 import { PlacePreview } from '../../components/maps/PlacePreview';
 import { MapControls } from '../../components/maps/MapControls';
 
@@ -19,14 +26,11 @@ export interface MapShellProps {
   boundaryGeoJson?: any;
 }
 
-const DEFAULT_CENTER: GeoPoint = {
-  latitude: 24.7136,
-  longitude: 46.6753,
-};
+const DEFAULT_CENTER: GeoPoint = WAYNAH_DEFAULT_MAP_CENTER;
 
 export const MapShell: React.FC<MapShellProps> = ({
   center = DEFAULT_CENTER,
-  zoom = 12,
+  zoom = WAYNAH_DEFAULT_MAP_ZOOM,
   markers = [],
   selectedMarkerId = null,
   onMarkerSelect,

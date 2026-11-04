@@ -604,7 +604,7 @@ export const MOCK_DEMO_PLACES: PlaceSearchResult[] = [
     address: 'عبس — شارع السوق الرئيسي — بجوار المجمع الطبي',
     phoneNumber: '+967 771 234 567',
     website: 'https://waynah.demo/pharmacy-abs',
-    verificationStatus: 'VERIFIED',
+    verificationStatus: 'UNVERIFIED',
     categoryId: 'cat-1',
     categoryNameAr: 'صيدليات ورعاية صحية',
     districtNameAr: 'حي السوق الرئيسي',
@@ -623,7 +623,7 @@ export const MOCK_DEMO_PLACES: PlaceSearchResult[] = [
     address: 'عبس — المدخل الجنوبي — الخط العام',
     phoneNumber: '+967 770 987 654',
     website: 'https://waynah.demo/abs-hospital',
-    verificationStatus: 'VERIFIED',
+    verificationStatus: 'UNVERIFIED',
     categoryId: 'cat-3',
     categoryNameAr: 'مستشفيات وطوارئ',
     districtNameAr: 'حي النصر',
@@ -677,7 +677,7 @@ export const MOCK_DEMO_PLACES: PlaceSearchResult[] = [
     description: 'صيدلية مركزية توفر المستلزمات الطبية والأدوية وتجهيزات العناية الشخصية.',
     address: 'حجة — الشارع الرئيسي — مقابل المستشفى الجمهوري',
     phoneNumber: '+967 775 888 999',
-    verificationStatus: 'VERIFIED',
+    verificationStatus: 'UNVERIFIED',
     categoryId: 'cat-1',
     categoryNameAr: 'صيدليات ورعاية صحية',
     districtNameAr: 'حي النصر',
@@ -751,7 +751,9 @@ export class ApiClient {
       }
 
       // Prototype Mock Fallback Logic when server is offline and mock mode is explicitly enabled
-      const enableMock = process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === 'true';
+      const enableMock =
+        process.env.NODE_ENV !== 'production' &&
+        process.env.NEXT_PUBLIC_ENABLE_MOCK_FALLBACK === 'true';
 
       if (enableMock) {
         if (endpoint.includes('/v1/auth/verify-email')) {

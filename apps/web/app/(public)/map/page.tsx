@@ -17,7 +17,13 @@ import { SearchBar, LocationCoords } from '../../../components/domain/SearchBar'
 import { PlaceCard } from '../../../components/domain/PlaceCard';
 import { SearchFilters } from '../../../components/filters/SearchFilters';
 import { MapShell } from '../../../lib/maps/map-shell';
-import { GeoPoint, MapMarkerData } from '../../../lib/maps/map-types';
+import {
+  GeoPoint,
+  MapMarkerData,
+  isValidCoordinate,
+  WAYNAH_DEFAULT_MAP_CENTER,
+  WAYNAH_DEFAULT_MAP_ZOOM,
+} from '../../../lib/maps/map-types';
 import { apiClient, type PlaceSearchResult, type PlaceCategory } from '../../../lib/api/api-client';
 
 function MapPageContent() {
@@ -31,14 +37,17 @@ function MapPageContent() {
   const latStr = searchParams.get('lat');
   const lngStr = searchParams.get('lng');
 
-  const initialLat = latStr ? Number(latStr) : 24.7136;
-  const initialLng = lngStr ? Number(lngStr) : 46.6753;
+  const parsedLat = latStr === null || latStr.trim() === '' ? null : Number(latStr);
+  const parsedLng = lngStr === null || lngStr.trim() === '' ? null : Number(lngStr);
+  const hasValidUrlCoordinates = isValidCoordinate(parsedLat, parsedLng);
+  const initialLat = hasValidUrlCoordinates ? parsedLat! : WAYNAH_DEFAULT_MAP_CENTER.latitude;
+  const initialLng = hasValidUrlCoordinates ? parsedLng! : WAYNAH_DEFAULT_MAP_CENTER.longitude;
 
   // Search & Filter state
   const [query, setQuery] = useState(initialQuery);
   const [selectedCategory, setSelectedCategory] = useState<string | undefined>(initialCategory);
   const [location, setLocation] = useState<LocationCoords | null>(
-    latStr && lngStr ? { lat: initialLat, lng: initialLng } : null
+    hasValidUrlCoordinates ? { lat: initialLat, lng: initialLng } : null
   );
   const [radiusMeters, setRadiusMeters] = useState<number>(5000);
   const [selectedPlaceId, setSelectedPlaceId] = useState<string | null>(initialPlaceId || null);
@@ -357,7 +366,7 @@ function MapPageContent() {
               <div className={`lg:col-span-2 relative ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
                 <MapShell
                   center={{ latitude: initialLat, longitude: initialLng }}
-                  zoom={12}
+                  zoom={hasValidUrlCoordinates ? 12 : WAYNAH_DEFAULT_MAP_ZOOM}
                   markers={mapMarkers}
                   selectedMarkerId={selectedPlaceId}
                   onMarkerSelect={(m) => setSelectedPlaceId(m ? m.id : null)}
