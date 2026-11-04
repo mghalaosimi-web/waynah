@@ -10,6 +10,18 @@ export interface GeoPoint {
   longitude: number;
 }
 
+/**
+ * WAYNAH's initial map focus follows the first approved pilot region.
+ * Coordinates identify Hajjah city (GeoNames feature 75337), not a user location.
+ */
+export const WAYNAH_DEFAULT_MAP_CENTER: GeoPoint = {
+  latitude: 15.69425,
+  longitude: 43.60582,
+};
+
+/** Country-pilot overview zoom; explicit coordinates use a closer zoom. */
+export const WAYNAH_DEFAULT_MAP_ZOOM = 8;
+
 export interface MapMarkerData {
   id: string;
   latitude: number;
