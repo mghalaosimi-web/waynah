@@ -30,7 +30,7 @@ https://waynah.vercel.app                  https://waynah-api.vercel.app
 ### Component Summary:
 - **Web Frontend (`@waynah/web`)**: Next.js 16 App Router hosted on Vercel (`https://waynah.vercel.app`).
 - **Production API (`@waynah/api`)**: Hono Node.js serverless app hosted on Vercel (`https://waynah-api.vercel.app`).
-- **Database Subsystem**: PostgreSQL 16 with PostGIS 3.4 extensions hosted on Supabase (`aws-0-ap-south-1.pooler.supabase.com`), accessed via PgBouncer pooled port `:6543`.
+- **Database Subsystem**: The intended production architecture is Supabase PostgreSQL with PostGIS. The exact production engine/extension state and active migration state must be verified through the approved owner connection; current API connectivity is failing under Issue #5. Do not infer database readiness from Vercel deployment status.
 
 ---
 
@@ -69,20 +69,19 @@ https://waynah.vercel.app                  https://waynah-api.vercel.app
    pnpm --filter @waynah/web build
    ```
 
-2. **Git Deployment Trigger**:
-   - Deployments to Vercel production are automatically triggered upon pushing commits to the `main` branch:
-   ```bash
-   git add .
-   git commit -m "feat/fix: <description>"
-   git push origin main
-   ```
+2. **Reviewed Git Deployment Trigger**:
+   - Never push implementation commits directly to `main`.
+   - Create a focused branch from the current `main`, open a pull request, and wait for the required CI checks and review.
+   - Verify a protected preview using an authorized session. If SSO prevents the live check, leave the PR open and record the blocker.
+   - Merge only after the change is within approved scope and its required checks pass. Vercel's Git integration may then create the production deployment from the merged `main` commit.
+   - Do not deploy, promote, or roll back production as a substitute for review or database repair.
 
 3. **Post-Deployment Live Verification Probes**:
    - Probe API Health:
      ```bash
      curl -i https://waynah-api.vercel.app/health
      ```
-     *Expected Response*: `{"success":true,"data":{"status":"ok","database":{"connected":true...}}}` (HTTP 200).
+     *Required release condition*: HTTP 200 **and** `data.database.connected === true` with `data.status === "ok"`. An HTTP 200 response alone is not sufficient. On current `main`, the production probe returned HTTP 200 while `database.connected=false`; Prisma rejected the datasource URL. Treat this as a P0 blocker (Issue #5), not a passing health check.
    - Probe Web Origin:
      ```bash
      curl -i https://waynah.vercel.app
@@ -111,10 +110,7 @@ If source code changes must be reverted in git:
    ```bash
    git revert <bad-commit-hash>
    ```
-2. Push the revert commit to trigger an automated production build:
-   ```bash
-   git push origin main
-   ```
+2. Open a pull request containing the revert, run the required checks, and merge only after review and approval. Do not push directly to `main`.
 
 ---
 
@@ -123,6 +119,8 @@ If source code changes must be reverted in git:
 Because automated E2E testing cannot simulate interactive multi-factor Google credentials without violating Google security policies, human QA testing must execute the following protocol:
 
 ### Step-by-Step QA Protocol:
+**Prerequisite:** database connectivity and the required API routes must be healthy first. While Issue #5 is open, the complete authenticated user journey is blocked and this protocol must not be reported as passed.
+
 1. Open an incognito browser window and navigate to `https://waynah.vercel.app/login`.
 2. Open Browser Developer Tools (`F12`) -> **Console** and **Network** tabs.
 3. Click the **"تسجيل الدخول بواسطة Google"** button.
@@ -147,5 +145,5 @@ Because automated E2E testing cannot simulate interactive multi-factor Google cr
 ---
 
 <div align="center">
-<b>WAYNAH Production Operational Runbook · Phase 12 Hardened</b>
+<b>WAYNAH Production Operational Runbook · Current P0 database blocker documented</b>
 </div>
