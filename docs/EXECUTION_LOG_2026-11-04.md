@@ -15,7 +15,7 @@
 
 ## Work completed in draft pull requests
 
-| PR | Scope | Exact head commit | GitHub Actions |
+| PR | Scope | Verified commit (CI) | GitHub Actions |
 |---|---|---|---|
 | [#8](https://github.com/mghalaosimi-web/waynah/pull/8) | Health endpoint reports degraded state when database is disconnected and avoids leaking internal Prisma diagnostics | `7664bab41d89a750b7b13d537c1ce4d9a555c806` | Existing draft baseline; preview acceptance remains blocked by protected access |
 | [#11](https://github.com/mghalaosimi-web/waynah/pull/11) | Yemen/Hajjah map defaults, URL coordinate validation, API-backed public places directory, production mock-data guard, integration/licensing baseline | `84611e5433441d4567c6cfaf428afa278ee22c44` | Passed: install, TypeScript, API tests, search tests, production build |
