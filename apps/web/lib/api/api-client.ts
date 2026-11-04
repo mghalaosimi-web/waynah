@@ -146,6 +146,35 @@ export interface BusinessInvitationItem {
 
 export type BusinessVerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 
+export interface AdminAnalyticsOverview {
+  generatedAt: string;
+  periodDays: number;
+  summary: {
+    placesTotal: number;
+    placesVerified: number;
+    placesUnverified: number;
+    businessesTotal: number;
+    categoriesTotal: number;
+    governoratesTotal: number;
+    districtsTotal: number;
+    dataSourcesTotal: number;
+    observationsTotal: number;
+    observationsPending: number;
+    openConflictsTotal: number;
+    reviewsTotal: number;
+    auditEventsLast7Days: number;
+  };
+  recentAuditEvents: Array<{
+    id: string;
+    eventType: string;
+    action?: string | null;
+    actorType?: string | null;
+    resourceType?: string | null;
+    resourceId?: string | null;
+    createdAt: string;
+  }>;
+}
+
 export interface AdminVerificationStats {
   pendingCount: number;
   verifiedCount: number;
@@ -1467,6 +1496,13 @@ export class ApiClient {
   public async getAdminVerifications(status?: string): Promise<ApiResponse<BusinessVerificationData[]>> {
     const endpoint = `/v1/admin/verifications${status ? `?status=${status}` : ''}`;
     return this.request<BusinessVerificationData[]>(endpoint);
+  }
+
+  /**
+   * Admin operational analytics overview (Protected API).
+   */
+  public async getAdminAnalyticsOverview(): Promise<ApiResponse<AdminAnalyticsOverview>> {
+    return this.request<AdminAnalyticsOverview>('/v1/admin/analytics/overview');
   }
 
   /**

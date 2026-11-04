@@ -650,6 +650,23 @@ export function createAdminRouter(prismaClient: PrismaClient = defaultPrisma) {
   );
 
   /**
+   * GET /v1/admin/analytics/overview
+   * Returns privacy-minimized operational aggregates for the admin dashboard.
+   * Required Permission: admin.audit.read
+   */
+  router.get('/analytics/overview', requirePermission(PERMISSIONS.ADMIN_AUDIT_READ), async (c) => {
+    try {
+      const overview = await adminService.getAnalyticsOverview();
+      return c.json(ApiResponse.success(overview));
+    } catch (_err) {
+      return c.json(
+        ApiResponse.error('فشل في جلب ملخص التحليلات', 'FETCH_ANALYTICS_FAILED'),
+        500
+      );
+    }
+  });
+
+  /**
    * GET /v1/admin/audit-logs
    * Returns paginated operational audit logs with verified filtering.
    * Read-only administrative endpoint.
