@@ -18,7 +18,7 @@ const DEFAULT_CORS_ORIGINS = IS_PRODUCTION
     ];
 
 const isLoopbackOrigin = (origin: string) =>
-  /^https?:\\/\\/(?:localhost|127\\.0\\.0\\.1|\\[::1\\])(?::\\d+)?$/i.test(origin);
+  /^https?:\/\/(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?$/i.test(origin);
 
 const CONFIGURED_CORS_ORIGINS = (process.env.CORS_ORIGIN || '')
   .split(',')
