@@ -346,28 +346,30 @@ User Query ("مطعم شيباني صنعاء")
 
 ## 14 — PRODUCTION STATUS & PUBLIC LAUNCH ROADMAP
 
-![Production Deployment & Rollout Roadmap](docs/images/public_launch_roadmap.svg)
-*خارطة الطريق 1: التمييز الهندسي الدقيق بين النشر الإنتاجي المطبق والنشر التدريجي والإطلاق العام.*
+**Operational snapshot: 4 November 2026.** Deployment status and application readiness are separate: a Vercel deployment can be READY while database-backed product functions are unavailable.
 
-| المكون | حالة التشغيل (Production Status) | البيئة والاستضافة | ملاحظات الجاهزية |
-| :--- | :--- | :--- | :--- |
-| **Web Application** | 🟢 Production Deployed & Verified | Vercel Serverless | متصل بالواجهة ويدعم العرض التفاعلي والخريطة |
-| **API Gateway** | 🟢 Production Deployed & Verified | Vercel Serverless Function | يخدم جميع المسارات وتتوفر نقطة `/health` (HTTP 200) |
-| **PostgreSQL + PostGIS** | 🟢 Production Deployed & Migrated | Supabase Managed Postgres | تم تنفيذ جميع الهجرات الـ 17 وتفعيل ملحق PostGIS |
-| **Public Launch Gate** | 🟡 Production Ready (Controlled Rollout) | Operational Launch Gate Audited | التشر الإنتاجي محقق ومفحص؛ مرحلة الإطلاق العام تدريجية ومبوبة |
+| Component | Verified state | Evidence / limitation |
+| :--- | :--- | :--- |
+| **Web Application** | 🟡 Production deployment READY | `waynah.vercel.app` is served by deployment `dpl_46ixWdfzthfkwBMt2XHLvTf1pGyy` (commit `f707655`). The homepage and `/login` rendered during the latest browser smoke test; the homepage displayed its search-failure fallback. This does not verify all web routes or user journeys. |
+| **API Gateway** | 🟡 Production deployment READY; database-dependent routes failing | `waynah-api.vercel.app` is served by deployment `dpl_2AwrGmco6LZ7cd5FsxG9uMbn2Cqj` (main commit `8bf75bba`). `GET /health` returned HTTP 200 while `database.connected=false`; search and category reads returned HTTP 500; an unknown route returned HTTP 404. |
+| **PostgreSQL + PostGIS** | 🔴 Production connectivity unverified / unavailable | Prisma rejects the effective datasource URL because it does not begin with `postgresql://` or `postgres://`. Production migration state and spatial queries cannot be verified until the owner restores the approved connection. |
+| **Public Launch Gate** | 🔴 BLOCKED — P0 | Issue [#5](https://github.com/mghalaosimi-web/waynah/issues/5) remains open. Database-backed discovery, categories, and other dependent journeys must not be described as production-ready. |
 
-> **تنبيه الإطلاق**: النشر الإنتاجي (Production Deployment) نشط ومفحص تقنيًا. الإطلاق العام للجمهور (Public Launch) يُدار بشكل تدريجي ومسيطر عليه.
+**Release rule:** READY in Vercel is deployment status, not end-to-end readiness. Do not announce public launch until database connectivity, PostGIS reads, search/categories, and the critical browser-to-API journeys pass live verification.
 
 ---
 
 ## 15 — VERIFIED ENGINEERING STATUS
 
-تم التثبت التقني من سلامة النظام من خلال:
+The following results are scoped to the exact source revision and must not be generalized to production:
 
-- ✅ **17 الهجرات المكانية والهيكلية (Prisma Migrations)**: تم إنشاؤها وتطبيقها بنجاح دون أخطاء.
-- ✅ **596 اختبار كلي (Integration & Security Test Suites)**: تغطي 577 اختبار API و 19 اختبار حزمة البحث.
-- ✅ **بناء خالي من الأخطاء (Zero Typecheck Errors)**: نجاح أمر `pnpm typecheck` عبر 10 حزم وتطبيقات في المونوريبو.
-- ✅ **الربط والإنتاجية (Supabase Direct & Pooler Connectivity)**: تم ضبط روابط قواعد البيانات وقنوات الحماية.
+- **PR #6 head** (`0c74ae9c04319bcfc2cc883dd0a5eeca32f13f01`): isolated verification passed frozen install, TypeScript (10/10 tasks), API tests (49 files / 609 tests), Search tests (3 files / 19 tests), and workspace build (6/6 tasks; 28 Next.js pages generated).
+- **Lint:** not passed. Current package lint scripts are `echo` placeholders; the config package has no lint script.
+- **Preview:** API preview deployment is READY, but live route verification is blocked by Vercel SSO protection. PR #6 remains Draft and unmerged.
+- **Production database:** not connected; the P0 in Issue #5 remains open. The passing test/build results do not establish production database or PostGIS health.
+- **Migrations:** 17 migration directories are present in the repository. The currently applied production migration state has not been verified during this incident because the database connection is unavailable.
+
+The latest code-level validation is not a production release. No production secrets, database schema, migrations, or production data were changed as part of this verification.
 
 ---
 
