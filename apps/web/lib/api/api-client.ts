@@ -162,7 +162,7 @@ export interface AdminPlaceListItem {
     nameEn?: string | null;
     governorate?: { id: string; nameAr: string; nameEn?: string | null } | null;
   } | null;
-  business?: { id: string; name: string; slug: string } | null;
+  business?: { id: string; name: string; slug?: string | null } | null;
 }
 
 export interface AdminVerificationStats {
