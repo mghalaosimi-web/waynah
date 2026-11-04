@@ -650,6 +650,57 @@ export function createAdminRouter(prismaClient: PrismaClient = defaultPrisma) {
   );
 
   /**
+   * GET /v1/admin/places
+   * Lists canonical place records for administrative review.
+   * Required Permission: admin.places.read
+   */
+  router.get('/places', requirePermission(PERMISSIONS.ADMIN_PLACES_READ), async (c) => {
+    const query = c.req.query();
+    const page = query.page === undefined ? 1 : Number(query.page);
+    const requestedLimit = query.limit === undefined ? 20 : Number(query.limit);
+    const status = query.status?.trim();
+    const allowedStatuses = ['UNVERIFIED', 'VERIFIED', 'CLAIMED', 'REPORTED', 'CLOSED'];
+
+    if (!Number.isInteger(page) || page < 1) {
+      return c.json(ApiResponse.error('رقم الصفحة غير صالح', 'INVALID_INPUT'), 400);
+    }
+    if (!Number.isInteger(requestedLimit) || requestedLimit < 1) {
+      return c.json(ApiResponse.error('عدد العناصر غير صالح', 'INVALID_INPUT'), 400);
+    }
+    if (status && !allowedStatuses.includes(status)) {
+      return c.json(ApiResponse.error('حالة التوثيق غير صالحة', 'INVALID_INPUT'), 400);
+    }
+
+    const searchQuery = query.query?.trim();
+    if (searchQuery && searchQuery.length > 120) {
+      return c.json(ApiResponse.error('عبارة البحث طويلة جداً', 'INVALID_INPUT'), 400);
+    }
+
+    try {
+      const result = await adminService.listPlaces({
+        query: searchQuery || undefined,
+        status: status || undefined,
+        categoryId: query.categoryId?.trim() || undefined,
+        districtId: query.districtId?.trim() || undefined,
+        page,
+        limit: Math.min(100, requestedLimit),
+      });
+
+      return c.json(ApiResponse.success(result.items, {
+        page: result.page,
+        limit: result.limit,
+        total: result.total,
+        totalPages: result.totalPages,
+      }));
+    } catch (_err) {
+      return c.json(
+        ApiResponse.error('فشل في جلب قائمة الأماكن', 'FETCH_ADMIN_PLACES_FAILED'),
+        500
+      );
+    }
+  });
+
+  /**
    * GET /v1/admin/audit-logs
    * Returns paginated operational audit logs with verified filtering.
    * Read-only administrative endpoint.
