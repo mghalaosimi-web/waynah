@@ -3,9 +3,10 @@ import { createServer } from '../src/server.js';
 
 describe('GET /health', () => {
   it('reports degraded when the database health check is disconnected', async () => {
+    const internalError = 'Prisma datasource validation failure at schema.prisma:8';
     const app = createServer(undefined, async () => ({
       connected: false,
-      error: 'Database connection unavailable',
+      error: internalError,
     }));
 
     const response = await app.request('/health');
@@ -15,6 +16,8 @@ describe('GET /health', () => {
     expect(response.status).toBe(200);
     expect(body.data.status).toBe('degraded');
     expect(body.data.database.connected).toBe(false);
+    expect(body.data.database.error).toBe('Database connection unavailable');
+    expect(JSON.stringify(body)).not.toContain(internalError);
   });
 
   it('reports ok when the database health check is connected', async () => {
