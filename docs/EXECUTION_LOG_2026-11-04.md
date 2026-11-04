@@ -24,7 +24,7 @@
 | [#15](https://github.com/mghalaosimi-web/waynah/pull/15) | Protected, read-only, filtered and paginated admin place list with history links | `06e2565fe713a8ba1574064e06271e2026824a99` | Passed: install, TypeScript, API tests, search tests, production build |
 | [#17](https://github.com/mghalaosimi-web/waynah/pull/17) | Read-only category hierarchy browser and truthful street-network readiness page | `078a31b4a57c523d783af7ecfb0338401ff4bab3` | Passed: install, TypeScript, API tests, search tests, production build |
 
-All five pull requests remain Draft. None has been merged or deployed.
+All listed pull requests remain Draft. None has been merged or deployed.
 
 ## Open blockers and tracked work
 
