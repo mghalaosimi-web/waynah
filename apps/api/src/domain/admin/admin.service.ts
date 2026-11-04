@@ -220,5 +220,60 @@ export class AdminService {
       data: { status: 'IGNORED' },
     });
   }
+  /**
+   * Lists canonical places for authorized administration with bounded pagination and filters.
+   */
+  async listPlaces(filters: {
+    query?: string;
+    status?: string;
+    categoryId?: string;
+    districtId?: string;
+    page: number;
+    limit: number;
+  }) {
+    const where: Record<string, any> = {};
+
+    if (filters.query) {
+      where.OR = [
+        { nameAr: { contains: filters.query, mode: 'insensitive' } },
+        { nameEn: { contains: filters.query, mode: 'insensitive' } },
+      ];
+    }
+    if (filters.status) where.verificationStatus = filters.status;
+    if (filters.categoryId) where.categoryId = filters.categoryId;
+    if (filters.districtId) where.districtId = filters.districtId;
+
+    const skip = (filters.page - 1) * filters.limit;
+    const [total, items] = await Promise.all([
+      this.prisma.place.count({ where }),
+      this.prisma.place.findMany({
+        where,
+        include: {
+          category: { select: { id: true, nameAr: true, nameEn: true, slug: true } },
+          district: {
+            select: {
+              id: true,
+              nameAr: true,
+              nameEn: true,
+              governorate: { select: { id: true, nameAr: true, nameEn: true } },
+            },
+          },
+          business: { select: { id: true, name: true, slug: true } },
+        },
+        orderBy: [{ updatedAt: 'desc' }, { id: 'desc' }],
+        skip,
+        take: filters.limit,
+      }),
+    ]);
+
+    return {
+      items,
+      page: filters.page,
+      limit: filters.limit,
+      total,
+      totalPages: Math.ceil(total / filters.limit),
+    };
+  }
+
 }
 
