@@ -1,10 +1,10 @@
 # 📐 WAYNAH System Architecture & Engineering Specification
 
-> **Document Status**: Factually Audited & Verified Specification  
+> **Document Status**: Architecture Reference — operational readiness is tracked separately  
 > **Release Baseline**: v0.12.0  
 > **Platform Name**: WAYNAH / وَيْنَه؟  
 > **Lead Architecture**: M.GH.AL  
-> **Audit Status**: FACTUALLY VERIFIED & CLOSED  
+> **Audit Status**: Architecture reference retained; production operational verification OPEN (Issue #5)  
 
 ---
 
@@ -17,12 +17,12 @@ The system is structured as a monorepo managed by **Turborepo v2.4.4** and **pnp
 ### Empirically Verified Technology Stack:
 - **Monorepo Manager**: Turborepo `v2.4.4` + pnpm Workspaces `v12.8.1`
 - **Frontend App (`apps/web`)**: Next.js `v16.3.6` (App Router), React `v19.3.0`, Tailwind CSS `v4.3.3`, Leaflet `v1.9.4`
-- **API Gateway (`apps/api`)**: Hono Core `v4.13.10` with `@hono/node-server` `v2.1.1` and `@hono/vercel` serverless adapter
+- **API Gateway (`apps/api`)**: Hono Core `v4.13.10`; the production entry exports the Hono app for Vercel's native Node.js request handling
 - **Database ORM (`packages/database`)**: Prisma ORM `v6.4.1` with `@prisma/client` `v6.4.1`
 - **Database Engine (Production)**: Supabase Managed PostgreSQL `17.x` + PostGIS `3.3.7` + `pg_trgm` `1.6`
 - **Database Engine (Local Docker)**: PostgreSQL `16` (`postgis/postgis:16-3.4-alpine`)
 - **Runtime Language**: TypeScript `v5.8.2`
-- **Test Framework**: Vitest `v5.0.2` (596 total tests passing)
+- **Test Framework**: Vitest `v5.0.2`; PR #6 was independently verified at 628 tests (609 API + 19 Search), not a production-readiness signal
 
 ---
 
@@ -57,9 +57,9 @@ waynah (Monorepo Root)
 - **Database Engine**: PostgreSQL 17 (Production Supabase) / PostgreSQL 16 (Local Docker Container).
 - **Spatial Extension**: PostGIS (`geography` type extension).
 - **Fuzzy Search Extension**: `pg_trgm` (PostgreSQL Trigram Matching).
-- **Migration State**: **17 / 17 migrations applied** under `packages/database/prisma/migrations`.
+- **Repository Migration Inventory**: 17 migration directories are present under `packages/database/prisma/migrations`. The currently applied production migration state is **unverified** while the production database connection is failing (Issue #5).
 
-### Schema Migrations Audit Log (17 Applied):
+### Schema Migration Files Present (17; production application state unverified):
 1. `0_init_baseline`
 2. `0_init_extensions`
 3. `20260929233000_client_favorites_and_requests`
@@ -165,18 +165,20 @@ Every administrative moderation event, authentication lifecycle change, and bran
 
 ## 9. Production & Verification Status
 
+**Operational snapshot: 4 November 2026.** This architecture document describes the intended system design. It does not certify current production readiness.
+
 ### Production Infrastructure:
-- **API Server (`waynah-api`)**: Deployed on Vercel Serverless Functions (`/v1/*` endpoints live; `/health` returning HTTP 200).
-- **Web App (`waynah-web`)**: Deployed on Vercel (`27 / 27` Next.js App Router routes compiled cleanly).
-- **Database**: Supabase PostgreSQL 17 + PostGIS 3.3.7 + pg_trgm 1.6 with 17/17 migrations applied.
-- **Public Launch Status**: Production Ready & Production Deployed. Public Launch Gate Audited. Public launch rollout is controlled.
+- **Web App (`waynah`)**: Vercel production deployment READY on commit `f7076553162d135bed3dfeed350e2d2d45e3e468`. The homepage and login route rendered in the latest browser smoke test, but the homepage showed a search-failure fallback.
+- **API Server (`waynah-api`)**: Vercel production deployment READY on main commit `8bf75bba8d9c13f00d722bcb217aa851d2d58835`. `/health` returned HTTP 200 while `database.connected=false`; `/v1/search` and `/v1/search/categories` returned HTTP 500 due to Prisma datasource validation failure.
+- **Database**: The intended architecture is Supabase PostgreSQL + PostGIS. Current production connectivity is unavailable because Prisma rejects the effective datasource URL. Production schema/migration application state and PostGIS query health cannot currently be verified.
+- **Public Launch Status**: **BLOCKED (P0)** until Issue #5 is resolved and live database-backed smoke tests pass.
 
 ### Verification Benchmark Metrics:
-- **API Vitest Tests**: `577 / 577 passed` (42 test suites)
-- **Search Package Vitest Tests**: `19 / 19 passed` (3 test suites)
-- **Combined Platform Tests**: `596 / 596 passed`
-- **TypeScript Typecheck**: `10 / 10 successful` across workspace
-- **Applied Database Migrations**: `17 / 17 applied`
+- **PR #6 isolated checks**: Frozen install passed; TypeScript 10/10 tasks; API tests 609/609 (49 files); Search tests 19/19 (3 files); workspace build 6/6 tasks and 28/28 Next.js pages.
+- **Lint**: Not verified; package lint scripts are `echo` placeholders and are not real lint checks.
+- **Preview verification**: API preview is READY but its live route is protected by Vercel SSO; live HTTP verification remains incomplete. PR #6 remains Draft and unmerged.
+- **Production verification**: Search/categories are failing; a successful build or READY deployment must not be interpreted as a successful end-to-end release.
+- **Migration verification**: 17 migration directories are present in source; current production application state remains unverified until the approved database connection is restored.
 
 ---
 
@@ -191,6 +193,6 @@ To ensure absolute factual integrity, deferred components are explicitly marked:
 ---
 
 <div align="center">
-<b>WAYNAH ARCHITECTURE SPECIFICATION — FACTUALLY VERIFIED & CLOSED</b>  
+<b>WAYNAH ARCHITECTURE SPECIFICATION — DESIGN REFERENCE; PRODUCTION VERIFICATION OPEN</b>  
 <i>Engineered by M.GH.AL</i>
 </div>
