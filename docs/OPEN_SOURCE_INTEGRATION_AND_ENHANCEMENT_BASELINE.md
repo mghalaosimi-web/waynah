@@ -30,6 +30,17 @@ Adopt a **capability integration** model:
 
 These projects are complementary engines, not a complete place-discovery product. None supplies WAYNAH's Yemen-specific administrative hierarchy, local trust, verification workflows, business ownership, moderation, Arabic UX, or product-specific domain model.
 
+### Full-platform references checked
+
+| Project | License | What it offers | WAYNAH decision |
+|---|---|---|---|
+| [OpenMapX](https://github.com/OpenMapX/openmapx) | AGPL-3.0-or-later | The closest full map-platform reference: place search, directions, public transit, saved lists, map layers, optional imagery/weather/reviews, offline continuation, an admin panel, and pluggable services/integrations. Its documented core stack includes PostgreSQL/PostGIS, Valkey, a reverse proxy, data-manager, operations agent, and optional Photon/Valhalla/tile services. | **Best architectural and UX reference, not a drop-in replacement.** Its AGPL network-source obligations, separate domain model, service-heavy Docker deployment, and operational footprint make a wholesale adoption unsuitable without a deliberate licensing and migration decision. Study its service manifest, integration contracts, admin operations, offline behavior, and provider boundaries; reimplement compatible ideas inside WAYNAH's architecture. |
+| [Mapforge](https://github.com/mapforge-org/mapforge) | AGPL-3.0 | Polished collaborative GIS map editor with MapLibre, 3D layers, GeoJSON/GPX/KML import/export, Overpass layers, routing and PWA. | **Map interaction reference only.** It is a map-authoring tool, not a verified local directory; Rails/MongoDB/Redis/Action Cable are a different stack and AGPL applies. |
+| [LeadForge](https://github.com/MuhammadMuneeb007/LeadForge) | MIT | Map-first discovery of public business listings from OSM/Overpass, radius/category filters, local saved lists, exports, responsive UI. | **Useful UX and bounded-query reference.** It has no server database or account/trust/moderation system; not a WAYNAH backend. |
+| [TRIP](https://github.com/itskovacs/TRIP) | MIT | Self-hosted POI map tracker, itinerary planning and collaboration. | **Useful POI/list UX reference.** It is primarily a trip planner, not a public local-services discovery and verification platform. |
+
+OpenMapX is the strongest single repository to study for the overall map-service architecture, while LeadForge is closer to the public-business discovery interaction. Neither replaces WAYNAH's Yemen-specific domain, provenance, trust, verification, business, and administrative capabilities. A code-level reuse decision must be made against the exact upstream commit and all bundled third-party licenses.
+
 ## 3. Integration boundaries
 
 ### Map rendering
