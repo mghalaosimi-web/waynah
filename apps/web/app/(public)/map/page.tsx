@@ -37,8 +37,8 @@ function MapPageContent() {
   const latStr = searchParams.get('lat');
   const lngStr = searchParams.get('lng');
 
-  const parsedLat = latStr === null ? null : Number(latStr);
-  const parsedLng = lngStr === null ? null : Number(lngStr);
+  const parsedLat = latStr === null || latStr.trim() === '' ? null : Number(latStr);
+  const parsedLng = lngStr === null || lngStr.trim() === '' ? null : Number(lngStr);
   const hasValidUrlCoordinates = isValidCoordinate(parsedLat, parsedLng);
   const initialLat = hasValidUrlCoordinates ? parsedLat! : WAYNAH_DEFAULT_MAP_CENTER.latitude;
   const initialLng = hasValidUrlCoordinates ? parsedLng! : WAYNAH_DEFAULT_MAP_CENTER.longitude;
