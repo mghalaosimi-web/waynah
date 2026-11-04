@@ -182,7 +182,13 @@ function makeMockPrisma() {
         return Promise.resolve(null);
       }),
     },
-    place: { count: vi.fn().mockResolvedValue(20) },
+    place: {
+      count: vi.fn().mockImplementation(({ where } = {}) => {
+        if (where?.verificationStatus === 'VERIFIED') return Promise.resolve(7);
+        if (where?.verificationStatus === 'UNVERIFIED') return Promise.resolve(12);
+        return Promise.resolve(20);
+      }),
+    },
     category: { count: vi.fn().mockResolvedValue(8) },
     governorate: { count: vi.fn().mockResolvedValue(22) },
     district: { count: vi.fn().mockResolvedValue(333) },
