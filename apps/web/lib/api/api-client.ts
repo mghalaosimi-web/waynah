@@ -146,6 +146,25 @@ export interface BusinessInvitationItem {
 
 export type BusinessVerificationStatus = 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED';
 
+export type AdminPlaceStatus = 'UNVERIFIED' | 'VERIFIED' | 'CLAIMED' | 'REPORTED' | 'CLOSED';
+
+export interface AdminPlaceListItem {
+  id: string;
+  nameAr: string;
+  nameEn?: string | null;
+  address?: string | null;
+  verificationStatus: AdminPlaceStatus;
+  updatedAt: string;
+  category?: { id: string; nameAr: string; nameEn?: string | null; slug: string } | null;
+  district?: {
+    id: string;
+    nameAr: string;
+    nameEn?: string | null;
+    governorate?: { id: string; nameAr: string; nameEn?: string | null } | null;
+  } | null;
+  business?: { id: string; name: string; slug?: string | null } | null;
+}
+
 export interface AdminVerificationStats {
   pendingCount: number;
   verifiedCount: number;
@@ -1467,6 +1486,30 @@ export class ApiClient {
   public async getAdminVerifications(status?: string): Promise<ApiResponse<BusinessVerificationData[]>> {
     const endpoint = `/v1/admin/verifications${status ? `?status=${status}` : ''}`;
     return this.request<BusinessVerificationData[]>(endpoint);
+  }
+
+  /**
+   * Paginated canonical place list for administrative review.
+   */
+  public async getAdminPlaces(filters: {
+    query?: string;
+    status?: AdminPlaceStatus;
+    categoryId?: string;
+    districtId?: string;
+    page?: number;
+    limit?: number;
+  } = {}): Promise<ApiResponse<AdminPlaceListItem[]>> {
+    const params = new URLSearchParams();
+    if (filters.query) params.set('query', filters.query);
+    if (filters.status) params.set('status', filters.status);
+    if (filters.categoryId) params.set('categoryId', filters.categoryId);
+    if (filters.districtId) params.set('districtId', filters.districtId);
+    if (filters.page) params.set('page', String(filters.page));
+    if (filters.limit) params.set('limit', String(filters.limit));
+    const queryString = params.toString();
+    return this.request<AdminPlaceListItem[]>(
+      `/v1/admin/places${queryString ? `?${queryString}` : ''}`
+    );
   }
 
   /**
