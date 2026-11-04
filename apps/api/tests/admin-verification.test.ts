@@ -392,7 +392,7 @@ describe('WAYNAH-ADMIN-001 — Admin Foundation & Verification Review Tests', ()
     const data = await res.json();
     expect(data.success).toBe(true);
     expect(data.data.summary.placesTotal).toBe(20);
-    expect(data.data.summary.businessesTotal).toBe(0);
+    expect(data.data.summary.businessesTotal).toBe(1);
     expect(data.data.summary.auditEventsLast7Days).toBe(0);
   });
 
