@@ -182,6 +182,27 @@ function makeMockPrisma() {
         return Promise.resolve(null);
       }),
     },
+    place: {
+      count: vi.fn().mockResolvedValue(20),
+      findMany: vi.fn().mockResolvedValue([
+        {
+          id: 'place-1',
+          nameAr: 'مستشفى حجة العام',
+          nameEn: 'Hajjah General Hospital',
+          address: 'حجة، اليمن',
+          verificationStatus: 'UNVERIFIED',
+          updatedAt: new Date('2026-11-04T10:00:00.000Z'),
+          category: { id: 'cat-1', nameAr: 'مستشفى', nameEn: 'Hospital', slug: 'hospital' },
+          district: {
+            id: 'district-1',
+            nameAr: 'مدينة حجة',
+            nameEn: 'Hajjah City',
+            governorate: { id: 'gov-1', nameAr: 'حجة', nameEn: 'Hajjah' },
+          },
+          business: null,
+        },
+      ]),
+    },
     $transaction: vi.fn().mockImplementation((cb) =>
       cb({
         business: {
@@ -367,6 +388,19 @@ describe('WAYNAH-ADMIN-001 — Admin Foundation & Verification Review Tests', ()
     expect(data.success).toBe(true);
     expect(data.data.id).toBe(verificationId);
     expect(data.data.business.name).toBe('مجموعة المجد التجارية');
+  });
+
+  it('Admin can list canonical places with pagination', async () => {
+    const res = await app.request('/v1/admin/places?page=1&limit=20', {
+      headers: { Authorization: `Bearer ${adminToken}` },
+    });
+
+    expect(res.status).toBe(200);
+    const data = await res.json();
+    expect(data.success).toBe(true);
+    expect(data.data).toHaveLength(1);
+    expect(data.data[0].nameAr).toBe('مستشفى حجة العام');
+    expect(data.meta).toMatchObject({ page: 1, limit: 20, total: 20, totalPages: 1 });
   });
 
   // --- REVIEW ACTION & TRANSITION TESTS ---
