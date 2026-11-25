@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { apiClient, type PlaceCategory, type PlaceSearchResult } from '../../lib/api/api-client';
 import {
   ArrowLeft, Bell, Bookmark, Building2, CalendarDays, Check,
