@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { apiClient, type PlaceCategory, type PlaceSearchResult } from '../../lib/api/api-client';
 import {
   ArrowLeft, Bell, Bookmark, Building2, CalendarDays, Check,
   ChevronDown, Compass, Filter, Heart, Home, MapPin,
@@ -53,6 +54,30 @@ export default function ProductExperiencePage() {
   const [notice, setNotice] = useState('');
   const [bookingSent, setBookingSent] = useState(false);
   const [contributionSent, setContributionSent] = useState(false);
+  const [liveCategories, setLiveCategories] = useState<PlaceCategory[]>([]);
+  const [livePlaces, setLivePlaces] = useState<PlaceSearchResult[]>([]);
+  const [liveLoading, setLiveLoading] = useState(false);
+  const [liveError, setLiveError] = useState<string | null>(null);
+  const [liveCategoryId, setLiveCategoryId] = useState<string | undefined>(undefined);
+  const [liveQuery, setLiveQuery] = useState('');
+
+  const searchLivePlaces = useCallback(async (nextQuery = liveQuery, categoryId = liveCategoryId) => {
+    setLiveLoading(true);
+    setLiveError(null);
+    const result = await apiClient.searchPlaces({ query: nextQuery.trim() || undefined, categoryId, limit: 12 });
+    setLiveLoading(false);
+    if (result.success && result.data) setLivePlaces(result.data);
+    else setLiveError(typeof result.error === 'string' ? result.error : result.error?.message || 'تعذر تحميل الأماكن من خدمة WAYNAH.');
+  }, [liveQuery, liveCategoryId]);
+
+  useEffect(() => {
+    let active = true;
+    apiClient.getCategories().then((result) => {
+      if (active && result.success && result.data) setLiveCategories(result.data);
+    }).catch(() => undefined);
+    searchLivePlaces('', undefined);
+    return () => { active = false; };
+  }, []);
 
   const visibleListings = useMemo(() => listings.filter((item) => {
     const matchesQuery = `${item.name} ${item.category} ${item.district}`.toLowerCase().includes(query.trim().toLowerCase());
