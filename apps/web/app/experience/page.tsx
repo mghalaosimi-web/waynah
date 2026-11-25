@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { apiClient, type PlaceCategory, type PlaceSearchResult } from '../../lib/api/api-client';
 import {
   ArrowLeft, Bell, Bookmark, Building2, CalendarDays, Check,
-  ChevronDown, Compass, Filter, Heart, Home, MapPin,
+  ChevronDown, Compass, Heart, Home, MapPin,
   Search, ShoppingBag, SlidersHorizontal, Sparkles, Store, Truck, UserRound, Map as MapIcon,
   X,
 } from 'lucide-react';
@@ -28,7 +28,6 @@ const listings: Listing[] = [
   { id: 'demo-05', name: 'خدمة تعليمية — مثال توضيحي', category: 'تعليم', district: 'حجة · بيانات تجريبية', description: 'سجل تجريبي يوضح كيفية تنظيم المؤسسات التعليمية.', status: 'بيانات تجريبية', kind: 'place' },
 ];
 
-const categories = ['الكل', 'مطاعم', 'مقاهي', 'تسوق', 'صحة', 'تعليم', 'سياحة', 'نقل', 'خدمات عامة'];
 const modules = [
   { id: 'market', title: 'السوق المحلي', subtitle: 'منتجات وسلال وطلبات تجريبية', icon: ShoppingBag, state: 'عرض تفاعلي' },
   { id: 'delivery', title: 'التوصيل والخدمات اللوجستية', subtitle: 'إنشاء طلب وتتبع حالات توضيحية', icon: Truck, state: 'محاكاة' },
@@ -46,7 +45,6 @@ const products = [
 export default function ProductExperiencePage() {
   const [tab, setTab] = useState<Tab>('home');
   const [query, setQuery] = useState('');
-  const [category, setCategory] = useState('الكل');
   const [saved, setSaved] = useState<string[]>([]);
   const [cart, setCart] = useState<Record<string, number>>({});
   const [activeListing, setActiveListing] = useState<Listing | null>(null);
@@ -78,12 +76,6 @@ export default function ProductExperiencePage() {
     searchLivePlaces('', undefined);
     return () => { active = false; };
   }, []);
-
-  const visibleListings = useMemo(() => listings.filter((item) => {
-    const matchesQuery = `${item.name} ${item.category} ${item.district}`.toLowerCase().includes(query.trim().toLowerCase());
-    const matchesCategory = category === 'الكل' || item.category === category;
-    return matchesQuery && matchesCategory;
-  }), [query, category]);
 
   const savedListings = listings.filter((item) => saved.includes(item.id));
   const cartCount = Object.values(cart).reduce((sum, count) => sum + count, 0);
