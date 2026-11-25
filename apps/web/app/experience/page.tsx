@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
-  ArrowLeft, ArrowUpLeft, Bell, Bookmark, Building2, CalendarDays, Check,
-  ChevronDown, Compass, Filter, Heart, Home, MapPin, Menu, Package,
+  ArrowLeft, Bell, Bookmark, Building2, CalendarDays, Check,
+  ChevronDown, Compass, Filter, Heart, Home, MapPin,
   Search, ShoppingBag, SlidersHorizontal, Sparkles, Store, Truck, UserRound,
   X,
 } from 'lucide-react';
@@ -208,7 +208,7 @@ function ListingGrid({ items, saved, onOpen, onSave }: { items: Listing[]; saved
   return <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{items.map((item) => <article key={item.id} className="overflow-hidden rounded-2xl border border-[#D8D5CC] bg-white"><div className="relative flex h-28 items-center justify-center overflow-hidden bg-[#EAE4D8]"><div className="absolute inset-0 opacity-40" style={{ backgroundImage: 'repeating-radial-gradient(ellipse at 80% 30%, transparent 0 18px, #B9AD98 19px 20px, transparent 21px 36px)' }} /><span className="relative rounded-full border border-[#C9BDA9] bg-white/80 px-3 py-1 text-[10px] font-bold text-[#8B6B37]">مثال توضيحي · ليس موقعاً حقيقياً</span></div><div className="p-4"><div className="flex items-start justify-between gap-2"><div><h3 className="text-sm font-black">{item.name}</h3><p className="mt-1 text-[11px] text-[#64716A]">{item.category} · {item.district}</p></div><button onClick={() => onSave(item.id)} aria-label={saved.includes(item.id) ? 'إزالة من المحفوظات' : 'حفظ'} className={`rounded-full p-2 ${saved.includes(item.id) ? 'bg-[#F7EBD1] text-[#9A6B1F]' : 'bg-[#F4F1EA] text-[#64716A]'}`}><Heart size={16} fill={saved.includes(item.id) ? 'currentColor' : 'none'} /></button></div><div className="mt-4 flex items-center justify-between border-t border-[#EEEAE2] pt-3"><span className="text-[10px] font-bold text-[#9A7740]">{item.status}</span><button onClick={() => onOpen(item)} className="text-xs font-black text-[#123C32]">التفاصيل ←</button></div></div></article>)}</div>;
 }
 
-function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
   return <div className="fixed inset-0 z-50 flex items-end justify-center bg-[#18201D]/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}><section role="dialog" aria-modal="true" aria-label={title} className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-t-[28px] bg-[#FBFAF7] p-6 shadow-2xl sm:rounded-[28px]"><div className="mb-5 flex items-center justify-between gap-3"><h2 className="text-lg font-black">{title}</h2><button onClick={onClose} aria-label="إغلاق النافذة" className="rounded-full bg-[#EEEAE2] p-2"><X size={18} /></button></div>{children}</section></div>;
 }
 
